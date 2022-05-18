@@ -16,8 +16,8 @@
 //
 // =============================================================
 
-#include "shared_functions.h"
-#include "operator.h"
+#include "shared_functions.hpp"
+#include "operator.hpp"
 #include "nlohmann/json.hpp"
 
 #include <iostream>
