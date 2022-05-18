@@ -1,5 +1,4 @@
 #include "context.hpp"
-#include "scene.hpp"
 #include "exec.hpp"
 
 void bxx::context::set_mode(bxx::editor_mode mode)
