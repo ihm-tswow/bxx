@@ -20,7 +20,8 @@ blender_python_version = blender_version_map[blender_version]
 cur_python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
 
 if blender_python_version != cur_python_version:
-    raise Exception(f"Using wrong python version {cur_python_version}, blender version {blender_version} needs {blender_python_version}")
+    #raise Exception(f"Using wrong python version {cur_python_version}, blender version {blender_version} needs {blender_python_version}")
+    pass
 
 build_core = "--build-core" in sys.argv
 build_scripts = '--build-scripts' in sys.argv
