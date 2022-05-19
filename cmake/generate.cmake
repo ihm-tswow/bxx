@@ -102,6 +102,7 @@ endif()
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 add_custom_target(
   core
+  ALL
   COMMAND
     ${PYTHON_BIN} setup.py build_ext --inplace
   WORKING_DIRECTORY
