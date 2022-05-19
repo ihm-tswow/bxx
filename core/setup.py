@@ -5,12 +5,13 @@ import os
 source_files = [
     '../common/shared_functions.cpp',
     '../common/exec.cpp',
+    '../common/preferences.cpp',
     'core_cxx.cpp',
-    'core.pyx'
+    'core.pyx',
 ]
 
 include_dirs = [
-    '../common'
+    '../common',
 ]
 
 extensions = [

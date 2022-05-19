@@ -1,4 +1,6 @@
-#include "shared_functions.hpp"
+#include "../common/shared_functions.hpp"
+#include "../common/preferences.hpp"
+#include "../common/exec.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -59,7 +61,13 @@ static void unload_script(library_handle const& handle)
 
 static fs::path get_dll_path(std::string const& script_name)
 {
-    return root_path / "build" / "RelWithDebInfo" / (script_name + ".dll");
+    std::string version = eval_string(
+        "out = "
+        "str(bpy.app.version[0]) + '.' +"
+        "str(bpy.app.version[1]) + '.' +"
+        "str(bpy.app.version[2])"
+    );
+    return root_path / "build" / bxx::preferences::get_string("loaded_build_type","Debug") / (script_name + "-" + version + ".dll");
 }
 
 static void load_script(std::string const& script_name)
