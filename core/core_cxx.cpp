@@ -1,6 +1,8 @@
+// relative imports because cmake can't add include directories for custom targets
 #include "../common/shared_functions.hpp"
 #include "../common/preferences.hpp"
 #include "../common/exec.hpp"
+#include "../common/tests.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -10,6 +12,7 @@ namespace fs = std::filesystem;
 typedef void (*script_register_ct)(char const* script_name, shared_functions* functions);
 typedef void (*script_unregister_ct)();
 typedef void (*cy_unregister_script_ct)(char*);
+typedef bxx::test_collection* (*__register_tests_ct)();
 
 static cy_unregister_script_ct _cy_unregister_script = nullptr;
 
@@ -22,6 +25,7 @@ static cy_unregister_script_ct _cy_unregister_script = nullptr;
     #define SL_EXT ".dll"
 #endif
 
+// Functions called from cython
 extern "C" {
     void setup_cxx(
         char* path,
@@ -35,6 +39,7 @@ extern "C" {
     void register_cxx();
     void unregister_cxx();
     void auto_reload_cxx();
+    void run_tests(char* include, char* exclude);
 }
 
 static shared_functions functions;
@@ -147,6 +152,27 @@ void auto_reload_cxx()
         if (old == libraries.end() || old->second.m_ctime != fs::last_write_time(get_dll_path(script_name)))
         {
             load_script(script_name);
+        }
+    }
+}
+
+void run_tests(char* include, char* exclude)
+{
+    std::cout << "== Running Tests == \n";
+    for (auto const& [name,library] : libraries)
+    {
+        __register_tests_ct __register_tests = (__register_tests_ct)SL_FN(library.m_library, "__register__tests");
+        if (__register_tests)
+        {
+            bxx::test_collection* col = __register_tests();
+            if (col)
+            {
+                for (int i = 0; i < col->m_count; ++i)
+                {
+                    std::cout << "Test:" << name << "_" << col->m_entries[i].m_name << "\n";
+                    col->m_entries[i].test_ptr();
+                }
+            }
         }
     }
 }

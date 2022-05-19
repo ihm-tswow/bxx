@@ -139,6 +139,21 @@ target_link_libraries(
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
+# - unit tests-
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+add_custom_target(
+  generate_tests
+  ALL ${PYTHON_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/bxx/testing/generate.py
+  WORKING_DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}
+  SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/testing/generate.py
+)
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
 # - scripts -
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -161,7 +176,13 @@ foreach(child ${children})
     file(GLOB_RECURSE script_files ${full}/*)
     file(GLOB_RECURSE script_files_rel RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${full}/*)
     set(OLD_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
-    add_library(${child} SHARED ${script_files} ${scripts_core})
+    add_library(${child} SHARED
+      ${script_files}
+      ${scripts_core}
+      ${full}/tests.generated.cpp
+    )
+    source_group("refs" FILES "${full}\\tests.generated.cpp")
+    add_dependencies(${child} generate_tests)
     set_target_properties(${child} PROPERTIES RELWITHDEBINFO_POSTFIX -${BLENDER_VERSION})
     set_target_properties(${child} PROPERTIES RELEASE_POSTFIX -${BLENDER_VERSION})
     set_target_properties(${child} PROPERTIES DEBUG_POSTFIX -${BLENDER_VERSION})

@@ -1,3 +1,4 @@
 build
 *.pyd
-core/core.c
+core/core_cy.c
+__pycache__

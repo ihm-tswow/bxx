@@ -7,7 +7,7 @@ source_files = [
     '../common/exec.cpp',
     '../common/preferences.cpp',
     'core_cxx.cpp',
-    'core.pyx',
+    'core_cy.pyx',
 ]
 
 include_dirs = [
@@ -15,7 +15,7 @@ include_dirs = [
 ]
 
 extensions = [
-    Extension("core",
+    Extension("core_cy",
         source_files,
         extra_compile_args = ['/std:c++20']
     )
