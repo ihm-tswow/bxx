@@ -109,7 +109,8 @@ add_custom_target(
     ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core
   SOURCES
     bxx/core/core_cxx.cpp
-    bxx/core/core.pyx
+    bxx/core/core_cy.pyx
+    bxx/core/core.py
     bxx/core/setup.py
 )
 
@@ -143,14 +144,13 @@ target_link_libraries(
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 add_custom_target(
-  generate_tests
-  ALL ${PYTHON_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/bxx/testing/generate.py
+  generate_scripts
+  ALL ${PYTHON_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/generate_scripts.py
   WORKING_DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}
   SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/testing/generate.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/generate_scripts.py
 )
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -166,7 +166,7 @@ function(generate_filetree files)
   endforeach()
 endfunction()
 
-set(scripts_core ${CMAKE_CURRENT_SOURCE_DIR}/bxx/scripts/script_core.cpp)
+set(scripts_core ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core/core_script.cpp)
 source_group("refs" FILES "${CMAKE_CURRENT_SOURCE_DIR}\\CMakeLists.txt" ${scripts_core})
 
 file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts/*)
@@ -176,13 +176,18 @@ foreach(child ${children})
     file(GLOB_RECURSE script_files ${full}/*)
     file(GLOB_RECURSE script_files_rel RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${full}/*)
     set(OLD_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
+    if(EXISTS "${full}/calls.generated.cpp")
+    else()
+      file(TOUCH "${full}/calls.generated.cpp")
+    endif()
+
     add_library(${child} SHARED
       ${script_files}
       ${scripts_core}
-      ${full}/tests.generated.cpp
+      ${full}/calls.generated.cpp
     )
-    source_group("refs" FILES "${full}\\tests.generated.cpp")
-    add_dependencies(${child} generate_tests)
+    source_group("refs" FILES "${full}\\calls.generated.cpp")
+    add_dependencies(${child} generate_scripts)
     set_target_properties(${child} PROPERTIES RELWITHDEBINFO_POSTFIX -${BLENDER_VERSION})
     set_target_properties(${child} PROPERTIES RELEASE_POSTFIX -${BLENDER_VERSION})
     set_target_properties(${child} PROPERTIES DEBUG_POSTFIX -${BLENDER_VERSION})

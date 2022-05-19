@@ -1,6 +1,6 @@
 #include <string>
 
-#define TEST(name) void name()
+#define BXX_TEST(name) void __test_##name()
 
 namespace bxx
 {

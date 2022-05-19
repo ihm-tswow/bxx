@@ -28,6 +28,7 @@ extern "C" {
     __declspec(dllexport) void _fire_operator(char const* op, char const* json);
 }
 
+void __register_operators();
 void __set_script_name(std::string const& script_name);
 void __init_pointers_store(shared_functions* functions);
 
@@ -38,6 +39,7 @@ void _script_register(char const* script_name, shared_functions* functions)
 {
     __init_pointers_store(functions);
     __set_script_name(script_name);
+    __register_operators();
     script_register();
 }
 

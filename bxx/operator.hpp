@@ -8,6 +8,8 @@
 #include <map>
 #include <set>
 
+#define BXX_OPERATOR(x) void __register_##x(bxx::operator_builder & x)
+
 namespace bxx
 {
     struct operator_parameter
