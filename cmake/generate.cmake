@@ -174,7 +174,12 @@ foreach(child ${children})
   set(full "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
   if(IS_DIRECTORY ${full})
     file(GLOB_RECURSE script_files ${full}/*)
-    file(GLOB_RECURSE script_files_rel RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${full}/*)
+    file(GLOB_RECURSE script_files_rel
+      RELATIVE
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+      ${full}/*
+    )
+    list(REMOVE_ITEM script_files_rel ${child}/calls.generated.cpp)
     set(OLD_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
     if(EXISTS "${full}/calls.generated.cpp")
     else()
@@ -198,7 +203,7 @@ foreach(child ${children})
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
     )
     target_link_libraries(${child} PRIVATE bxx)
-    generate_filetree(${script_files_rel})
+    generate_filetree("${script_files_rel}")
   endif()
 endforeach()
 
