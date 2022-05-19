@@ -56,7 +56,7 @@ if(WIN32)
   set(PYTHON_PATH ${${PYTHON_ID}_SOURCE_DIR})
   set(PYTHON_BIN ${PYTHON_PATH}/python.exe)
   file(DOWNLOAD
-    https://bootstrap.pypa.io/get-pip.py
+    "${PIP_DOWNLOAD}"
     "${PYTHON_PATH}/get-pip.py"
   )
 
