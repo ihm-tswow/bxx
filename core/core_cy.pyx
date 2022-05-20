@@ -2,6 +2,8 @@ import os
 import bpy
 import json
 from ...preferences import preferences
+from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
+from ..third_party.lock import FileLock
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -123,14 +125,25 @@ cdef extern void setup_cxx(
 );
 cdef extern void auto_reload_cxx();
 
+def get_root_dir():
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+def auto_reload_lockfile_path():
+    return os.path.join(get_root_dir(), AUTO_RELOAD_LOCK_FILE)
+
+if os.path.exists(auto_reload_lockfile_path()):
+    try:
+        os.remove(auto_reload_lockfile_path())
+    except:
+        print("Failed to remove lockfile, automatic reloading can become unstable")
+
 setup_cxx(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))).encode('utf-8'),
+    get_root_dir().encode('utf-8'),
     _exec,
     eval_ptr,
     eval_int,
     eval_float,
     eval_string,
-
     unregister_script,
 );
 
@@ -138,8 +151,12 @@ def auto_reload_delay():
     return preferences.get('auto_reload_interval',0.25)
 
 def auto_reload():
-    if preferences.get('auto_reload_scripts', False):
-        auto_reload_cxx()
+    if os.path.exists(os.path.join(get_root_dir(), AUTO_RELOAD_CONFIG_FILE)):
+        try:
+            with FileLock(auto_reload_lockfile_path(),0.001):
+                auto_reload_cxx()
+        except:
+            print("Libraries were busy, not loading")
     return auto_reload_delay()
 
 def register():

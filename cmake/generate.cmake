@@ -259,10 +259,17 @@ foreach(child ${children})
     )
     source_group("refs" FILES "${full}\\calls.generated.cpp")
     add_dependencies(${child} generate_scripts)
-    set_target_properties(${child} PROPERTIES RELWITHDEBINFO_POSTFIX -${BLENDER_VERSION})
-    set_target_properties(${child} PROPERTIES RELEASE_POSTFIX -${BLENDER_VERSION})
-    set_target_properties(${child} PROPERTIES DEBUG_POSTFIX -${BLENDER_VERSION})
-    set_target_properties(${child} PROPERTIES MINSIZEREL_POSTFIX -${BLENDER_VERSION})
+
+    add_custom_command(
+      TARGET ${child}
+      POST_BUILD
+      COMMAND ${PYTHON_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/rename_lib.py
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${BLENDER_VERSION}
+        ${CMAKE_BUILD_TYPE}
+        $<TARGET_FILE:${child}>
+    )
+
     target_include_directories(
       ${child} PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx
@@ -273,15 +280,24 @@ foreach(child ${children})
   endif()
 endforeach()
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bxx"
-        DESTINATION "./"
-          PATTERN "*/build" EXCLUDE
-          PATTERN "*core.c" EXCLUDE
-          PATTERN "*.git" EXCLUDE
-        )
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bxx"
+  DESTINATION "./"
+  PATTERN "*/build" EXCLUDE
+  PATTERN "*core.c" EXCLUDE
+  PATTERN "*.git" EXCLUDE
+)
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts" DESTINATION "./")
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Debug" DESTINATION "./build" FILES_MATCHING PATTERN "*.dll")
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo" DESTINATION "./build" FILES_MATCHING PATTERN "*.dll")
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Release" DESTINATION "./build" FILES_MATCHING PATTERN "*.dll")
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MinSizeRel" DESTINATION "./build" FILES_MATCHING PATTERN "*.dll")
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
+  DESTINATION "./"
+)
+
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+  DESTINATION "./"
+  FILES_MATCHING
+    PATTERN "*.dll"
+    PATTERN "*.so"
+    PATTERN "*.dylib"
+)

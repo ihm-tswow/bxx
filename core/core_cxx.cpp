@@ -57,6 +57,7 @@ struct library_handle
     fs::file_time_type m_ctime;
     sl_ptr_ct m_library;
     std::string m_name;
+    fs::path m_load_path;
 };
 static std::map<std::string,library_handle> libraries;
 
@@ -69,6 +70,7 @@ static void unload_script(library_handle const& handle)
     }
     _cy_unregister_script(const_cast<char*>(handle.m_name.c_str()));
     SL_CLOSE(handle.m_library);
+    fs::remove(handle.m_load_path);
 }
 
 static fs::path get_dll_path(std::string const& script_name)
@@ -79,7 +81,7 @@ static fs::path get_dll_path(std::string const& script_name)
         "str(bpy.app.version[1]) + '.' +"
         "str(bpy.app.version[2])"
     );
-    return root_path / "build" / bxx::preferences::get_string("loaded_build_type","Debug") / (script_name + "-" + version + SL_EXT);
+    return root_path / "lib" / (script_name + "-" + version + SL_EXT);
 }
 
 static void load_script(std::string const& script_name)
@@ -87,7 +89,7 @@ static void load_script(std::string const& script_name)
     fs::path dll_path = get_dll_path(script_name);
     if(!fs::exists(dll_path))
     {
-        std::cout << "Error: Could not find library file for script " << script_name << "\n";
+        std::cout << "Error: Could not find library file " << dll_path << "\n";
         return;
     }
 
@@ -100,20 +102,20 @@ static void load_script(std::string const& script_name)
 
     // copy to a separate file so we can rebuild in peace
     fs::file_time_type last_write = fs::last_write_time(dll_path);
-    fs::path dll_lock_path = dll_path.string() + ".lock";
+    fs::path dll_load_path = dll_path.string() + ".load";
 
     try
     {
         // unix: todo: add lock file writing here
         // windows: throws exception if compiler is writing the file, just ignore that and try again
-        fs::copy(dll_path,dll_lock_path,fs::copy_options::overwrite_existing);
+        fs::copy(dll_path,dll_load_path,fs::copy_options::overwrite_existing);
     }
     catch(...) // todo: specify error
     {
         return;
     }
 
-    sl_ptr_ct dll = SL_LOAD(dll_lock_path.string().c_str());
+    sl_ptr_ct dll = SL_LOAD(dll_load_path.string().c_str());
 
     if (dll == nullptr)
     {
@@ -121,7 +123,7 @@ static void load_script(std::string const& script_name)
         return;
     }
 
-    libraries[script_name] = {last_write,dll,script_name};
+    libraries[script_name] = {last_write,dll,script_name,dll_load_path};
 
     script_register_ct script_register = (script_register_ct) SL_FN(dll, "_script_register");
     if(!script_register)
