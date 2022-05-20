@@ -28,7 +28,7 @@ if not os.path.exists(lib_dir):
 lib_name = os.path.basename(build_file)[prefix_len:-len(ext)]
 
 def write_lib():
-    shutil.copyfile(build_file,os.path.join(lib_dir,lib_name + '-' + blender_version + ext))
+    shutil.copyfile(build_file,os.path.join(lib_dir,lib_name + ext))
 
 if os.path.exists(AUTO_RELOAD_CONFIG_FILE):
     try:
