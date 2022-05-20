@@ -27,8 +27,8 @@ extensions = [
     Extension("core_cy",
         source_files,
         extra_compile_args = [
-            '-std=c++2a' if platform.system() == 'Linux' else
-            '/std:c++20'
+            '-std=c++17' if platform.system() == 'Linux' else
+            '/std:c++17'
         ]
     )
 ]
