@@ -1,6 +1,14 @@
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import os
+import sys
+import platform
+
+python_include = ''
+for arg in sys.argv:
+    if arg.startswith('python-include='):
+        python_include = arg[len('python-include='):]
+        sys.argv.remove(arg)
 
 source_files = [
     '../common/shared_functions.cpp',
@@ -12,12 +20,16 @@ source_files = [
 
 include_dirs = [
     '../common',
+    python_include,
 ]
 
 extensions = [
     Extension("core_cy",
         source_files,
-        extra_compile_args = ['/std:c++20']
+        extra_compile_args = [
+            '-std=c++2a' if platform.system() == 'Linux' else
+            '/std:c++20'
+        ]
     )
 ]
 

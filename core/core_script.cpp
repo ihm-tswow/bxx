@@ -19,14 +19,13 @@
 #include "shared_functions.hpp"
 #include "operator.hpp"
 #include "nlohmann/json.hpp"
+#include "api.hpp"
 
 #include <iostream>
 
-extern "C" {
-    __declspec(dllexport) void _script_register(char const* script_name, shared_functions* functions);
-    __declspec(dllexport) void _script_unregister();
-    __declspec(dllexport) void _fire_operator(char const* op, char const* json);
-}
+BXX_API void _script_register(char const* script_name, shared_functions* functions);
+BXX_API void _script_unregister();
+BXX_API void _fire_operator(char const* op, char const* json);
 
 void __register_operators();
 void __set_script_name(std::string const& script_name);

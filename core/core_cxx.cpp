@@ -23,6 +23,13 @@ static cy_unregister_script_ct _cy_unregister_script = nullptr;
     #define SL_LOAD LoadLibrary
     #define SL_CLOSE FreeLibrary
     #define SL_EXT ".dll"
+#else
+    #include <dlfcn.h>
+    typedef void* sl_ptr_ct;
+    #define SL_FN dlsym
+    #define SL_LOAD(x) dlopen(x,RTLD_LAZY)
+    #define SL_CLOSE dlclose
+    #define SL_EXT ".so"
 #endif
 
 // Functions called from cython
@@ -72,7 +79,7 @@ static fs::path get_dll_path(std::string const& script_name)
         "str(bpy.app.version[1]) + '.' +"
         "str(bpy.app.version[2])"
     );
-    return root_path / "build" / bxx::preferences::get_string("loaded_build_type","Debug") / (script_name + "-" + version + ".dll");
+    return root_path / "build" / bxx::preferences::get_string("loaded_build_type","Debug") / (script_name + "-" + version + SL_EXT);
 }
 
 static void load_script(std::string const& script_name)

@@ -25,6 +25,7 @@ def generate_dir(script_root):
     generated = '\n'.join([
         f'#include "tests.hpp"',
         f'#include "operator.hpp"',
+        f'#include "api.hpp"',
         f'',
         f'// Generated test calls',
         f'',
@@ -39,21 +40,17 @@ def generate_dir(script_root):
             f'',
             f'static bxx::test_collection col = {{ cases, {len(all_tests)} }};',
             f'',
-            f'extern "C" {{',
-            f'    __declspec(dllexport) bxx::test_collection* __register__tests() {{',
-            f'        return &col;',
-            f'    }}',
+            f'BXX_API bxx::test_collection* __register__tests() {{',
+            f'    return &col;',
             f'}}',
             f'',
             f'',
         ])
     else:
         generated += '\n'.join([
-            f'extern "C" {{',
-            f'    __declspec(dllexport) bxx::test_collection* __register__tests() {{',
-            f'        return nullptr;',
-            f'    }}',
-            f'}}'
+            f'BXX_API bxx::test_collection* __register__tests() {{',
+            f'    return nullptr;',
+            f'}}',
             f'',
             f'',
         ])

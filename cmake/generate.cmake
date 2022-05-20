@@ -1,5 +1,18 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
+# - Build settings -
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+unset(CMAKE_BUILD_TYPE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if((NOT DEFINED CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
+  set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
 # - Version Processing -
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -14,11 +27,21 @@ set(BLENDER_DOWNLOAD "https://github.com/blender/blender/archive/refs/tags/v${BL
 set(PYTHON_WINDOWS_DEV_DOWNLOAD "https://www.nuget.org/api/v2/package/python/${PYTHON_VERSION}")
 set(PYTHON_WINDOWS_BIN_DOWNLOAD "https://www.python.org/ftp/python/${PYTHON_VERSION}/python-${PYTHON_VERSION}-embed-amd64.zip")
 
-string(SUBSTRING ${PYTHON_VERSION} 0 1 PYTHON_MAJOR_VERSION)
-string(SUBSTRING ${PYTHON_VERSION} 2 1 PYTHON_MINOR_VERSION)
-string(SUBSTRING ${PYTHON_VERSION} 4 1 PYTHON_MICRO_VERSION)
 set(BLENDER_ID blender-${BLENDER_VERSION})
 set(PYTHON_ID python-${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.${PYTHON_MICRO_VERSION})
+
+string(REPLACE "." ";" PYTHON_VERSION_LIST ${PYTHON_VERSION})
+list(GET PYTHON_VERSION_LIST 0 PYTHON_MAJOR_VERSION)
+list(GET PYTHON_VERSION_LIST 1 PYTHON_MINOR_VERSION)
+list(GET PYTHON_VERSION_LIST 2 PYTHON_MICRO_VERSION)
+
+string(REPLACE "." ";" BLENDER_VERSION_LIST ${BLENDER_VERSION})
+
+list(GET BLENDER_VERSION_LIST 0 BLENDER_MAJOR_VERSION)
+list(GET BLENDER_VERSION_LIST 1 BLENDER_MINOR_VERSION)
+
+string(REGEX REPLACE "[a-zA-Z]" "" BLENDER_MINOR_VERSION_SHORT ${BLENDER_MINOR_VERSION})
+set(BLENDER_BIN_DIR ${BLENDER_MAJOR_VERSION}.${BLENDER_MINOR_VERSION_SHORT})
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -84,6 +107,49 @@ if(WIN32)
   file(COPY ${${PYTHON_ID}_dev_SOURCE_DIR}/tools/include DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
 endif()
 
+if(UNIX AND NOT APPLE)
+  # use the python blender ships with
+  set(BLENDER_BIN_ID blender-${BLENDER_VERSION}-bin)
+  FetchContent_Declare(
+    ${BLENDER_BIN_ID}
+    URL ${BLENDER_LINUX_BIN}
+  )
+  if(NOT ${BLENDER_BIN_ID}_POPULATED)
+    message(STATUS "Installing python (via blender)")
+    FetchContent_Populate(${BLENDER_BIN_ID})
+  endif()
+
+  set(PYTHON_BASE_PATH "${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_BIN_DIR}/python")
+  set(PYTHON_PATH "${PYTHON_BASE_PATH}/bin")
+  set(PYTHON_BIN "${PYTHON_PATH}/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}")
+  file(DOWNLOAD
+    "${PIP_DOWNLOAD}"
+    "${PYTHON_PATH}/get-pip.py"
+  )
+  message(${PYTHON_PATH})
+
+  # pip / cython
+  if(EXISTS ${PYTHON_PATH}/pip)
+  else()
+    execute_process(COMMAND ${PYTHON_BIN} ${PYTHON_PATH}/get-pip.py)
+  endif()
+  if(EXISTS ${PYTHON_PATH}/cython)
+  else()
+    execute_process(COMMAND ${PYTHON_BIN} -m pip install cython)
+  endif()
+
+  # python source code (includes)
+  set(PYTHON_SOURCE python-${PYTHON_VERSION})
+  FetchContent_Declare(
+    ${PYTHON_SOURCE}
+    URL "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
+  )
+  if(NOT ${PYTHON_SOURCE}_POPULATED)
+    message(STATUS "Installing python development files")
+    FetchContent_Populate(${PYTHON_SOURCE})
+  endif()
+endif()
+
 FetchContent_MakeAvailable(fmt json)
 
 # avoid calling any blender cmake scripts
@@ -104,7 +170,7 @@ add_custom_target(
   core
   ALL
   COMMAND
-    ${PYTHON_BIN} setup.py build_ext --inplace
+    ${PYTHON_BIN} setup.py build_ext --inplace python-include="${${PYTHON_SOURCE}_SOURCE_DIR}/Include"
   WORKING_DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core
   SOURCES
