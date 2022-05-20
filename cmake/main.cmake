@@ -274,8 +274,13 @@ foreach(child ${children})
       ${child} PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
+      ${SCRIPT_INCLUDE_DIRECTORIES}
     )
-    target_link_libraries(${child} PRIVATE bxx)
+    target_link_libraries(
+      ${child} PRIVATE
+      bxx
+      ${SCRIPT_LIBRARIES}
+    )
     generate_filetree("${script_files_rel}")
   endif()
 endforeach()
