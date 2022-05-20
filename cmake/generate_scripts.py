@@ -64,6 +64,12 @@ def generate_dir(script_root):
         f'}}',
     ])
 
+    if os.path.exists(generated_path):
+        with open(generated_path,'r') as generated_file:
+            read = generated_file.read()
+            if read == generated:
+                return
+
     with open(generated_path,'w') as generated_file:
         generated_file.write(generated)
 
