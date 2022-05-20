@@ -20,7 +20,7 @@ elif platform.system() == 'Linux':
     prefix_len = 3
     ext = '.so'
 else:
-    raise Exception(f'Unsupported platform {platform.system()}')
+    raise Exception('Unsupported platform %s' % (platform.system()))
 
 lib_dir = os.path.join(source_root,'lib')
 if not os.path.exists(lib_dir):
@@ -36,11 +36,12 @@ if os.path.exists(AUTO_RELOAD_CONFIG_FILE):
         with lock.FileLock(AUTO_RELOAD_LOCK_FILE,5):
             write_lib()
     except e:
+        print(e)
         print(
-            f"Failed to acquire autoload lock, cannot safely write library.",
-            f"\n",
-            f"\n",
-            f"Please shut down blender, manually delete {AUTO_RELOAD_LOCK_FILE} and try again."
+            "Failed to acquire autoload lock, cannot safely write library.",
+            "\n",
+            "\n",
+            "Please shut down blender, manually delete {0} and try again.".format(AUTO_RELOAD_LOCK_FILE)
         )
 else:
     write_lib()

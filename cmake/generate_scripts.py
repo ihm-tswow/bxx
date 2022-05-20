@@ -15,53 +15,53 @@ def generate_dir(script_root):
                 for line in file.readlines():
                     m = re.search('BXX_TEST\( *(.+?) *\)',line)
                     if m:
-                        all_tests.append(m[1])
+                        all_tests.append(m.groups()[0])
 
                     m = re.search('BXX_OPERATOR\( *(.+?) *\)',line)
                     if m:
-                        all_operators.append(m[1])
+                        all_operators.append(m.groups()[0])
 
     generated_path = os.path.join(script_root,'calls.generated.cpp')
     generated = '\n'.join([
-        f'#include "tests.hpp"',
-        f'#include "operator.hpp"',
-        f'#include "api.hpp"',
-        f'',
-        f'// Generated test calls',
-        f'',
+        '#include "tests.hpp"',
+        '#include "operator.hpp"',
+        '#include "api.hpp"',
+        '',
+        '// Generated test calls',
+        '',
     ])
 
     if len(all_tests) > 0:
         generated += '\n'.join([
-            f'\n'.join([f'void __test_{test}();' for test in all_tests]),
-            f'static bxx::test_case cases[] = {{',
-            f',\n'.join([f'    {{"{test}",__test_{test}}}' for test in all_tests]),
-            f'}};',
-            f'',
-            f'static bxx::test_collection col = {{ cases, {len(all_tests)} }};',
-            f'',
-            f'BXX_API bxx::test_collection* __register__tests() {{',
-            f'    return &col;',
-            f'}}',
-            f'',
-            f'',
+            '\n'.join(['void __test_{0}();'.format(test) for test in all_tests]),
+            'static bxx::test_case cases[] = {',
+            ',\n'.join(['    "{0}",__test_{0}}'.format(test) for test in all_tests]),
+            '};',
+            '',
+            'static bxx::test_collection col = { cases, { {0} };'.format(len(all_tests)),
+            '',
+            'BXX_API bxx::test_collection* __register__tests() {',
+            '    return &col;',
+            '}',
+            '',
+            '',
         ])
     else:
         generated += '\n'.join([
-            f'BXX_API bxx::test_collection* __register__tests() {{',
-            f'    return nullptr;',
-            f'}}',
-            f'',
-            f'',
+            'BXX_API bxx::test_collection* __register__tests() {',
+            '    return nullptr;',
+            '}',
+            '',
+            '',
         ])
 
     generated += '\n'.join([
-        f'// Generated operator calls',
-        f'\n'.join([f'void __register_{operator}(bxx::operator_builder &);' for operator in all_operators]),
-        f'void __register_operators() {{',
-        f'\n'.join([f'    bxx::operator_builder _op_{operator} = bxx::operators::create("bxx.{operator}");' for operator in all_operators]),
-        f'\n'.join([f'    __register_{operator}(_op_{operator});' for operator in all_operators]),
-        f'}}',
+        '// Generated operator calls',
+        '\n'.join(['void __register_{0}(bxx::operator_builder &);'.format(operator) for operator in all_operators]),
+        'void __register_operators() {',
+        '\n'.join(['    bxx::operator_builder _op_{0} = bxx::operators::create("bxx.{0}");'.format(operator) for operator in all_operators]),
+        '\n'.join(['    __register_{0}(_op_{0});'.format(operator) for operator in all_operators]),
+        '}',
     ])
 
     if os.path.exists(generated_path):

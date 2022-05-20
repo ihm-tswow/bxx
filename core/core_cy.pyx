@@ -77,7 +77,7 @@ cdef void _exec(char* exec_bytes):
     try:
         exec(exec_bytes.decode('utf-8'), build_context())
     except Exception as e:
-        raise Exception(f'Failed to execute python string:\n\n{exec_bytes.decode("utf-8")}') from e
+        raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
 
 def _eval(char* exec_bytes):
     try:
@@ -85,7 +85,7 @@ def _eval(char* exec_bytes):
         exec(exec_bytes.decode('utf-8'), context)
         return context['out']
     except Exception as e:
-        raise Exception(f'Failed to execute python string:\n\n{exec_bytes.decode("utf-8")}') from e
+        raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
 
 cdef cy_ptr_ct eval_ptr(char* exec_bytes):
     return _eval(exec_bytes)
