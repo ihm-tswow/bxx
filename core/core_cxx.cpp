@@ -152,11 +152,21 @@ void setup_cxx(
     __init_pointers_store(&functions);
 }
 
-void auto_reload_cxx()
+static std::vector<fs::path> get_scripts()
 {
+    std::vector<fs::path> paths = { root_path / "bxx" / "tests" };
     for (auto const& dir_entry : fs::directory_iterator{ root_path / "scripts" })
     {
-        std::string script_name = dir_entry.path().filename().string();
+        paths.push_back(dir_entry.path());
+    }
+    return paths;
+}
+
+void auto_reload_cxx()
+{
+    for (auto const& dir_entry : get_scripts())
+    {
+        std::string script_name = dir_entry.filename().string();
         auto old = libraries.find(script_name);
         if (old == libraries.end() || old->second.m_ctime != fs::last_write_time(get_dll_path(script_name)))
         {
@@ -188,9 +198,9 @@ void run_tests(char* include, char* exclude)
 
 void register_cxx()
 {
-    for (auto const& dir_entry : fs::directory_iterator{root_path / "scripts"})
+    for (auto const& dir_entry : get_scripts())
     {
-        load_script(dir_entry.path().filename().string());
+        load_script(dir_entry.filename().string());
     }
 }
 

@@ -35,11 +35,11 @@ if((NOT DEFINED CMAKE_BUILD_TYPE) OR ("${CMAKE_BUILD_TYPE}" STREQUAL ""))
 endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-function(generate_filetree files)
+function(generate_filetree root files)
   foreach(source IN LISTS files)
       get_filename_component(source_path "${source}" PATH)
       string(REPLACE "/" "\\" source_path_msvc "${source_path}")
-      source_group("${source_path_msvc}" FILES "scripts\\${source}")
+      source_group("${source_path_msvc}" FILES "${root}\\${source}")
   endforeach()
 endfunction()
 
@@ -260,16 +260,16 @@ function(generate_blender_version build_version)
   source_group("refs" FILES "${CMAKE_CURRENT_SOURCE_DIR}\\CMakeLists.txt" ${scripts_core})
 
   file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts/*)
-  foreach(child ${children})
-    set(full "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
+
+  function(make_script_target child child_path root full)
     if(IS_DIRECTORY ${full})
       file(GLOB_RECURSE script_files ${full}/*)
       file(GLOB_RECURSE script_files_rel
         RELATIVE
-        ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+        ${CMAKE_CURRENT_SOURCE_DIR}/${root}
         ${full}/*
       )
-      list(REMOVE_ITEM script_files_rel ${child}/calls.generated.cpp)
+      list(REMOVE_ITEM script_files_rel ${child_path}/calls.generated.cpp)
       set(OLD_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
       if(EXISTS "${full}/calls.generated.cpp")
       else()
@@ -309,9 +309,14 @@ function(generate_blender_version build_version)
         ${bxx}
         ${SCRIPT_LIBRARIES}
       )
-      generate_filetree("${script_files_rel}")
+      generate_filetree(${root} "${script_files_rel}")
     endif()
+  endfunction()
+
+  foreach(child ${children})
+    make_script_target(${child} ${child} "scripts" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
   endforeach()
+  make_script_target("bxx-tests" "tests" "bxx" "${CMAKE_CURRENT_SOURCE_DIR}/bxx/tests")
 endfunction()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

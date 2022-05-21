@@ -35,10 +35,10 @@ def generate_dir(script_root):
         generated += '\n'.join([
             '\n'.join(['void __test_{0}();'.format(test) for test in all_tests]),
             'static bxx::test_case cases[] = {',
-            ',\n'.join(['    "{0}",__test_{0}}'.format(test) for test in all_tests]),
+            ',\n'.join(['    {{"{0}",__test_{0}}}'.format(test) for test in all_tests]),
             '};',
             '',
-            'static bxx::test_collection col = { cases, { {0} };'.format(len(all_tests)),
+            'static bxx::test_collection col = {{ cases, {{ {0} }}}};'.format(len(all_tests)),
             '',
             'BXX_API bxx::test_collection* __register__tests() {',
             '    return &col;',
@@ -75,3 +75,5 @@ def generate_dir(script_root):
 
 for directory in os.listdir('scripts'):
     generate_dir(os.path.join('scripts',directory))
+
+generate_dir('bxx/tests')

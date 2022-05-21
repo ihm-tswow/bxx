@@ -1,5 +1,6 @@
 build
 *.pyd
 *.so
+*.generated.cpp
 core/core_cy.c
 __pycache__
