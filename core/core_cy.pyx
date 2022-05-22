@@ -176,4 +176,7 @@ def unregister():
 
 # called from test_runner.py, because blender does not accept cython methods
 def _run_tests(incl,excl):
-    return run_tests(incl,excl)
+    ret = run_tests(incl,excl)
+    bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
+    return ret
+

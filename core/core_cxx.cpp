@@ -179,6 +179,7 @@ void auto_reload_cxx()
 
 int run_tests(char* include, char* exclude)
 {
+    exec("bpy.ops.wm.read_homefile(use_empty=True)");
     std::cout
         << "\n\n"
         << "Running Tests: "
@@ -231,6 +232,7 @@ int run_tests(char* include, char* exclude)
                     try
                     {
                         col->m_entries[i].test_ptr();
+                        exec("bpy.ops.wm.read_homefile(use_empty=True)");
                         successful_tests++;
                     }
                     catch (bxx::test_exception const& except) {
