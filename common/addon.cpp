@@ -1,4 +1,4 @@
-#include "preferences.hpp"
+#include "addon.hpp"
 #include "exec.hpp"
 
 // note: we avoid fmt::format in this file since core is using it

@@ -1,6 +1,6 @@
 // relative imports because cmake can't add include directories for custom targets
 #include "../common/shared_functions.hpp"
-#include "../common/preferences.hpp"
+#include "../common/addon.hpp"
 #include "../common/exec.hpp"
 #include "../common/tests.hpp"
 #include "../common/util.hpp"

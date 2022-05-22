@@ -13,7 +13,7 @@ for arg in sys.argv:
 source_files = [
     '../common/shared_functions.cpp',
     '../common/exec.cpp',
-    '../common/preferences.cpp',
+    '../common/addon.cpp',
     '../common/util.cpp',
     'core_cxx.cpp',
     'core_cy.pyx',
