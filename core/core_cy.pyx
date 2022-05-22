@@ -112,7 +112,7 @@ cdef char* eval_string(char* exec_bytes):
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-cdef extern void run_tests(char* incl, char* excl);
+cdef extern int run_tests(char* incl, char* excl);
 cdef extern void register_cxx();
 cdef extern void unregister_cxx();
 cdef extern void setup_cxx(
@@ -173,4 +173,4 @@ def unregister():
 
 # called from test_runner.py, because blender does not accept cython methods
 def _run_tests(incl,excl):
-    run_tests(incl,excl)
+    return run_tests(incl,excl)

@@ -48,7 +48,7 @@ extern "C" {
     void register_cxx();
     void unregister_cxx();
     void auto_reload_cxx();
-    void run_tests(char* include, char* exclude);
+    int run_tests(char* include, char* exclude);
 }
 
 static shared_functions functions;
@@ -177,7 +177,7 @@ void auto_reload_cxx()
     }
 }
 
-void run_tests(char* include, char* exclude)
+int run_tests(char* include, char* exclude)
 {
     std::cout
         << "\n\n"
@@ -244,7 +244,7 @@ void run_tests(char* include, char* exclude)
     if (total_tests == 0)
     {
         std::cout << "No tests run\n";
-        return;
+        return 1;
     }
 
     int grays = 80 * float(skipped_tests) / float(total_tests);
@@ -265,7 +265,7 @@ void run_tests(char* include, char* exclude)
         std::cout
             << bxx::color_code::GREEN  << "All tests passed "
             << bxx::color_code::DEFAULT << "(" << total_tests << " tests)\n";
-        return;
+        return 0;
     }
 
     std::cout << bxx::color_code::DEFAULT << "test cases: " << total_tests;
@@ -274,6 +274,7 @@ void run_tests(char* include, char* exclude)
     if (failed_tests)     std::cout << bxx::color_code::GRAY << " | " << bxx::color_code::RED   << "failed: "       << failed_tests;
     if (skipped_tests)    std::cout << bxx::color_code::GRAY << " | " << bxx::color_code::GRAY  << "skipped: "      << skipped_tests;
     std::cout << bxx::color_code::DEFAULT << "\n";
+    return failed_tests > 0;
 }
 
 void register_cxx()

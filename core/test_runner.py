@@ -19,6 +19,12 @@ class test_runner(bpy.types.Operator):
         default = "",
     )
 
+    produce_output: bpy.props.BoolProperty(
+        name = "Produce Output",
+        description = "Whether to write the exit code to a file",
+        default = True
+    )
+
     def draw(self, context):
         self.layout.prop(self, 'incl', text = 'Include')
         self.layout.prop(self, 'excl', text = 'Exclude')
@@ -26,7 +32,10 @@ class test_runner(bpy.types.Operator):
     def execute(self, context):
         incl_b = self.incl.encode('utf-8')
         excl_b = self.excl.encode('utf-8')
-        _run_tests(incl_b,excl_b)
+        res = _run_tests(incl_b,excl_b)
+        if(self.produce_output):
+            with open('test-results.txt','w') as file:
+                file.write(str(res))
         return {'FINISHED'}
 
 def show_test_runner(self, context):
