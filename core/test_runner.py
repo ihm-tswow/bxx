@@ -19,7 +19,7 @@ class test_runner(bpy.types.Operator):
         default = "",
     )
 
-    produce_output: bpy.props.BoolProperty(
+    raise_on_failure: bpy.props.BoolProperty(
         name = "Produce Output",
         description = "Whether to write the exit code to a file",
         default = True
@@ -33,9 +33,8 @@ class test_runner(bpy.types.Operator):
         incl_b = self.incl.encode('utf-8')
         excl_b = self.excl.encode('utf-8')
         res = _run_tests(incl_b,excl_b)
-        if(self.produce_output):
-            with open('test-results.txt','w') as file:
-                file.write(str(res))
+        if(self.raise_on_failure):
+            raise Exception("Tests failed")
         return {'FINISHED'}
 
 def show_test_runner(self, context):

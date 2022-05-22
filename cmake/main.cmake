@@ -1,6 +1,8 @@
 include(FetchContent)
 include(bxx/cmake/blender_versions.cmake)
 
+set(INSTALL_TEST_COMMANDS "")
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # - Global Dependencies -
@@ -81,6 +83,20 @@ function(generate_blender_version build_version)
   #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   if(WIN32)
+    if(RUN_TESTS_ON_INSTALL)
+      # todo: if doing this, don't grab python again
+      set(BLENDER_BIN_ID blender-${build_version}-bin)
+      FetchContent_Declare(
+        ${BLENDER_BIN_ID}
+        URL ${BLENDER_WINDOWS_BIN}
+      )
+      if(NOT ${BLENDER_VERSION}-bin_POPULATED)
+        message(STATUS "Installing Blender binaries")
+        FetchContent_Populate(${BLENDER_BIN_ID})
+      endif()
+      set(BLENDER_BIN ${${BLENDER_BIN_ID}_SOURCE_DIR}/blender.exe)
+    endif()
+
     FetchContent_Declare(
       ${PYTHON_ID}
       URL ${PYTHON_WINDOWS_BIN_DOWNLOAD}
@@ -135,7 +151,7 @@ function(generate_blender_version build_version)
       message(STATUS "Installing python (via blender)")
       FetchContent_Populate(${BLENDER_BIN_ID})
     endif()
-
+    set(BLENDER_BIN ${BLENDER_BIN_ID}/blender)
     set(PYTHON_BASE_PATH "${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_BIN_DIR}/python")
     set(PYTHON_PATH "${PYTHON_BASE_PATH}/bin")
     set(PYTHON_BIN "${PYTHON_PATH}/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}")
@@ -283,6 +299,7 @@ function(generate_blender_version build_version)
         ${scripts_core}
         ${full}/calls.generated.cpp
       )
+
       set_target_properties(${script_name} PROPERTIES FOLDER ${build_version})
 
       source_group("refs" FILES "${full}\\calls.generated.cpp")
@@ -317,6 +334,11 @@ function(generate_blender_version build_version)
     make_script_target(${child} ${child} "scripts" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
   endforeach()
   make_script_target("bxx-tests" "tests" "bxx" "${CMAKE_CURRENT_SOURCE_DIR}/bxx/tests")
+
+  get_filename_component(addon_name ${CMAKE_INSTALL_PREFIX} NAME)
+  list(APPEND INSTALL_TEST_COMMANDS "file(COPY \"${CMAKE_INSTALL_PREFIX}\" DESTINATION \"${${BLENDER_BIN_ID}_SOURCE_DIR}/3.0/scripts/addons\")")
+  list(APPEND INSTALL_TEST_COMMANDS "execute_process(COMMAND \"${BLENDER_BIN}\" -b -P \"${${BLENDER_BIN_ID}_SOURCE_DIR}/3.0/scripts/addons/${addon_name}/bxx/cmake/bl_run_tests.py\")")
+  set(INSTALL_TEST_COMMANDS ${INSTALL_TEST_COMMANDS} PARENT_SCOPE)
 endfunction()
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -334,6 +356,13 @@ install(
 )
 
 install(
+  FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/__init__.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/preferences.py"
+  DESTINATION "./"
+)
+
+install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
   DESTINATION "./"
 )
@@ -346,3 +375,15 @@ install(
     PATTERN "*.so"
     PATTERN "*.dylib"
 )
+
+function(finish_bxx_generate)
+  if(RUN_TESTS_ON_INSTALL)
+    foreach(command ${INSTALL_TEST_COMMANDS})
+      string(REPLACE "\\" "/" command ${command})
+      install(
+        CODE ${command}
+      )
+    endforeach()
+  endif()
+  string(REPLACE "\\" "/" CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+endfunction()
