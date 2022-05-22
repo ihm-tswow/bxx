@@ -12,4 +12,5 @@ namespace bxx
         static float get_float(std::string const& id, float def);
         static bool get_bool(std::string const& id, bool def);
     };
+    std::string get_addon_name();
 }

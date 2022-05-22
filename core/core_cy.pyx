@@ -4,6 +4,7 @@ import json
 from ...preferences import preferences
 from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
 from ..third_party.lock import FileLock
+from .util import get_root_dir, get_addon_name
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -71,6 +72,7 @@ def build_context():
     context['register_operator'] = register_operator
     context['preferences'] = preferences
     context['fire_operator'] = fire_operator
+    context['get_addon_name'] = get_addon_name
     return context
 
 cdef void _exec(char* exec_bytes):
@@ -124,9 +126,6 @@ cdef extern void setup_cxx(
     cy_unregister_script_ct cy_unregister_script,
 );
 cdef extern void auto_reload_cxx();
-
-def get_root_dir():
-    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 def auto_reload_lockfile_path():
     return os.path.join(get_root_dir(), AUTO_RELOAD_LOCK_FILE)

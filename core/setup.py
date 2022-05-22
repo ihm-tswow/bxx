@@ -14,6 +14,7 @@ source_files = [
     '../common/shared_functions.cpp',
     '../common/exec.cpp',
     '../common/preferences.cpp',
+    '../common/util.cpp',
     'core_cxx.cpp',
     'core_cy.pyx',
 ]

@@ -33,9 +33,9 @@ def generate_dir(script_root):
 
     if len(all_tests) > 0:
         generated += '\n'.join([
-            '\n'.join(['void __test_{0}();'.format(test) for test in all_tests]),
+            '\n'.join(['void {0}();'.format(test) for test in all_tests]),
             'static bxx::test_case cases[] = {',
-            ',\n'.join(['    {{"{0}",__test_{0}}}'.format(test) for test in all_tests]),
+            ',\n'.join(['    {{"{0}",{0}}}'.format(test) for test in all_tests]),
             '};',
             '',
             'static bxx::test_collection col = {{ cases, {{ {0} }}}};'.format(len(all_tests)),

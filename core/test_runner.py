@@ -1,9 +1,10 @@
 import bpy
 from .core_cy import _run_tests
+from .util import get_addon_name
 
 class test_runner(bpy.types.Operator):
-    bl_idname = 'tests.run'
-    bl_label = "Run Unit Tests"
+    bl_idname = 'unit_tests.{0}'.format(get_addon_name())
+    bl_label = 'Unit Tests: {0}'.format(get_addon_name())
     bl_options = {'REGISTER','UNDO'}
 
     incl: bpy.props.StringProperty(

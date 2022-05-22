@@ -22,3 +22,8 @@ bool bxx::preferences::get_bool(std::string const& id, bool def)
 {
     return bool(eval_int("out = int(preferences.get('" + id + "', " + (def ? "True" : "False") + "))"));
 }
+
+std::string bxx::get_addon_name()
+{
+    return eval_string("out = get_addon_name()");
+}

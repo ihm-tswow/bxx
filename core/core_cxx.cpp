@@ -3,10 +3,12 @@
 #include "../common/preferences.hpp"
 #include "../common/exec.hpp"
 #include "../common/tests.hpp"
+#include "../common/util.hpp"
 
 #include <iostream>
 #include <filesystem>
 #include <map>
+#include <vector>
 
 namespace fs = std::filesystem;
 typedef void (*script_register_ct)(char const* script_name, shared_functions* functions);
@@ -61,6 +63,19 @@ struct library_handle
 };
 static std::map<std::string,library_handle> libraries;
 
+static std::string get_library_extension()
+{
+    // todo: this is wrong on 2.79b
+    static std::string blender_version = eval_string(
+        "out = "
+        "str(bpy.app.version[0]) + '.' +"
+        "str(bpy.app.version[1]) + '.' +"
+        "str(bpy.app.version[2])"
+    );
+    static std::string extension = "-" + blender_version + SL_EXT;
+    return extension;
+}
+
 static void unload_script(library_handle const& handle)
 {
     script_unregister_ct script_unregister = (script_unregister_ct)SL_FN(handle.m_library, "_script_unregister");
@@ -73,25 +88,9 @@ static void unload_script(library_handle const& handle)
     fs::remove(handle.m_load_path);
 }
 
-static fs::path get_dll_path(std::string const& script_name)
+static void load_script(fs::path const& dll_path)
 {
-    std::string version = eval_string(
-        "out = "
-        "str(bpy.app.version[0]) + '.' +"
-        "str(bpy.app.version[1]) + '.' +"
-        "str(bpy.app.version[2])"
-    );
-    return root_path / "lib" / (script_name + "-" + version + SL_EXT);
-}
-
-static void load_script(std::string const& script_name)
-{
-    fs::path dll_path = get_dll_path(script_name);
-    if(!fs::exists(dll_path))
-    {
-        std::cout << "Error: Could not find library file " << dll_path << "\n";
-        return;
-    }
+    std::string const& script_name = dll_path.filename().string();
 
     auto old = libraries.find(script_name);
     if(old != libraries.end())
@@ -154,10 +153,13 @@ void setup_cxx(
 
 static std::vector<fs::path> get_scripts()
 {
-    std::vector<fs::path> paths = { root_path / "bxx" / "tests" };
-    for (auto const& dir_entry : fs::directory_iterator{ root_path / "scripts" })
+    std::vector<fs::path> paths;
+    for (auto const& dir_entry : fs::directory_iterator{ root_path / "lib" })
     {
-        paths.push_back(dir_entry.path());
+        if (bxx::ends_with(dir_entry.path().string(), get_library_extension()))
+        {
+            paths.push_back(dir_entry.path());
+        }
     }
     return paths;
 }
@@ -168,16 +170,41 @@ void auto_reload_cxx()
     {
         std::string script_name = dir_entry.filename().string();
         auto old = libraries.find(script_name);
-        if (old == libraries.end() || old->second.m_ctime != fs::last_write_time(get_dll_path(script_name)))
+        if (old == libraries.end() || old->second.m_ctime != fs::last_write_time(dir_entry))
         {
-            load_script(script_name);
+            load_script(dir_entry);
         }
     }
 }
 
 void run_tests(char* include, char* exclude)
 {
-    std::cout << "== Running Tests == \n";
+    std::cout
+        << "\n\n"
+        << "Running Tests: "
+        << bxx::color_code::YELLOW
+        << bxx::get_addon_name()
+        << bxx::color_code::DEFAULT
+        << "\n"
+        ;
+
+    int total_tests = 0;
+    int successful_tests = 0;
+    int failed_tests = 0;
+    int skipped_tests = 0;
+    bool has_include = strlen(include) > 0;
+    bool has_exclude = strlen(exclude) > 0;
+
+    if (has_include)
+    {
+        std::cout << bxx::color_code::GRAY << "include: " << include << bxx::color_code::DEFAULT << "\n";
+    }
+
+    if (has_exclude)
+    {
+        std::cout << bxx::color_code::GRAY << "exclude: " << include << bxx::color_code::DEFAULT << "\n";
+    }
+
     for (auto const& [name,library] : libraries)
     {
         __register_tests_ct __register_tests = (__register_tests_ct)SL_FN(library.m_library, "__register__tests");
@@ -188,19 +215,72 @@ void run_tests(char* include, char* exclude)
             {
                 for (int i = 0; i < col->m_count; ++i)
                 {
-                    std::cout << "Test:" << name << "_" << col->m_entries[i].m_name << "\n";
-                    col->m_entries[i].test_ptr();
+                    total_tests++;
+                    std::string full_name =
+                          name.substr(0, name.size() - int(get_library_extension().size()))
+                        + "." + col->m_entries[i].m_name;
+
+                    if (
+                        (has_include && !bxx::match(include, full_name)) ||
+                        (has_exclude && bxx::match(exclude, full_name))
+                    ) {
+                        skipped_tests++;
+                        continue;
+                    }
+
+                    try
+                    {
+                        col->m_entries[i].test_ptr();
+                        successful_tests++;
+                    }
+                    catch (bxx::test_exception const& except) {
+                        failed_tests++;
+                    }
                 }
             }
         }
     }
+
+    if (total_tests == 0)
+    {
+        std::cout << "No tests run\n";
+        return;
+    }
+
+    int grays = 80 * float(skipped_tests) / float(total_tests);
+    int greens = 80 * float(successful_tests) / float(total_tests);
+    int reds = 80 * float(failed_tests) / float(total_tests);
+
+    std::cout << "\n";
+    std::cout << bxx::color_code::RED;
+    for (size_t i = 0; i < reds; ++i) std::cout << "=";
+    std::cout << bxx::color_code::GREEN;
+    for (size_t i = 0; i < greens; ++i) std::cout << "=";
+    std::cout << bxx::color_code::GRAY;
+    for (size_t i = 0; i < grays; ++i) std::cout << "=";
+    std::cout << bxx::color_code::DEFAULT << "\n";
+
+    if (skipped_tests == 0 && failed_tests == 0)
+    {
+        std::cout
+            << bxx::color_code::GREEN  << "All tests passed "
+            << bxx::color_code::DEFAULT << "(" << total_tests << " tests)\n";
+        return;
+    }
+
+    std::cout << bxx::color_code::DEFAULT << "test cases: " << total_tests;
+
+    if (successful_tests) std::cout << bxx::color_code::GRAY << " | " << bxx::color_code::GREEN << "successful: " << successful_tests;
+    if (failed_tests)     std::cout << bxx::color_code::GRAY << " | " << bxx::color_code::RED   << "failed: "       << failed_tests;
+    if (skipped_tests)    std::cout << bxx::color_code::GRAY << " | " << bxx::color_code::GRAY  << "skipped: "      << skipped_tests;
+    std::cout << bxx::color_code::DEFAULT << "\n";
 }
 
 void register_cxx()
 {
     for (auto const& dir_entry : get_scripts())
     {
-        load_script(dir_entry.filename().string());
+        load_script(dir_entry);
     }
 }
 
