@@ -131,6 +131,7 @@ static void load_script(fs::path const& dll_path)
         return;
     }
 
+    std::cout << "Loading script " << script_name << "\n";
     script_register(script_name.c_str(), &functions);
 }
 
