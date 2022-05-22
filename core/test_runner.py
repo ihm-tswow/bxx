@@ -22,7 +22,7 @@ class test_runner(bpy.types.Operator):
     raise_on_failure: bpy.props.BoolProperty(
         name = "Produce Output",
         description = "Whether to write the exit code to a file",
-        default = True
+        default = False
     )
 
     def draw(self, context):
