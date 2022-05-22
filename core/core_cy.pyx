@@ -101,7 +101,10 @@ cdef float eval_float(char* exec_bytes):
 last_str = None
 cdef char* eval_string(char* exec_bytes):
     global last_str
-    last_str = str(_eval(exec_bytes)).encode('utf-8')
+    try:
+        last_str = str(_eval(exec_bytes)).encode('utf-8')
+    except:
+        last_str = "".encode('utf-8')
     return last_str
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
