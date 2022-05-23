@@ -1,8 +1,14 @@
 #include "object.hpp"
+#include "exec.hpp"
+#include "mesh.hpp"
 
 #include "makesdna/DNA_object_types.h"
 
 #include "fmt/core.h"
+
+bxx::object::object(bl_object* obj)
+    : m_raw(obj)
+{}
 
 bl_object* bxx::object::get_raw()
 {
@@ -39,10 +45,56 @@ void bxx::object::set_rotation_euler(std::string const& fmt, float x, float y, f
 void bxx::object::set_rotation_quaternion(float w, float x, float y, float z)
 {
     set_string_prop("rotation_mode", "QUATERNION");
-    set_float_prop("rotation_euler", x, y, z);
+    set_float_prop("rotation_quaternion", w, x, y, z);
 }
 
 void bxx::object::set_scale(float x, float y, float z)
 {
     set_float_prop("scale", x, y, z);
+}
+
+bxx::object bxx::object::create(std::string const& name, bxx::mesh mesh)
+{
+    return bxx::object(eval_ptr<bl_object>({
+        fmt::format("out = bpy.data.objects.new('{}', {}).as_pointer()", name, mesh.get_full_name())
+    }));
+}
+
+bxx::vec3 bxx::object::get_location()
+{
+    return {
+        eval_float(fmt::format("out = {}.location[0]", get_full_name())),
+        eval_float(fmt::format("out = {}.location[1]", get_full_name())),
+        eval_float(fmt::format("out = {}.location[2]", get_full_name())),
+    };
+}
+
+
+bxx::vec3 bxx::object::get_rotation_euler()
+{
+    return {
+        eval_float(fmt::format("out = {}.rotation_euler[0]", get_full_name())),
+        eval_float(fmt::format("out = {}.rotation_euler[1]", get_full_name())),
+        eval_float(fmt::format("out = {}.rotation_euler[2]", get_full_name())),
+    };
+}
+
+bxx::quaternion bxx::object::get_rotation_quaternion()
+{
+    return {
+        eval_float(fmt::format("out = {}.rotation_quaternion[0]", get_full_name())),
+        eval_float(fmt::format("out = {}.rotation_quaternion[1]", get_full_name())),
+        eval_float(fmt::format("out = {}.rotation_quaternion[2]", get_full_name())),
+        eval_float(fmt::format("out = {}.rotation_quaternion[3]", get_full_name())),
+    };
+
+}
+
+bxx::vec3 bxx::object::get_scale()
+{
+    return {
+        eval_float(fmt::format("out = {}.scale[0]", get_full_name())),
+        eval_float(fmt::format("out = {}.scale[1]", get_full_name())),
+        eval_float(fmt::format("out = {}.scale[2]", get_full_name())),
+    };
 }

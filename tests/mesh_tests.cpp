@@ -45,5 +45,3 @@ BXX_TEST(mesh_can_add_channels) {
     tri.get_color(1).set(0, 0, 0, 0);
     tri.get_color(2).set(0, 0, 0, 0);
 }
-
-
