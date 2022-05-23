@@ -25,6 +25,13 @@ namespace mathutils
         float z;
     };
 
+    struct vec2
+    {
+        vec2(float x, float y);
+        float x;
+        float y;
+    };
+
     struct quaternion
     {
         quaternion(float w, float x, float y, float z);

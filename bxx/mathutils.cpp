@@ -4,6 +4,11 @@ mathutils::vec3::vec3(float _x, float _y, float _z)
     : x(_x),y(_y),z(_z)
 {}
 
+mathutils::vec2::vec2(float _x, float _y)
+    : x(_x), y(_y)
+{}
+
+
 mathutils::quaternion::quaternion(float _w, float _x, float _y, float _z)
     : w(_w), x(_x), y(_y), z(_z)
 {}
