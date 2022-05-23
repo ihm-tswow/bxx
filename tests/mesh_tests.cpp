@@ -20,10 +20,10 @@ static bxx::mesh create_basic_triangle()
     mesh.add_verts(3);
     mesh.add_loops(3);
     mesh.add_polygons(1);
-    mesh.get_loop(0).set(0);
-    mesh.get_loop(1).set(1);
-    mesh.get_loop(2).set(2);
-    mesh.get_poly(0).set(0, 3);
+    mesh.loop(0).set(0);
+    mesh.loop(1).set(1);
+    mesh.loop(2).set(2);
+    mesh.poly(0).set(0, 3);
     return mesh;
 }
 
@@ -38,10 +38,10 @@ BXX_TEST(mesh_can_add_channels) {
     bxx::mesh tri = create_basic_triangle();
     tri.add_uv_channel();
     tri.add_color_channel();
-    tri.get_uv(0).set(0, 1);
-    tri.get_uv(1).set(2, 3);
-    tri.get_uv(2).set(4, 5);
-    tri.get_color(0).set(0, 0, 0, 0);
-    tri.get_color(1).set(0, 0, 0, 0);
-    tri.get_color(2).set(0, 0, 0, 0);
+    tri.uv(0).set(0, 1);
+    tri.uv(1).set(2, 3);
+    tri.uv(2).set(4, 5);
+    tri.color(0).set(0, 0, 0, 0);
+    tri.color(1).set(0, 0, 0, 0);
+    tri.color(2).set(0, 0, 0, 0);
 }

@@ -6,6 +6,16 @@
 #include "makesdna/DNA_mesh_types.h"
 #include "makesdna/DNA_meshdata_types.h"
 
+void bxx::vert::set(mathutils::vec3 vert)
+{
+    set(vert.x, vert.y, vert.z);
+}
+
+mathutils::vec3 bxx::vert::get()
+{
+    return { get_x(), get_y(), get_z() };
+}
+
 bxx::vert::vert(bl_vert* vert)
     : m_vert(vert)
 {}
@@ -288,27 +298,40 @@ bxx::mesh bxx::mesh::create(std::string const& name)
     }));
 }
 
-bxx::vert bxx::mesh::get_vert(int index)
+bxx::vert bxx::mesh::vert(int index)
 {
     return bxx::vert(m_raw->mvert+index);
 }
 
-bxx::poly bxx::mesh::get_poly(int poly)
+bxx::poly bxx::mesh::poly(int poly)
 {
     return bxx::poly(m_raw->mpoly+poly);
 }
 
-bxx::loop bxx::mesh::get_loop(int loop)
+bxx::loop bxx::mesh::loop(int loop)
 {
     return bxx::loop(m_raw->mloop+loop);
 }
 
-bxx::uv_wrapper bxx::mesh::get_uv(int loop)
+bxx::uv_wrapper bxx::mesh::uv(int loop)
 {
     return bxx::uv_wrapper(m_raw->mloopuv+loop);
 }
 
-bxx::color bxx::mesh::get_color(int loop)
+bxx::color bxx::mesh::color(int loop)
 {
     return bxx::color(m_raw->mloopcol+loop);
+}
+
+mathutils::rgba<255> bxx::color::get()
+{
+    return { get_r(), get_g(), get_b(), get_a() };
+}
+
+void bxx::color::set(mathutils::rgba<255> color)
+{
+    set_r(color.r);
+    set_g(color.g);
+    set_b(color.b);
+    set_a(color.a);
 }

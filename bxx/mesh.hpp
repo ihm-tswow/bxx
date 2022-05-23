@@ -1,6 +1,7 @@
 #pragma once
 
 #include "id.hpp"
+#include "mathutils.hpp"
 
 typedef struct Mesh bl_mesh;
 typedef struct MVert bl_vert;
@@ -19,6 +20,8 @@ namespace bxx
         void set_y(float value);
         void set_z(float value);
         void set(float x, float y, float z);
+        void set(mathutils::vec3 vert);
+        mathutils::vec3 get();
         float get_x();
         float get_y();
         float get_z();
@@ -80,6 +83,8 @@ namespace bxx
         void set_b(float b);
         void set_a(float a);
         void set(float r, float g, float b, float a = 255);
+        mathutils::rgba<255> get();
+        void set(mathutils::rgba<255> color);
         float get_r();
         float get_g();
         float get_b();
@@ -107,11 +112,11 @@ namespace bxx
         int get_num_polys();
         int get_num_loops();
 
-        bxx::vert get_vert(int index);
-        bxx::poly get_poly(int poly);
-        bxx::loop get_loop(int loop);
-        bxx::uv_wrapper get_uv(int loop);
-        bxx::color get_color(int loop);
+        bxx::vert vert(int index);
+        bxx::poly poly(int poly);
+        bxx::loop loop(int loop);
+        bxx::uv_wrapper uv(int loop);
+        bxx::color color(int loop);
 
         bl_mesh* get_raw();
         static bxx::mesh create(std::string const& name);

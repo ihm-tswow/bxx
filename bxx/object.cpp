@@ -6,6 +6,13 @@
 
 #include "fmt/core.h"
 
+bxx::object bxx::object::create(std::string const& name, bxx::mesh mesh)
+{
+    return bxx::object(eval_ptr<bl_object>({
+        fmt::format("out = bpy.data.objects.new('{}',{}).as_pointer()", name, mesh.get_full_name())
+    }));
+}
+
 bxx::object::object(bl_object* obj)
     : m_raw(obj)
 {}
@@ -25,76 +32,28 @@ std::string bxx::object::get_full_name()
     return fmt::format("bpy.data.objects['{}']", get_name());
 }
 
-void bxx::object::set_location(float x, float y, float z)
+bxx::vec3 bxx::object::location()
 {
-    set_float_prop("location", x, y, z);
+    return bxx::vec3(&m_raw->loc);
 }
 
-void bxx::object::set_rotation_euler(float x, float y, float z)
+bxx::vec3 bxx::object::rotation_euler()
 {
-    set_string_prop("rotation_mode", "XYZ");
-    set_float_prop("rotation_euler", x, y, z);
+    return bxx::vec3(&m_raw->rot);
 }
 
-void bxx::object::set_rotation_euler(std::string const& fmt, float x, float y, float z)
+bxx::quaternion bxx::object::rotation_quaternion()
 {
-    set_string_prop("rotation_mode", fmt);
-    set_float_prop("rotation_euler", x, y, z);
+    return bxx::quaternion(&m_raw->quat);
 }
 
-void bxx::object::set_rotation_quaternion(float w, float x, float y, float z)
+bxx::vec3 bxx::object::scale()
 {
-    set_string_prop("rotation_mode", "QUATERNION");
-    set_float_prop("rotation_quaternion", w, x, y, z);
+    return bxx::vec3(&m_raw->scale);
 }
 
-void bxx::object::set_scale(float x, float y, float z)
+mathutils::quaternion bxx::quaternion::get()
 {
-    set_float_prop("scale", x, y, z);
+    return { get_w(), get_x(), get_y(), get_z() };
 }
 
-bxx::object bxx::object::create(std::string const& name, bxx::mesh mesh)
-{
-    return bxx::object(eval_ptr<bl_object>({
-        fmt::format("out = bpy.data.objects.new('{}', {}).as_pointer()", name, mesh.get_full_name())
-    }));
-}
-
-bxx::vec3 bxx::object::get_location()
-{
-    return {
-        eval_float(fmt::format("out = {}.location[0]", get_full_name())),
-        eval_float(fmt::format("out = {}.location[1]", get_full_name())),
-        eval_float(fmt::format("out = {}.location[2]", get_full_name())),
-    };
-}
-
-
-bxx::vec3 bxx::object::get_rotation_euler()
-{
-    return {
-        eval_float(fmt::format("out = {}.rotation_euler[0]", get_full_name())),
-        eval_float(fmt::format("out = {}.rotation_euler[1]", get_full_name())),
-        eval_float(fmt::format("out = {}.rotation_euler[2]", get_full_name())),
-    };
-}
-
-bxx::quaternion bxx::object::get_rotation_quaternion()
-{
-    return {
-        eval_float(fmt::format("out = {}.rotation_quaternion[0]", get_full_name())),
-        eval_float(fmt::format("out = {}.rotation_quaternion[1]", get_full_name())),
-        eval_float(fmt::format("out = {}.rotation_quaternion[2]", get_full_name())),
-        eval_float(fmt::format("out = {}.rotation_quaternion[3]", get_full_name())),
-    };
-
-}
-
-bxx::vec3 bxx::object::get_scale()
-{
-    return {
-        eval_float(fmt::format("out = {}.scale[0]", get_full_name())),
-        eval_float(fmt::format("out = {}.scale[1]", get_full_name())),
-        eval_float(fmt::format("out = {}.scale[2]", get_full_name())),
-    };
-}
