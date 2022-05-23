@@ -1,5 +1,7 @@
 #include "context.hpp"
 #include "exec.hpp"
+#include "view_layer.hpp"
+#include "scene.hpp"
 
 void bxx::context::set_mode(bxx::editor_mode mode)
 {
@@ -45,4 +47,19 @@ void bxx::context::set_mode(bxx::editor_mode mode)
         exec("bpy.ops.object.mode_set(mode='WEIGHT_PAINT')");
         break;
     }
+}
+
+bxx::view_layer bxx::context::get_view_layer()
+{
+    // todo: is it _always_ the current scene containing the current view layer?
+    return bxx::view_layer(get_scene(), eval_ptr<bl_view_layer>({
+        "out = bpy.context.view_layer.as_pointer()"
+    }));
+}
+
+bxx::scene bxx::context::get_scene()
+{
+    return bxx::scene(eval_ptr<bl_scene>({
+        "out = bpy.context.scene.as_pointer()"
+    }));
 }

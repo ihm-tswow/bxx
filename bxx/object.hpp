@@ -14,9 +14,8 @@ namespace bxx
     public:
         object(bl_object* obj);
         bl_object* get_raw();
-        std::string get_name() override;
-        std::string get_full_name() override;
-
+        std::string get_name() const override;
+        std::string get_full_name() const override;
         bxx::vec3 location();
         bxx::vec3 rotation_euler();
         bxx::quaternion rotation_quaternion();

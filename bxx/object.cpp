@@ -22,12 +22,12 @@ bl_object* bxx::object::get_raw()
     return m_raw;
 }
 
-std::string bxx::object::get_name()
+std::string bxx::object::get_name() const
 {
     return m_raw->id.name + 2;
 }
 
-std::string bxx::object::get_full_name()
+std::string bxx::object::get_full_name() const
 {
     return fmt::format("bpy.data.objects['{}']", get_name());
 }

@@ -2,6 +2,9 @@
 
 namespace bxx
 {
+    class view_layer;
+    class scene;
+
     enum class editor_mode
     {
         OBJECT,
@@ -20,6 +23,9 @@ namespace bxx
     };
     class context
     {
+    public:
         static void set_mode(editor_mode mode);
+        static view_layer get_view_layer();
+        static scene get_scene();
     };
 }

@@ -98,8 +98,8 @@ namespace bxx
     {
     public:
         mesh(bl_mesh* raw);
-        std::string get_name() override;
-        std::string get_full_name() override;
+        std::string get_name() const override;
+        std::string get_full_name() const override;
 
         void add_verts(int verts);
         void add_loops(int loops);

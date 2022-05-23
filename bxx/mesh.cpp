@@ -267,12 +267,12 @@ int bxx::mesh::get_num_loops()
     return m_raw->totloop;
 }
 
-std::string bxx::mesh::get_name()
+std::string bxx::mesh::get_name() const
 {
     return m_raw->id.name + 2;
 }
 
-std::string bxx::mesh::get_full_name()
+std::string bxx::mesh::get_full_name() const
 {
     return fmt::format("bpy.data.meshes['{}']", get_name());
 }
