@@ -8,6 +8,9 @@ namespace mathutils
     template <int max>
     struct rgba
     {
+        rgba(float _r, float _g, float _b, float _a = max)
+            : r(_r), g(_g), b(_b), a(_a)
+        {}
         float r;
         float g;
         float b;
