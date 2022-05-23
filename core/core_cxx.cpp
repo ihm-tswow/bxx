@@ -43,7 +43,10 @@ extern "C" {
         cy_eval_int_ct cy_eval_int,
         cy_eval_float_ct cy_eval_float,
         cy_eval_string_ct cy_eval_string,
-        cy_unregister_script_ct cy_unregister_script
+        cy_unregister_script_ct cy_unregister_script,
+        cy_create_image_buffer_ct cy_create_image_buffer,
+        cy_apply_image_buffer_ct cy_apply_image_buffer,
+        cy_delete_image_buffer_ct cy_delete_image_buffer
     );
     void register_cxx();
     void unregister_cxx();
@@ -143,11 +146,22 @@ void setup_cxx(
     cy_eval_int_ct cy_eval_int,
     cy_eval_float_ct cy_eval_float,
     cy_eval_string_ct cy_eval_string,
-    cy_unregister_script_ct cy_unregister_script
-)
-{
+    cy_unregister_script_ct cy_unregister_script,
+    cy_create_image_buffer_ct cy_create_image_buffer,
+    cy_apply_image_buffer_ct cy_apply_image_buffer,
+    cy_delete_image_buffer_ct cy_delete_image_buffer
+) {
     root_path = fs::path(path);
-    functions = {cy_exec,cy_eval_ptr,cy_eval_int,cy_eval_float,cy_eval_string};
+    functions = {
+        cy_exec,
+        cy_eval_ptr,
+        cy_eval_int,
+        cy_eval_float,
+        cy_eval_string,
+        cy_create_image_buffer,
+        cy_apply_image_buffer,
+        cy_delete_image_buffer
+    };
     _cy_unregister_script = cy_unregister_script;
     __init_pointers_store(&functions);
 }

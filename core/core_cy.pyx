@@ -1,6 +1,7 @@
 import os
 import bpy
 import json
+from cpython cimport array
 from ...preferences import preferences
 from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
 from ..third_party.lock import FileLock
@@ -47,6 +48,24 @@ def fire_operator(self,script,operator,arguments):
     obj_json_b = json.dumps(obj).encode('utf-8')
     _fire_operator(script_b,operator_b,obj_json_b)
 
+cdef array.array cur_pixels
+image_buffers = {}
+cdef float* create_image_buffer(unsigned long long id, int width ,int height):
+    global cur_pixels
+    cur_pixels = array.array('f',[0])
+    array.resize(cur_pixels,width*height*4)
+    image_buffers[id] = cur_pixels
+    return cur_pixels.data.as_floats
+
+cdef void apply_image_buffer(unsigned long long buffer_id, char* image_name):
+    image_name_str = image_name.decode('utf-8')
+    image = bpy.data.images[image_name_str]
+    buffer = image_buffers[buffer_id]
+    image.pixels.foreach_set(buffer) # this looks slow, but it's very fast.
+
+cdef void delete_image_buffer(unsigned long long id):
+    del image_buffers[id]
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #   - Cython Functions -
@@ -65,6 +84,10 @@ ctypedef int (*cy_eval_int_ct)(char*)
 ctypedef float (*cy_eval_float_ct)(char*)
 ctypedef char* (*cy_eval_string_ct)(char*)
 ctypedef void (*cy_unregister_script_ct)(char*)
+
+ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
+ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
+ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
 def build_context():
     context = {}
@@ -125,8 +148,10 @@ cdef extern void setup_cxx(
     cy_eval_int_ct cy_eval_int,
     cy_eval_float_ct cy_eval_float,
     cy_eval_string_ct cy_eval_string,
-
     cy_unregister_script_ct cy_unregister_script,
+    cy_create_image_buffer_ct cy_create_image_buffer,
+    cy_apply_image_buffer_ct cy_apply_image_buffer,
+    cy_delete_image_buffer_ct cy_delete_image_buffer,
 );
 cdef extern void auto_reload_cxx();
 
@@ -147,6 +172,9 @@ setup_cxx(
     eval_float,
     eval_string,
     unregister_script,
+    create_image_buffer,
+    apply_image_buffer,
+    delete_image_buffer
 );
 
 def auto_reload_delay():

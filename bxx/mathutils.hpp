@@ -41,6 +41,24 @@ namespace mathutils
     std::ostream& operator<<(std::ostream& os, const mathutils::vec3& dt);
     std::ostream& operator<<(std::ostream& os, const mathutils::quaternion& dt);
 
+    template <int max>
+    bool operator== (rgba<max> const& a, rgba<max> const& b)
+    {
+        return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+    }
+
+    template <int max>
+    bool operator!= (rgba<max> const& a, rgba<max> const& b)
+    {
+        return !(a == b);
+    }
+
+    template <int max>
+    std::ostream& operator<<(std::ostream& os, rgba<max> const& rgba)
+    {
+        os << "{" << rgba.r << "," << rgba.g << "," << rgba.b << "," << rgba.a << "}";
+        return os;
+    }
 }
 
 // bxx is for blender type references / functions
