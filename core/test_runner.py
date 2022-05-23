@@ -33,7 +33,7 @@ class test_runner(bpy.types.Operator):
         incl_b = self.incl.encode('utf-8')
         excl_b = self.excl.encode('utf-8')
         res = _run_tests(incl_b,excl_b)
-        if(self.raise_on_failure):
+        if(self.raise_on_failure and res):
             raise Exception("Tests failed")
         return {'FINISHED'}
 
