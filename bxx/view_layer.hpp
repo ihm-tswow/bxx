@@ -18,6 +18,7 @@ namespace bxx
         std::string get_name() const override;
         std::string get_full_name() const override;
         void link_object(bxx::object const& obj);
+        void update();
         bl_view_layer* get_raw();
     private:
         bl_view_layer* m_raw;

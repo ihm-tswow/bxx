@@ -1,6 +1,7 @@
 #include "object.hpp"
 #include "exec.hpp"
 #include "mesh.hpp"
+#include "armature.hpp"
 
 #include "makesdna/DNA_object_types.h"
 
@@ -12,6 +13,14 @@ bxx::object bxx::object::create(std::string const& name, bxx::mesh mesh)
         fmt::format("out = bpy.data.objects.new('{}',{}).as_pointer()", name, mesh.get_full_name())
     }));
 }
+
+bxx::object bxx::object::create(std::string const& name, bxx::armature armature)
+{
+    return bxx::object(eval_ptr<bl_object>({
+        fmt::format("out = bpy.data.objects.new('{}',{}).as_pointer()", name, armature.get_full_name())
+    }));
+}
+
 
 bxx::object::object(bl_object* obj)
     : m_raw(obj)
@@ -55,5 +64,10 @@ bxx::vec3 bxx::object::scale()
 mathutils::quaternion bxx::quaternion::get()
 {
     return { get_w(), get_x(), get_y(), get_z() };
+}
+
+void bxx::object::set_selected(bool selected)
+{
+    exec(fmt::format("{}.select_set({})",get_full_name(),selected ? "True" : "False"));
 }
 

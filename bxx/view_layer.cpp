@@ -35,3 +35,8 @@ bl_view_layer* bxx::view_layer::get_raw()
     return m_raw;
 }
 
+void bxx::view_layer::update()
+{
+    exec(fmt::format("{}.update()", get_full_name()));
+}
+
