@@ -21,6 +21,8 @@ namespace bxx
         bxx::vec3 rotation_euler();
         bxx::quaternion rotation_quaternion();
         bxx::vec3 scale();
+        bxx::mesh mesh();
+        bxx::armature armature();
         void set_selected(bool selected);
         static bxx::object create(std::string const& name, bxx::mesh mesh);
         static bxx::object create(std::string const& name, bxx::armature armature);

@@ -71,3 +71,17 @@ void bxx::object::set_selected(bool selected)
     exec(fmt::format("{}.select_set({})",get_full_name(),selected ? "True" : "False"));
 }
 
+bxx::mesh bxx::object::mesh()
+{
+    return bxx::mesh(eval_ptr<bl_mesh>({
+        fmt::format("out = {}.data.as_pointer()", get_full_name())
+    }));
+}
+
+bxx::armature bxx::object::armature()
+{
+    return bxx::armature(eval_ptr<bl_armature>({
+        fmt::format("out = {}.data.as_pointer()", get_full_name())
+    }));
+}
+
