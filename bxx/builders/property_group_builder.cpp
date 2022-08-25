@@ -13,9 +13,12 @@ namespace bxx
 
     property_group_builder::~property_group_builder()
     {
-        python_builder builder;
-        write(builder);
-        exec(builder.get_code());
+        if (m_should_register)
+        {
+            python_builder builder;
+            write(builder);
+            exec(builder.get_code());
+        }
     }
 
 
