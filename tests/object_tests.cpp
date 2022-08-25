@@ -25,8 +25,8 @@ BXX_TEST(rotate_object_euler) {
 
 BXX_TEST(rotate_object_quaternion) {
     bxx::object obj = create_test_object("test_object");
-    obj.rotation_quaternion().set(-1, 0.1, 0.2, 0.3);
-    BXX_ASSERT_EQUAL(obj.rotation_quaternion().get(), mathutils::quaternion(-1, 0.1, 0.2, 0.3));
+    obj.rotation_quaternion().set(-1.0f, 0.1f, 0.2f, 0.3f);
+    BXX_ASSERT_EQUAL(obj.rotation_quaternion().get(), mathutils::quaternion(-1.0f, 0.1f, 0.2f, 0.3f));
 }
 
 BXX_TEST(scale_object) {
