@@ -136,7 +136,7 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
                     else
                     {
                         std::string val = entry.get_option_or("name", entry.get_id());
-                        builder.write_line("cur.prop(self,'{}', text = \"{}\");", entry.get_id(), val);
+                        builder.write_line("self.layout.prop(self,'{}', text = \"{}\");", entry.get_id(), val);
                     }
                 });
             }
