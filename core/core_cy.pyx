@@ -5,7 +5,7 @@ from cpython cimport array
 from ...preferences import preferences
 from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
 from ..third_party.lock import FileLock
-from .util import get_root_dir, get_addon_name
+from .util import get_addon_path, get_addon_name
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -96,6 +96,7 @@ def build_context():
     context['preferences'] = preferences
     context['fire_operator'] = fire_operator
     context['get_addon_name'] = get_addon_name
+    context['get_addon_path'] = get_addon_path
     return context
 
 cdef void _exec(char* exec_bytes):
@@ -156,7 +157,7 @@ cdef extern void setup_cxx(
 cdef extern void auto_reload_cxx();
 
 def auto_reload_lockfile_path():
-    return os.path.join(get_root_dir(), AUTO_RELOAD_LOCK_FILE)
+    return os.path.join(get_addon_path(), AUTO_RELOAD_LOCK_FILE)
 
 if os.path.exists(auto_reload_lockfile_path()):
     try:
@@ -165,7 +166,7 @@ if os.path.exists(auto_reload_lockfile_path()):
         print("Failed to remove lockfile, automatic reloading can become unstable")
 
 setup_cxx(
-    get_root_dir().encode('utf-8'),
+    get_addon_path().encode('utf-8'),
     _exec,
     eval_ptr,
     eval_int,
@@ -181,7 +182,7 @@ def auto_reload_delay():
     return preferences.get('auto_reload_interval',0.25)
 
 def auto_reload():
-    if os.path.exists(os.path.join(get_root_dir(), AUTO_RELOAD_CONFIG_FILE)):
+    if os.path.exists(os.path.join(get_addon_path(), AUTO_RELOAD_CONFIG_FILE)):
         try:
             with FileLock(auto_reload_lockfile_path(),0.001):
                 auto_reload_cxx()

@@ -1,6 +1,6 @@
 import os
 
-def get_root_dir():
+def get_addon_path():
     return os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 def get_addon_name():

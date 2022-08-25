@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace bxx
 {
@@ -13,4 +16,5 @@ namespace bxx
         static bool get_bool(std::string const& id, bool def);
     };
     std::string get_addon_name();
+    fs::path get_addon_path();
 }

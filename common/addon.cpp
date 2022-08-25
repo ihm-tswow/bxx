@@ -27,3 +27,8 @@ std::string bxx::get_addon_name()
 {
     return eval_string("out = get_addon_name()");
 }
+
+fs::path bxx::get_addon_path()
+{
+    return eval_string("out = get_addon_path()");
+}
