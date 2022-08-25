@@ -1,4 +1,5 @@
 #include "util.hpp"
+
 #include <ostream>
 
 bool bxx::ends_with(std::string const & value, std::string const & ending)
@@ -29,9 +30,7 @@ static bool match(const char* pattern, const char* candidate, int p, int c) {
     }
 }
 
-
 bool bxx::match(std::string const& pattern, std::string const& candidate)
 {
     return ::match(pattern.c_str(), candidate.c_str(), 0, 0);
 }
-

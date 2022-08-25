@@ -16,6 +16,5 @@ namespace bxx
     };
 
     std::ostream& operator<<(std::ostream& os, color_code const& color);
-
     bool match(std::string const& pattern, std::string const& candidate);
 }
