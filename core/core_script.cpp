@@ -17,7 +17,7 @@
 // =============================================================
 
 #include "shared_functions.hpp"
-#include "operator.hpp"
+#include "builders/operator_builder.hpp"
 #include "nlohmann/json.hpp"
 #include "api.hpp"
 

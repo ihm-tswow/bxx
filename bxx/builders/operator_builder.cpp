@@ -1,7 +1,7 @@
-#include "operator.hpp"
+#include "operator_builder.hpp"
 #include "exec.hpp"
-#include "script.hpp"
-#include "builders/python_builder.hpp"
+#include "../script.hpp" // include dir not working for this one file for some bizarre reason
+#include "python_builder.hpp"
 
 #include "fmt/core.h"
 #include <nlohmann/json.hpp>

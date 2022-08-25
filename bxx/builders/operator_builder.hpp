@@ -1,7 +1,7 @@
 #pragma once
 
-#include "builders/property_builder.hpp"
-#include "builders/class_header_builder.hpp"
+#include "property_builder.hpp"
+#include "class_header_builder.hpp"
 
 #include <nlohmann/json.hpp>
 

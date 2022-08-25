@@ -24,7 +24,7 @@ def generate_dir(script_root):
     generated_path = os.path.join(script_root,'calls.generated.cpp')
     generated = '\n'.join([
         '#include "tests.hpp"',
-        '#include "operator.hpp"',
+        '#include "builders/operator_builder.hpp"',
         '#include "api.hpp"',
         '',
         '// Generated test calls',

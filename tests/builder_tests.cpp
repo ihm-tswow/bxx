@@ -4,7 +4,7 @@
 #include "builders/value_builder.hpp"
 #include "builders/python_builder.hpp"
 #include "builders/property_builder.hpp"
-#include "operator.hpp"
+#include "builders/operator_builder.hpp"
 #include "addon.hpp"
 
 #define ASSERT_VALUE_CODE(value,code)\
