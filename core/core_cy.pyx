@@ -48,6 +48,14 @@ def fire_operator(self,script,operator,arguments):
     obj_json_b = json.dumps(obj).encode('utf-8')
     _fire_operator(script_b,operator_b,obj_json_b)
 
+registered_property_groups = []
+def register_property_group(target, name, property_group,is_collection):
+    registered_property_groups.append((target,name))
+    if is_collection:
+        setattr(target,name,bpy.props.CollectionProperty(type=property_group))
+    else:
+        setattr(target,name,bpy.props.PointerProperty(type=property_group))
+
 cdef array.array cur_pixels
 image_buffers = {}
 cdef float* create_image_buffer(unsigned long long id, int width ,int height):
@@ -93,6 +101,7 @@ def build_context():
     context = {}
     context['bpy'] = bpy
     context['register_operator'] = register_operator
+    context['register_property_group'] = register_property_group
     context['preferences'] = preferences
     context['fire_operator'] = fire_operator
     context['get_addon_name'] = get_addon_name
@@ -200,6 +209,10 @@ def unregister():
         for (operator,show) in op_table:
             bpy.types.VIEW3D_MT_object.remove(show)
             bpy.utils.unregister_class(operator)
+
+    for (target,name) in registered_property_groups:
+        delattr(target,name)
+
     registered_operators = []
     unregister_cxx();
 

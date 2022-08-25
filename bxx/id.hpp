@@ -6,6 +6,7 @@ typedef struct ID bl_id;
 
 namespace bxx
 {
+    class property_group;
     class id
     {
     public:
@@ -16,5 +17,9 @@ namespace bxx
         void set_float_prop(std::string const& prop, float v1, float v2, float v3);
         void set_float_prop(std::string const& prop, float v1, float v2, float v3, float v4);
         void set_string_prop(std::string const& prop, std::string const& value);
+
+        float get_float_prop(std::string const& prop);
+
+        property_group get_property_group(std::string const& key, int index = -1);
     };
 }
