@@ -27,7 +27,7 @@ namespace bxx
         , public bxx::class_header_builder<operator_builder>
     {
     public:
-        operator_builder(std::string const& bl_id, bool registers);
+        operator_builder(std::string const& bl_id, bool registers = true);
         operator_builder& set_description(std::string const& description);
         operator_builder& add_option(std::string const& option);
         operator_builder& add_option(std::initializer_list<std::string> const& option);
