@@ -7,6 +7,7 @@
 #include <iostream>
 #include <filesystem>
 #include <ostream>
+#include <fstream>
 
 #define BXX_TEST(name) void name()
 #define BXX_ASSERT_EQUAL(v1,v2) bxx::_assert_equal(__FILE__, __func__, __LINE__, v1, v2)
@@ -82,4 +83,8 @@ namespace bxx
             _print_test_error(file, func, lineno, v1, " == ", v2);
         }
     }
+
+    void write_test_file(std::string const& localPath, char const* values, size_t size, bool binary = false);
+    void write_test_file(std::string const& localPath, std::string const& contents);
+    void write_test_file(std::string const& localPath, std::vector<char> contents);
 }
