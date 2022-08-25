@@ -26,7 +26,7 @@ namespace bxx
         template <typename T>
         property_entry& add_option(std::string const& key, T const& value)
         {
-            //m_options.emplace(key,value);
+            m_options.emplace(key,value);
             return *this;
         }
 
