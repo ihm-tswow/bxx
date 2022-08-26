@@ -126,17 +126,18 @@ function(generate_blender_version build_version)
       execute_process(COMMAND ${PYTHON_PATH}/python.exe -m pip install cython)
     endif()
 
+    set(PYTHON_SOURCE ${PYTHON_ID}_dev)
     FetchContent_Declare(
-      ${PYTHON_ID}_dev
+      ${PYTHON_SOURCE}
       URL ${PYTHON_WINDOWS_DEV_DOWNLOAD}
     )
     FetchContent_GetProperties(${PYTHON_ID}_dev)
-    if(NOT ${PYTHON_ID}_dev_POPULATED)
+    if(NOT ${PYTHON_SOURCE}_POPULATED)
       message(STATUS "Installing python development files")
-      FetchContent_Populate(${PYTHON_ID}_dev)
+      FetchContent_Populate(${PYTHON_SOURCE})
     endif()
-    file(COPY ${${PYTHON_ID}_dev_SOURCE_DIR}/tools/libs DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
-    file(COPY ${${PYTHON_ID}_dev_SOURCE_DIR}/tools/include DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
+    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/libs DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
+    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/include DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
   endif()
 
   if(UNIX AND NOT APPLE)
@@ -182,6 +183,10 @@ function(generate_blender_version build_version)
       FetchContent_Populate(${PYTHON_SOURCE})
     endif()
   endif()
+
+  set(Python_ROOT_DIR ${${PYTHON_SOURCE}_SOURCE_DIR})
+  find_package(Python COMPONENTS Development)
+
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   #
@@ -255,6 +260,7 @@ function(generate_blender_version build_version)
 
   target_include_directories(
     ${bxx} PRIVATE
+    ${Python_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
@@ -263,6 +269,7 @@ function(generate_blender_version build_version)
 
   target_link_libraries(
     ${bxx} PUBLIC
+    ${Python_LIBRARIES}
     fmt::fmt-header-only
     nlohmann_json::nlohmann_json
   )
