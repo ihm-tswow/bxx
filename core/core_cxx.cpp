@@ -14,8 +14,9 @@
 
 struct library_handle
 {
-    library_handle(fs::file_time_type ctime, std::string const& name, fs::path load_path)
+    library_handle(fs::file_time_type ctime, size_t index, std::string const& name, fs::path load_path)
         : m_ctime(ctime)
+        , m_index(index)
         , m_name(name)
         , m_load_path(load_path)
     {}
@@ -23,9 +24,10 @@ struct library_handle
     library_handle() = default;
 
     fs::file_time_type m_ctime;
-    sl_ptr_ct m_library = nullptr;
+    size_t m_index;
     std::string m_name;
     fs::path m_load_path;
+    sl_ptr_ct m_library = nullptr;
 };
 
 void init_pointers_store(shared_functions* pointers);
@@ -85,7 +87,8 @@ static void load_script(fs::path const& dll_path)
     }
     else
     {
-        handle = &libraries.emplace_back(last_write, script_name, dll_load_path);
+        size_t index = libraries.size();
+        handle = &libraries.emplace_back(last_write, index, script_name, dll_load_path);
     }
 
     try
@@ -115,7 +118,7 @@ static void load_script(fs::path const& dll_path)
     }
 
     std::cout << "Loading script " << script_name << "\n";
-    script_register(script_name.c_str(), &functions);
+    script_register(script_name.c_str(), handle->m_index, &functions);
 }
 
 // Returns all script library paths
@@ -195,22 +198,22 @@ extern "C" {
         libraries.clear();
     }
 
-    void lib_fire_operator(char* script, char* op, char* json)
+    void lib_fire_operator(size_t index, char* op, char* json)
     {
-        auto itr = find_library(script);
-        if (itr == libraries.end())
+        if (index >= libraries.size())
         {
-            std::cout << "Error: Attempted to call operator " << op << " in non-existing script " << script << "\n";
+            std::cout << "Error: Attempted to call operator " << op << " for non-existing script index\n";
             return;
         }
-        fire_operator_ct cb = (fire_operator_ct)SL_FN(itr->m_library, "lib_fire_operator");
+        library_handle& handle = libraries[index];
+        fire_operator_ct cb = (fire_operator_ct)SL_FN(handle.m_library, "lib_fire_operator");
         if (cb)
         {
             cb(op, json);
         }
         else
         {
-            std::cout << "Error: Could not find declaration for lib_fire_operator script \"" << script << "\"\n";
+            std::cout << "Error: Could not find declaration for lib_fire_operator script \"" << handle.m_name << "\"\n";
         }
     }
 

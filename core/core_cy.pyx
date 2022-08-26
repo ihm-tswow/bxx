@@ -34,10 +34,9 @@ cdef void unregister_script(char* script):
             bpy.utils.unregister_class(operator)
         del registered_operators[script_str]
 
-cdef extern void lib_fire_operator(char* script, char* operator, char* args)
+cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
 
 def fire_operator(self,script,operator,arguments):
-    script_b = script.encode('utf-8')
     operator_b = operator.encode('utf-8')
     obj = {}
     for arg in arguments:
@@ -46,7 +45,7 @@ def fire_operator(self,script,operator,arguments):
             continue
         obj[arg] = getattr(self,arg)
     obj_json_b = json.dumps(obj).encode('utf-8')
-    lib_fire_operator(script_b,operator_b,obj_json_b)
+    lib_fire_operator(script,operator_b,obj_json_b)
 
 registered_property_groups = []
 def register_property_group(target, name, property_group,is_collection):

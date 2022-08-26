@@ -156,7 +156,7 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
                     }
                     });
             }
-            builder.write_line("fire_operator(self, '{}', '{}', parameter_names)", cur_script_name(), m_bl_id);
+            builder.write_line("fire_operator(self, {}, '{}', parameter_names)", get_script_index(), m_bl_id);
             builder.begin_line("return {{'FINISHED'}}");
         }
 
@@ -167,7 +167,7 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
         builder.write_line("self.layout.operator({}.bl_idname)", get_class_name());
     }
 
-    builder.write_line("register_operator('{}','{}',{},show_{})", bxx::cur_script_name(), m_bl_id, get_class_name(), get_class_name());
+    builder.write_line("register_operator({},'{}',{},show_{})", get_script_index(), m_bl_id, get_class_name(), get_class_name());
 }
 
 

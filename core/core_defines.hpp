@@ -3,7 +3,7 @@
 #include "../common/shared_functions.hpp"
 #include "../common/tests.hpp"
 
-typedef void (*script_register_ct)(char const* script_name, shared_functions* functions);
+typedef void (*script_register_ct)(char const* script_name, size_t index, shared_functions* functions);
 typedef void (*script_unregister_ct)();
 typedef void (*cy_unregister_script_ct)(char*);
 typedef bxx::test_collection* (*register_tests_ct)();
