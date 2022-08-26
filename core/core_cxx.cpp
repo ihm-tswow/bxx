@@ -14,9 +14,9 @@ namespace fs = std::filesystem;
 typedef void (*script_register_ct)(char const* script_name, shared_functions* functions);
 typedef void (*script_unregister_ct)();
 typedef void (*cy_unregister_script_ct)(char*);
-typedef bxx::test_collection* (*__register_tests_ct)();
+typedef bxx::test_collection* (*register_tests_ct)();
 
-static cy_unregister_script_ct _cy_unregister_script = nullptr;
+static cy_unregister_script_ct cy_unregister_script = nullptr;
 
 #if defined(WIN32) || defined (_WIN32) || defined(__WIN32)
     #include <windows.h>
@@ -81,12 +81,12 @@ static std::string get_library_extension()
 
 static void unload_script(library_handle const& handle)
 {
-    script_unregister_ct script_unregister = (script_unregister_ct)SL_FN(handle.m_library, "_script_unregister");
+    script_unregister_ct script_unregister = (script_unregister_ct)SL_FN(handle.m_library, "lib_script_unregister");
     if (script_unregister)
     {
         script_unregister();
     }
-    _cy_unregister_script(const_cast<char*>(handle.m_name.c_str()));
+    cy_unregister_script(const_cast<char*>(handle.m_name.c_str()));
     SL_CLOSE(handle.m_library);
     fs::remove(handle.m_load_path);
 }
@@ -127,7 +127,7 @@ static void load_script(fs::path const& dll_path)
 
     libraries[script_name] = {last_write,dll,script_name,dll_load_path};
 
-    script_register_ct script_register = (script_register_ct) SL_FN(dll, "_script_register");
+    script_register_ct script_register = (script_register_ct) SL_FN(dll, "lib_script_register");
     if(!script_register)
     {
         std::cout << "Error: Could not find registry function for script " << script_name << "\n";
@@ -138,7 +138,7 @@ static void load_script(fs::path const& dll_path)
     script_register(script_name.c_str(), &functions);
 }
 
-void __init_pointers_store(shared_functions* functions);
+void init_pointers_store(shared_functions* functions);
 void setup_cxx(
     char* path,
     cy_exec_ct cy_exec,
@@ -162,8 +162,8 @@ void setup_cxx(
         cy_apply_image_buffer,
         cy_delete_image_buffer
     };
-    _cy_unregister_script = cy_unregister_script;
-    __init_pointers_store(&functions);
+    cy_unregister_script = cy_unregister_script;
+    init_pointers_store(&functions);
 }
 
 static std::vector<fs::path> get_scripts()
@@ -223,10 +223,10 @@ int run_tests(char* include, char* exclude)
 
     for (auto const& [name,library] : libraries)
     {
-        __register_tests_ct __register_tests = (__register_tests_ct)SL_FN(library.m_library, "__register__tests");
-        if (__register_tests)
+        register_tests_ct lib_register_tests_ptr = (register_tests_ct)SL_FN(library.m_library, "lib_register_tests");
+        if (lib_register_tests_ptr)
         {
-            bxx::test_collection* col = __register_tests();
+            bxx::test_collection* col = lib_register_tests_ptr();
             if (col)
             {
                 for (int i = 0; i < col->m_count; ++i)
@@ -314,7 +314,7 @@ void unregister_cxx()
 typedef void (*fire_operator_ct)(char* op, char* json);
 
 extern "C" {
-    void _fire_operator(char* script, char* op, char* json)
+    void lib_fire_operator(char* script, char* op, char* json)
     {
         auto itr = libraries.find(script);
         if (itr == libraries.end())
@@ -322,14 +322,14 @@ extern "C" {
             std::cout << "Error: Attempted to call operator " << op << " in non-existing script " << script << "\n";
             return;
         }
-        fire_operator_ct cb = (fire_operator_ct)SL_FN(itr->second.m_library, "_fire_operator");
+        fire_operator_ct cb = (fire_operator_ct)SL_FN(itr->second.m_library, "lib_fire_operator");
         if (cb)
         {
             cb(op, json);
         }
         else
         {
-            std::cout << "Error: Could not find declaration for _fire_operator script \"" << script << "\"\n";
+            std::cout << "Error: Could not find declaration for lib_fire_operator script \"" << script << "\"\n";
         }
     }
 }

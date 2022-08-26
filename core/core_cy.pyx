@@ -34,7 +34,7 @@ cdef void unregister_script(char* script):
             bpy.utils.unregister_class(operator)
         del registered_operators[script_str]
 
-cdef extern void _fire_operator(char* script, char* operator, char* args)
+cdef extern void lib_fire_operator(char* script, char* operator, char* args)
 
 def fire_operator(self,script,operator,arguments):
     script_b = script.encode('utf-8')
@@ -46,7 +46,7 @@ def fire_operator(self,script,operator,arguments):
             continue
         obj[arg] = getattr(self,arg)
     obj_json_b = json.dumps(obj).encode('utf-8')
-    _fire_operator(script_b,operator_b,obj_json_b)
+    lib_fire_operator(script_b,operator_b,obj_json_b)
 
 registered_property_groups = []
 def register_property_group(target, name, property_group,is_collection):
@@ -114,7 +114,7 @@ cdef void _exec(char* exec_bytes):
     except Exception as e:
         raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
 
-def _eval(char* exec_bytes):
+def cy_eval(char* exec_bytes):
     try:
         context = build_context()
         exec(exec_bytes.decode('utf-8'), context)
@@ -123,19 +123,19 @@ def _eval(char* exec_bytes):
         raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
 
 cdef cy_ptr_ct eval_ptr(char* exec_bytes):
-    return _eval(exec_bytes)
+    return cy_eval(exec_bytes)
 
 cdef int eval_int(char* exec_bytes):
-    return int(_eval(exec_bytes))
+    return int(cy_eval(exec_bytes))
 
 cdef float eval_float(char* exec_bytes):
-    return float(_eval(exec_bytes))
+    return float(cy_eval(exec_bytes))
 
 last_str = None
 cdef char* eval_string(char* exec_bytes):
     global last_str
     try:
-        last_str = str(_eval(exec_bytes)).encode('utf-8')
+        last_str = str(cy_eval(exec_bytes)).encode('utf-8')
     except:
         last_str = "".encode('utf-8')
     return last_str
@@ -217,7 +217,7 @@ def unregister():
     unregister_cxx();
 
 # called from test_runner.py, because blender does not accept cython methods
-def _run_tests(incl,excl):
+def cy_run_tests(incl,excl):
     ret = run_tests(incl,excl)
     bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
     return ret

@@ -11,7 +11,7 @@
 #include <map>
 #include <set>
 
-#define BXX_OPERATOR(x) void __register_##x(bxx::operator_builder & x)
+#define BXX_OPERATOR(x) void op_register_##x(bxx::operator_builder & x)
 
 namespace bxx
 {

@@ -1,5 +1,5 @@
 import bpy
-from .core_cy import _run_tests
+from .core_cy import cy_run_tests
 from .util import get_addon_name
 
 class test_runner(bpy.types.Operator):
@@ -32,7 +32,7 @@ class test_runner(bpy.types.Operator):
     def execute(self, context):
         incl_b = self.incl.encode('utf-8')
         excl_b = self.excl.encode('utf-8')
-        res = _run_tests(incl_b,excl_b)
+        res = cy_run_tests(incl_b,excl_b)
         if(self.raise_on_failure and res):
             raise Exception("Tests failed")
         return {'FINISHED'}

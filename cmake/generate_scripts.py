@@ -40,7 +40,7 @@ def generate_dir(script_root):
             '',
             'static bxx::test_collection col = {{ cases, {{ {0} }}}};'.format(len(all_tests)),
             '',
-            'BXX_API bxx::test_collection* __register__tests() {',
+            'BXX_API bxx::test_collection* lib_register_tests() {',
             '    return &col;',
             '}',
             '',
@@ -48,7 +48,7 @@ def generate_dir(script_root):
         ])
     else:
         generated += '\n'.join([
-            'BXX_API bxx::test_collection* __register__tests() {',
+            'BXX_API bxx::test_collection* lib_register_tests() {',
             '    return nullptr;',
             '}',
             '',
@@ -57,10 +57,10 @@ def generate_dir(script_root):
 
     generated += '\n'.join([
         '// Generated operator calls',
-        '\n'.join(['void __register_{0}(bxx::operator_builder &);'.format(operator) for operator in all_operators]),
-        'void __register_operators() {',
+        '\n'.join(['void op_register_{0}(bxx::operator_builder &);'.format(operator) for operator in all_operators]),
+        'void register_operators() {',
         '\n'.join(['    bxx::operator_builder _op_{0}("{0}",true);'.format(operator) for operator in all_operators]),
-        '\n'.join(['    __register_{0}(_op_{0});'.format(operator) for operator in all_operators]),
+        '\n'.join(['    op_register_{0}(_op_{0});'.format(operator) for operator in all_operators]),
         '}',
     ])
 

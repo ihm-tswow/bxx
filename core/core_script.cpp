@@ -23,31 +23,31 @@
 
 #include <iostream>
 
-BXX_API void _script_register(char const* script_name, shared_functions* functions);
-BXX_API void _script_unregister();
-BXX_API void _fire_operator(char const* op, char const* json);
+BXX_API void lib_script_register(char const* script_name, shared_functions* functions);
+BXX_API void lib_script_unregister();
+BXX_API void lib_fire_operator(char const* op, char const* json);
 
-void __register_operators();
-void __set_script_name(std::string const& script_name);
-void __init_pointers_store(shared_functions* functions);
+void register_operators();
+void set_script_name(std::string const& script_name);
+void init_pointers_store(shared_functions* functions);
 
 void script_register();
 void script_unregister();
 
-void _script_register(char const* script_name, shared_functions* functions)
+void lib_script_register(char const* script_name, shared_functions* functions)
 {
-    __init_pointers_store(functions);
-    __set_script_name(script_name);
-    __register_operators();
+    init_pointers_store(functions);
+    set_script_name(script_name);
+    register_operators();
     script_register();
 }
 
-void _script_unregister()
+void lib_script_unregister()
 {
     script_unregister();
 }
 
-void _fire_operator(char const* op, char const* json)
+void lib_fire_operator(char const* op, char const* json)
 {
     auto callback = bxx::operators::get_callback(op);
     if (callback == nullptr)
