@@ -38,10 +38,10 @@ struct library_handle
 };
 
 void init_pointers_store(shared_functions* pointers);
-cy_unregister_script_ct cy_unregister_script = nullptr;
-shared_functions functions;
-fs::path root_path;
-std::vector<library_handle> libraries;
+static cy_unregister_script_ct cy_unregister_script = nullptr;
+static shared_functions functions;
+static fs::path root_path;
+static std::vector<library_handle> libraries;
 
 static auto find_library(std::string const& name)
 {
