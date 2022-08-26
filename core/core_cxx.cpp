@@ -14,8 +14,16 @@
 
 struct library_handle
 {
+    library_handle(fs::file_time_type ctime, std::string const& name, fs::path load_path)
+        : m_ctime(ctime)
+        , m_name(name)
+        , m_load_path(load_path)
+    {}
+
+    library_handle() = default;
+
     fs::file_time_type m_ctime;
-    sl_ptr_ct m_library;
+    sl_ptr_ct m_library = nullptr;
     std::string m_name;
     fs::path m_load_path;
 };
@@ -25,7 +33,12 @@ void init_pointers_store(shared_functions* pointers);
 cy_unregister_script_ct cy_unregister_script = nullptr;
 shared_functions functions;
 fs::path root_path;
-std::map<std::string, library_handle> libraries;
+std::vector<library_handle> libraries;
+
+static auto find_library(std::string const& name)
+{
+    return std::find_if(libraries.begin(), libraries.end(), [&](library_handle const& lib) { return lib.m_name == name; });
+}
 
 static std::string get_library_extension()
 {
@@ -58,16 +71,22 @@ static void load_script(fs::path const& dll_path)
 {
     std::string const& script_name = dll_path.filename().string();
 
-    auto old = libraries.find(script_name);
-    if(old != libraries.end())
-    {
-        unload_script(old->second);
-        libraries.erase(old);
-    }
-
     // copy to a separate file so we can rebuild in peace
     fs::file_time_type last_write = fs::last_write_time(dll_path);
     fs::path dll_load_path = dll_path.string() + ".load";
+
+    library_handle* handle;
+    auto old = find_library(script_name);
+    if(old != libraries.end())
+    {
+        unload_script(*old);
+        old->m_ctime = last_write;
+        handle = &*old;
+    }
+    else
+    {
+        handle = &libraries.emplace_back(last_write, script_name, dll_load_path);
+    }
 
     try
     {
@@ -80,17 +99,15 @@ static void load_script(fs::path const& dll_path)
         return;
     }
 
-    sl_ptr_ct dll = SL_LOAD(dll_load_path.string().c_str());
+    handle->m_library = SL_LOAD(dll_load_path.string().c_str());
 
-    if (dll == nullptr)
+    if (!handle->m_library)
     {
         std::cout << "Error: Could not open library file for script " << script_name << "\n";
         return;
     }
 
-    libraries[script_name] = {last_write,dll,script_name,dll_load_path};
-
-    script_register_ct script_register = (script_register_ct) SL_FN(dll, "lib_script_register");
+    script_register_ct script_register = (script_register_ct) SL_FN(handle->m_library, "lib_script_register");
     if(!script_register)
     {
         std::cout << "Error: Could not find registry function for script " << script_name << "\n";
@@ -153,8 +170,8 @@ extern "C" {
         for (auto const& dir_entry : get_scripts())
         {
             std::string script_name = dir_entry.filename().string();
-            auto old = libraries.find(script_name);
-            if (old == libraries.end() || old->second.m_ctime != fs::last_write_time(dir_entry))
+            auto old = find_library(script_name);
+            if (old == libraries.end() || old->m_ctime != fs::last_write_time(dir_entry))
             {
                 load_script(dir_entry);
             }
@@ -171,22 +188,22 @@ extern "C" {
 
     void unregister_cxx()
     {
-        for (auto& [_, script] : libraries)
+        for (library_handle & library : libraries)
         {
-            unload_script(script);
+            unload_script(library);
         }
         libraries.clear();
     }
 
     void lib_fire_operator(char* script, char* op, char* json)
     {
-        auto itr = libraries.find(script);
+        auto itr = find_library(script);
         if (itr == libraries.end())
         {
             std::cout << "Error: Attempted to call operator " << op << " in non-existing script " << script << "\n";
             return;
         }
-        fire_operator_ct cb = (fire_operator_ct)SL_FN(itr->second.m_library, "lib_fire_operator");
+        fire_operator_ct cb = (fire_operator_ct)SL_FN(itr->m_library, "lib_fire_operator");
         if (cb)
         {
             cb(op, json);
@@ -226,7 +243,7 @@ extern "C" {
             std::cout << bxx::color_code::GRAY << "exclude: " << include << bxx::color_code::DEFAULT << "\n";
         }
 
-        for (auto const& [name, library] : libraries)
+        for (library_handle & library : libraries)
         {
             register_tests_ct lib_register_tests_ptr = (register_tests_ct)SL_FN(library.m_library, "lib_register_tests");
             if (lib_register_tests_ptr)
@@ -238,7 +255,7 @@ extern "C" {
                     {
                         total_tests++;
                         std::string full_name =
-                            name.substr(0, name.size() - int(get_library_extension().size()))
+                            library.m_name.substr(0, library.m_name.size() - int(get_library_extension().size()))
                             + "." + col->m_entries[i].m_name;
 
                         if (
