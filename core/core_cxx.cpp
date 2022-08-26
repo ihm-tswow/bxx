@@ -28,10 +28,16 @@ struct library_handle
     std::string m_name;
     fs::path m_load_path;
     sl_ptr_ct m_library = nullptr;
+    lib_fire_event_ct m_fire_event = nullptr;
+
+    void unload()
+    {
+        m_library = nullptr;
+        m_fire_event = nullptr;
+    }
 };
 
 void init_pointers_store(shared_functions* pointers);
-
 cy_unregister_script_ct cy_unregister_script = nullptr;
 shared_functions functions;
 fs::path root_path;
@@ -56,7 +62,7 @@ static std::string get_library_extension()
 }
 
 // Unloads a single script library
-static void unload_script(library_handle const& handle)
+static void unload_script(library_handle & handle)
 {
     script_unregister_ct script_unregister = (script_unregister_ct)SL_FN(handle.m_library, "lib_script_unregister");
     if (script_unregister)
@@ -65,6 +71,7 @@ static void unload_script(library_handle const& handle)
     }
     cy_unregister_script(const_cast<char*>(handle.m_name.c_str()));
     SL_CLOSE(handle.m_library);
+    handle.unload();
     fs::remove(handle.m_load_path);
 }
 
@@ -111,6 +118,8 @@ static void load_script(fs::path const& dll_path)
     }
 
     script_register_ct script_register = (script_register_ct) SL_FN(handle->m_library, "lib_script_register");
+    handle->m_fire_event = (lib_fire_event_ct)SL_FN(handle->m_library, "lib_fire_event");
+
     if(!script_register)
     {
         std::cout << "Error: Could not find registry function for script " << script_name << "\n";
@@ -198,23 +207,9 @@ extern "C" {
         libraries.clear();
     }
 
-    void lib_fire_operator(size_t index, char* op, char* json)
+    void core_fire_event(size_t script, size_t evt, PyObject* obj)
     {
-        if (index >= libraries.size())
-        {
-            std::cout << "Error: Attempted to call operator " << op << " for non-existing script index\n";
-            return;
-        }
-        library_handle& handle = libraries[index];
-        fire_operator_ct cb = (fire_operator_ct)SL_FN(handle.m_library, "lib_fire_operator");
-        if (cb)
-        {
-            cb(op, json);
-        }
-        else
-        {
-            std::cout << "Error: Could not find declaration for lib_fire_operator script \"" << handle.m_name << "\"\n";
-        }
+        libraries[script].m_fire_event(evt, obj);
     }
 
     int run_tests(char* include, char* exclude)

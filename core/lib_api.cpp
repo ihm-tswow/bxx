@@ -23,10 +23,12 @@
 
 #include <iostream>
 
+
 // Private functions
 void register_operators();
 void init_pointers_store(shared_functions* functions);
 void setup_script_data(std::string const& name, size_t index);
+extern std::vector<std::function<void(PyObject*)>> events;
 
 // Provided by user
 void script_register();
@@ -46,13 +48,7 @@ BXX_API void lib_script_unregister()
     script_unregister();
 }
 
-BXX_API void lib_fire_operator(char const* op, char const* json)
+BXX_API void lib_fire_event(size_t index, PyObject* obj)
 {
-    auto callback = bxx::operators::get_callback(op);
-    if (callback == nullptr)
-    {
-        std::cout << "Error: Operator " << op << " has no callback registered\n";
-        return;
-    }
-    callback(nlohmann::json::parse(json));
+    events[index](obj);
 }

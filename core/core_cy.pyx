@@ -6,6 +6,7 @@ from ...preferences import preferences
 from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
 from ..third_party.lock import FileLock
 from .util import get_addon_path, get_addon_name
+from cpython.ref cimport PyObject
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -28,6 +29,7 @@ ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
 ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
 # Core API
+cdef extern void core_fire_event(size_t script, size_t event, PyObject* state)
 cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
 cdef extern int run_tests(char* incl, char* excl);
 cdef extern void register_cxx();
@@ -76,7 +78,7 @@ last_str = None # string eval temp
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-def register_operator(script,name,operator,show):
+def register_operator(script,operator,show):
     global registered_operators
     if not script in registered_operators:
         registered_operators[script] = []
@@ -92,16 +94,8 @@ cdef void unregister_script(char* script):
             bpy.utils.unregister_class(operator)
         del registered_operators[script_str]
 
-def fire_operator(self,script,operator,arguments):
-    operator_b = operator.encode('utf-8')
-    obj = {}
-    for arg in arguments:
-        if not hasattr(self,arg):
-            print(f"Error: missing argument {arg} in operator {operator}")
-            continue
-        obj[arg] = getattr(self,arg)
-    obj_json_b = json.dumps(obj).encode('utf-8')
-    lib_fire_operator(script,operator_b,obj_json_b)
+def fire_event(script,event,args):
+    core_fire_event(script,event,<PyObject*>args)
 
 def register_property_group(target, name, property_group,is_collection):
     registered_property_groups.append((target,name))
@@ -138,9 +132,9 @@ def build_context():
     context = {}
     context['bpy'] = bpy
     context['register_operator'] = register_operator
+    context['fire_event'] = fire_event
     context['register_property_group'] = register_property_group
     context['preferences'] = preferences
-    context['fire_operator'] = fire_operator
     context['get_addon_name'] = get_addon_name
     context['get_addon_path'] = get_addon_path
     return context

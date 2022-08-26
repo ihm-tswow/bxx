@@ -187,6 +187,14 @@ function(generate_blender_version build_version)
   set(Python_ROOT_DIR ${${PYTHON_SOURCE}_SOURCE_DIR})
   find_package(Python COMPONENTS Development)
 
+  if (WIN32)
+    execute_process(COMMAND 
+      ${PYTHON_BIN}
+      ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/fix_python_lib_path.py
+      ${Python_LIBRARIES}
+    )
+  endif()
+
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   #
@@ -270,6 +278,7 @@ function(generate_blender_version build_version)
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
   )
 
+
   target_link_libraries(
     ${bxx} PUBLIC
     ${Python_LIBRARIES}
@@ -331,10 +340,12 @@ function(generate_blender_version build_version)
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
         ${SCRIPT_INCLUDE_DIRECTORIES}
+        ${Python_INCLUDE_DIRS}
       )
       target_link_libraries(
         ${script_name} PRIVATE
         ${bxx}
+        ${Python_LIBRARIES}
         ${SCRIPT_LIBRARIES}
       )
       generate_filetree(${root} "${script_files_rel}")

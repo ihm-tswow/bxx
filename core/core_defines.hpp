@@ -3,11 +3,15 @@
 #include "../common/shared_functions.hpp"
 #include "../common/tests.hpp"
 
+#include "Python.h"
+
 typedef void (*script_register_ct)(char const* script_name, size_t index, shared_functions* functions);
 typedef void (*script_unregister_ct)();
 typedef void (*cy_unregister_script_ct)(char*);
 typedef bxx::test_collection* (*register_tests_ct)();
 typedef void (*fire_operator_ct)(char* op, char* json);
+
+typedef void (*lib_fire_event_ct)(size_t index, PyObject* obj);
 
 #if defined(WIN32) || defined (_WIN32) || defined(__WIN32)
 #include <windows.h>
