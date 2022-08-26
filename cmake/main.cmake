@@ -236,10 +236,13 @@ function(generate_blender_version build_version)
     WORKING_DIRECTORY
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core
     SOURCES
+      bxx/core/core_defines.hpp
       bxx/core/core_cxx.cpp
       bxx/core/core_cy.pyx
       bxx/core/core.py
       bxx/core/setup.py
+      bxx/core/util.py
+      bxx/core/test_runner.py
   )
   set_target_properties(${core} PROPERTIES FOLDER ${build_version})
 
@@ -280,7 +283,7 @@ function(generate_blender_version build_version)
   #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-  set(scripts_core ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core/core_script.cpp)
+  set(scripts_core ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core/lib_api.cpp)
   source_group("refs" FILES "${CMAKE_CURRENT_SOURCE_DIR}\\CMakeLists.txt" ${scripts_core})
 
   file(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts/*)
