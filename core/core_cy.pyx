@@ -9,14 +9,72 @@ from .util import get_addon_path, get_addon_name
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-#   - Exec Globals -
+#   - Defines -
+#
+#   Type definitions and forwards
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Library API
+ctypedef unsigned long long cy_ptr_ct;
+ctypedef void(*cy_exec_ct)(char*);
+ctypedef cy_ptr_ct (*cy_eval_ptr_ct)(char*);
+ctypedef int (*cy_eval_int_ct)(char*)
+ctypedef float (*cy_eval_float_ct)(char*)
+ctypedef char* (*cy_eval_string_ct)(char*)
+ctypedef void (*cy_unregister_script_ct)(char*)
+ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
+ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
+ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
+
+# Core API
+cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
+cdef extern int run_tests(char* incl, char* excl);
+cdef extern void register_cxx();
+cdef extern void unregister_cxx();
+cdef extern void setup_cxx(
+    char* path,
+    cy_exec_ct cy_exec,
+    cy_eval_ptr_ct cy_eval_ptr,
+    cy_eval_int_ct cy_eval_int,
+    cy_eval_float_ct cy_eval_float,
+    cy_eval_string_ct cy_eval_string,
+    cy_unregister_script_ct cy_unregister_script,
+    cy_create_image_buffer_ct cy_create_image_buffer,
+    cy_apply_image_buffer_ct cy_apply_image_buffer,
+    cy_delete_image_buffer_ct cy_delete_image_buffer,
+);
+cdef extern void auto_reload_cxx();
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#   - Cython State -
+#
+#   These are the variables we own
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# operators
+registered_operators = {}
+
+# property groups
+registered_property_groups = []
+
+# image buffers
+cdef array.array cur_pixels # image buffer create temp
+image_buffers = {}
+
+# eval
+last_str = None # string eval temp
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#   - Exec API -
 #
 #   These are variables and functions that exec functions
 #   can access.
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-registered_operators = {}
 
 def register_operator(script,name,operator,show):
     global registered_operators
@@ -34,8 +92,6 @@ cdef void unregister_script(char* script):
             bpy.utils.unregister_class(operator)
         del registered_operators[script_str]
 
-cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
-
 def fire_operator(self,script,operator,arguments):
     operator_b = operator.encode('utf-8')
     obj = {}
@@ -47,7 +103,6 @@ def fire_operator(self,script,operator,arguments):
     obj_json_b = json.dumps(obj).encode('utf-8')
     lib_fire_operator(script,operator_b,obj_json_b)
 
-registered_property_groups = []
 def register_property_group(target, name, property_group,is_collection):
     registered_property_groups.append((target,name))
     if is_collection:
@@ -55,8 +110,6 @@ def register_property_group(target, name, property_group,is_collection):
     else:
         setattr(target,name,bpy.props.PointerProperty(type=property_group))
 
-cdef array.array cur_pixels
-image_buffers = {}
 cdef float* create_image_buffer(unsigned long long id, int width ,int height):
     global cur_pixels
     cur_pixels = array.array('f',[0])
@@ -75,26 +128,11 @@ cdef void delete_image_buffer(unsigned long long id):
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-#   - Cython Functions -
+#   - Library API -
 #
-#   These are functions that we have to implement in cython.
-#
-#   They're currently in this file because it seems having them
-#   anywhere else causes issues.
+#   Cython functions we expose to libraries
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-ctypedef unsigned long long cy_ptr_ct;
-ctypedef void(*cy_exec_ct)(char*);
-ctypedef cy_ptr_ct (*cy_eval_ptr_ct)(char*);
-ctypedef int (*cy_eval_int_ct)(char*)
-ctypedef float (*cy_eval_float_ct)(char*)
-ctypedef char* (*cy_eval_string_ct)(char*)
-ctypedef void (*cy_unregister_script_ct)(char*)
-
-ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
-ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
-ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
 def build_context():
     context = {}
@@ -107,7 +145,7 @@ def build_context():
     context['get_addon_path'] = get_addon_path
     return context
 
-cdef void _exec(char* exec_bytes):
+cdef void cy_exec(char* exec_bytes):
     try:
         exec(exec_bytes.decode('utf-8'), build_context())
     except Exception as e:
@@ -130,7 +168,6 @@ cdef int eval_int(char* exec_bytes):
 cdef float eval_float(char* exec_bytes):
     return float(cy_eval(exec_bytes))
 
-last_str = None
 cdef char* eval_string(char* exec_bytes):
     global last_str
     try:
@@ -141,50 +178,14 @@ cdef char* eval_string(char* exec_bytes):
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-#   - Entry -
+#   - Core API -
 #
-#   These are the first functions we call
+#   Cython functions we expose to the rest of the core
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-cdef extern int run_tests(char* incl, char* excl);
-cdef extern void register_cxx();
-cdef extern void unregister_cxx();
-cdef extern void setup_cxx(
-    char* path,
-    cy_exec_ct cy_exec,
-    cy_eval_ptr_ct cy_eval_ptr,
-    cy_eval_int_ct cy_eval_int,
-    cy_eval_float_ct cy_eval_float,
-    cy_eval_string_ct cy_eval_string,
-    cy_unregister_script_ct cy_unregister_script,
-    cy_create_image_buffer_ct cy_create_image_buffer,
-    cy_apply_image_buffer_ct cy_apply_image_buffer,
-    cy_delete_image_buffer_ct cy_delete_image_buffer,
-);
-cdef extern void auto_reload_cxx();
-
 def auto_reload_lockfile_path():
     return os.path.join(get_addon_path(), AUTO_RELOAD_LOCK_FILE)
-
-if os.path.exists(auto_reload_lockfile_path()):
-    try:
-        os.remove(auto_reload_lockfile_path())
-    except:
-        print("Failed to remove lockfile, automatic reloading can become unstable")
-
-setup_cxx(
-    get_addon_path().encode('utf-8'),
-    _exec,
-    eval_ptr,
-    eval_int,
-    eval_float,
-    eval_string,
-    unregister_script,
-    create_image_buffer,
-    apply_image_buffer,
-    delete_image_buffer
-);
 
 def auto_reload_delay():
     return preferences.get('auto_reload_interval',0.25)
@@ -221,3 +222,31 @@ def cy_run_tests(incl,excl):
     bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
     return ret
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#   - Startup -
+#
+#   Code we fire as soon as we load
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Remove lockfile
+if os.path.exists(auto_reload_lockfile_path()):
+    try:
+        os.remove(auto_reload_lockfile_path())
+    except:
+        print("Failed to remove lockfile, automatic reloading can become unstable")
+
+# Give our pointers to the core
+setup_cxx(
+    get_addon_path().encode('utf-8'),
+    cy_exec,
+    eval_ptr,
+    eval_int,
+    eval_float,
+    eval_string,
+    unregister_script,
+    create_image_buffer,
+    apply_image_buffer,
+    delete_image_buffer
+);
