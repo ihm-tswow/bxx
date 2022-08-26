@@ -69,7 +69,7 @@ static void unload_script(library_handle & handle)
     {
         script_unregister();
     }
-    cy_unregister_script(const_cast<char*>(handle.m_name.c_str()));
+    cy_unregister_script(handle.m_index);
     SL_CLOSE(handle.m_library);
     handle.unload();
     fs::remove(handle.m_load_path);
@@ -118,7 +118,7 @@ static void load_script(fs::path const& dll_path)
     }
 
     script_register_ct script_register = (script_register_ct) SL_FN(handle->m_library, "lib_script_register");
-    handle->m_fire_event = (lib_fire_event_ct)SL_FN(handle->m_library, "lib_fire_event");
+    handle->m_fire_event = (lib_fire_event_ct) SL_FN(handle->m_library, "lib_fire_event");
 
     if(!script_register)
     {
@@ -151,29 +151,29 @@ static std::vector<fs::path> get_scripts()
 extern "C" {
     void setup_cxx(
         char* path,
-        cy_exec_ct cy_exec,
-        cy_eval_ptr_ct cy_eval_ptr,
-        cy_eval_int_ct cy_eval_int,
-        cy_eval_float_ct cy_eval_float,
-        cy_eval_string_ct cy_eval_string,
-        cy_unregister_script_ct cy_unregister_script,
-        cy_create_image_buffer_ct cy_create_image_buffer,
-        cy_apply_image_buffer_ct cy_apply_image_buffer,
-        cy_delete_image_buffer_ct cy_delete_image_buffer
+        cy_exec_ct exec,
+        cy_eval_ptr_ct eval_ptr,
+        cy_eval_int_ct eval_int,
+        cy_eval_float_ct eval_float,
+        cy_eval_string_ct eval_string,
+        cy_unregister_script_ct unregister_script,
+        cy_create_image_buffer_ct create_image_buffer,
+        cy_apply_image_buffer_ct apply_image_buffer,
+        cy_delete_image_buffer_ct delete_image_buffer
     )
     {
         root_path = fs::path(path);
         functions = {
-            cy_exec,
-            cy_eval_ptr,
-            cy_eval_int,
-            cy_eval_float,
-            cy_eval_string,
-            cy_create_image_buffer,
-            cy_apply_image_buffer,
-            cy_delete_image_buffer
+            exec,
+            eval_ptr,
+            eval_int,
+            eval_float,
+            eval_string,
+            create_image_buffer,
+            apply_image_buffer,
+            delete_image_buffer
         };
-        cy_unregister_script = cy_unregister_script;
+        cy_unregister_script = unregister_script;
         init_pointers_store(&functions);
     }
 
@@ -204,7 +204,6 @@ extern "C" {
         {
             unload_script(library);
         }
-        libraries.clear();
     }
 
     void core_fire_event(size_t script, size_t evt, PyObject* obj)

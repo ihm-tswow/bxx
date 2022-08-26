@@ -23,7 +23,7 @@ ctypedef cy_ptr_ct (*cy_eval_ptr_ct)(char*);
 ctypedef int (*cy_eval_int_ct)(char*)
 ctypedef float (*cy_eval_float_ct)(char*)
 ctypedef char* (*cy_eval_string_ct)(char*)
-ctypedef void (*cy_unregister_script_ct)(char*)
+ctypedef void (*cy_unregister_script_ct)(size_t)
 ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
 ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
 ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
@@ -56,11 +56,9 @@ cdef extern void auto_reload_cxx();
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# operators
+# python objects we need to unregister with the scripts
 registered_operators = {}
-
-# property groups
-registered_property_groups = []
+registered_property_groups = {}
 
 # image buffers
 cdef array.array cur_pixels # image buffer create temp
@@ -86,19 +84,25 @@ def register_operator(script,operator,show):
     bpy.utils.register_class(operator)
     bpy.types.VIEW3D_MT_object.append(show)
 
-cdef void unregister_script(char* script):
-    script_str = script.decode('utf-8')
-    if script_str in registered_operators:
-        for (operator,show) in registered_operators[script_str]:
-            bpy.types.VIEW3D_MT_object.remove(show)
-            bpy.utils.unregister_class(operator)
-        del registered_operators[script_str]
+cdef void unregister_script(size_t script):
+    if script in registered_operators:
+        for (op,show) in registered_operators[script]:
+             bpy.types.VIEW3D_MT_object.remove(show)
+             bpy.utils.unregister_class(op)
+        registered_operators[script] = []
+
+    if script in registered_property_groups:
+        for (target,name) in registered_property_groups[script]:
+            delattr(target,name)
+        registered_property_groups[script] = []
 
 def fire_event(script,event,args):
     core_fire_event(script,event,<PyObject*>args)
 
-def register_property_group(target, name, property_group,is_collection):
-    registered_property_groups.append((target,name))
+def register_property_group(script,target, name, property_group,is_collection):
+    if not script in registered_property_groups:
+        registered_property_groups[script] = []
+    registered_property_groups[script].append((target,name))
     if is_collection:
         setattr(target,name,bpy.props.CollectionProperty(type=property_group))
     else:
@@ -198,16 +202,6 @@ def register():
     bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
 
 def unregister():
-    global registered_operators
-    for op_table in registered_operators:
-        for (operator,show) in op_table:
-            bpy.types.VIEW3D_MT_object.remove(show)
-            bpy.utils.unregister_class(operator)
-
-    for (target,name) in registered_property_groups:
-        delattr(target,name)
-
-    registered_operators = []
     unregister_cxx();
 
 # called from test_runner.py, because blender does not accept cython methods

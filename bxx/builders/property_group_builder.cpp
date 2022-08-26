@@ -1,6 +1,7 @@
 #include "property_group_builder.hpp"
 #include "string_builder.hpp"
 #include "exec.hpp"
+#include "../script.hpp"
 
 namespace bxx
 {
@@ -61,7 +62,8 @@ namespace bxx
         builder.write_line("bpy.utils.register_class({})", get_class_name());
         for (auto const& [target,reg] : m_registered_to)
         {
-            builder.write_line("register_property_group({},\"{}\",{},{})"
+            builder.write_line("register_property_group({},{},\"{}\",{},{})"
+                ,get_script_index()
                 ,target
                 ,string_to_python_string(reg.m_name)
                 ,get_class_name()

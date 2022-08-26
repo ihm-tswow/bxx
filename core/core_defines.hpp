@@ -7,7 +7,7 @@
 
 typedef void (*script_register_ct)(char const* script_name, size_t index, shared_functions* functions);
 typedef void (*script_unregister_ct)();
-typedef void (*cy_unregister_script_ct)(char*);
+typedef void (*cy_unregister_script_ct)(size_t);
 typedef bxx::test_collection* (*register_tests_ct)();
 typedef void (*fire_operator_ct)(char* op, char* json);
 
