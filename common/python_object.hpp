@@ -49,7 +49,7 @@ namespace bxx
 
         PyObject* convert(std::string const& value)
         {
-            return add(PyBytes_FromString(value.c_str()));
+            return add(PyUnicode_FromString(value.c_str()));
         }
 
         PyObject* convert(std::uint64_t value)
@@ -211,7 +211,7 @@ namespace bxx
 
         // conversions
         template <typename T> T as();
-        template <> std::string as() { return std::string(PyBytes_AS_STRING(m_obj)); }
+        template <> std::string as() { return std::string(_PyUnicode_AsString(m_obj)); }
         template <> std::uint64_t as() { return std::uint64_t(PyLong_AsUnsignedLongLong(m_obj)); }
         template <> std::int64_t as() { return std::uint64_t(PyLong_AsLongLong(m_obj)); }
         template <> double as() { return std::uint64_t(PyFloat_AsDouble(m_obj)); }
