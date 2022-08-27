@@ -111,6 +111,9 @@ namespace bxx
     class python_object
     {
     public:
+        python_object()
+            : m_obj(nullptr)
+        {}
         python_object(PyObject* obj)
             : m_obj(obj){
             if (obj)
@@ -235,7 +238,6 @@ namespace bxx
         operator double() const;
         operator std::string() const;
         operator python_object();
-    protected:
         PyObject* m_obj;
     };
 
