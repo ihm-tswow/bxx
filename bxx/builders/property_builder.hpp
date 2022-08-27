@@ -146,7 +146,7 @@ namespace bxx
         virtual ~property_builder<T>(){}
         void write(python_builder & builder)
         {
-            for (std::unique_ptr<property_entry>& entry : m_properties)
+            for (std::shared_ptr<property_entry>& entry : m_properties)
             {
                 builder.begin_line("{}: {}", entry->get_id(), entry->get_type());
                 auto block = builder.scoped_block(python_builder::round_brackets, 2);
@@ -165,7 +165,7 @@ namespace bxx
         void for_each_property(std::function<void(property_entry& prop, bool is_last)> callback)
         {
             size_t i = 0;
-            for (std::unique_ptr<property_entry>& entry : m_properties)
+            for (std::shared_ptr<property_entry>& entry : m_properties)
             {
                 callback(*entry.get(), i == m_properties.size() - 1);
                 ++i;
@@ -262,10 +262,9 @@ namespace bxx
 
         T& add_property(std::string const& id, std::string const& type, std::function<void(property_entry&)> callback)
         {
-            callback(*m_properties.emplace_back( std::make_unique<property_entry>(id, type) ).get());
+            callback(*m_properties.emplace_back( std::make_shared<property_entry>(id, type) ).get());
             return *dynamic_cast<T*>(this);
         }
-    protected:
-        std::vector<std::unique_ptr<property_entry>> m_properties;
+        std::vector<std::shared_ptr<property_entry>> m_properties;
     };
 }
