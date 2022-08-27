@@ -14,8 +14,46 @@ namespace bxx
     {
         std::string m_id;
         std::string m_name = m_id;
-        std::string m_description = "";
-        std::string m_icon = "";
+        std::string m_description;
+        std::string m_icon;
+        std::optional<std::int64_t> m_value;
+
+        enum_entry(std::string id, std::string name, std::string description, std::string icon, std::int64_t value)
+            : m_id(id)
+            , m_name(name)
+            , m_description(description)
+            , m_icon(icon)
+            , m_value(value)
+        {}
+
+        enum_entry(std::string id, std::string name, std::string description, std::string icon)
+            : m_id(id)
+            , m_name(name)
+            , m_description(description)
+            , m_icon(icon)
+        {}
+
+        enum_entry(std::string id, std::string name, std::string description)
+            : m_id(id)
+            , m_name(name)
+            , m_description(description)
+            , m_icon("")
+        {}
+
+        enum_entry(std::string id, std::string name)
+            : m_id(id)
+            , m_name(name)
+            , m_description("")
+            , m_icon("")
+        {}
+
+        enum_entry(std::string id)
+            : m_id(id)
+            , m_name(id)
+            , m_description("")
+            , m_icon("")
+        {}
+
     };
 
     class property_entry
@@ -87,10 +125,24 @@ namespace bxx
         std::map<std::string, builder_value> m_options;
     };
 
+    class property_builder_base
+    {
+    protected:
+
+    };
+
     template <typename T>
     class property_builder
     {
     public:
+        template <typename G>
+        void read_properties_from(property_builder<G>& source)
+        {
+            m_properties = source.m_properties;
+        }
+
+        property_builder<T>() = default;
+
         virtual ~property_builder<T>(){}
         void write(python_builder & builder)
         {
@@ -170,16 +222,22 @@ namespace bxx
                 .add_option("name", name)
                 .add_option("description", description)
                 .add_option("default", def)
-                .add_option("items", [&](set_builder& builder) {
+                .add_option("items", [&](list_builder& builder) {
+                    std::int64_t curMax = 0;
                     for (enum_entry const& entry : values)
                     {
-                        builder.insert([&](list_builder& map) { map
+                        builder.add([&](list_builder& map) { map
+                            .set_bracket_type(python_builder::round_brackets)
                             .add(entry.m_id)
                             .add(entry.m_name)
                             .add(entry.m_description)
                             .add(entry.m_icon)
-                            // todo: how to add the number entries
                             ;
+                            if (entry.m_value.has_value())
+                            {
+                                curMax = entry.m_value.value();
+                            }
+                            map.add(curMax++);
                         });
                     }
                 })
