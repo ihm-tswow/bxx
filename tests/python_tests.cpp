@@ -1,6 +1,7 @@
 #include "tests.hpp"
 
 #include "python_object.hpp"
+#include "exec.hpp"
 
 BXX_TEST(empty_python_object_init_to_none) {
     BXX_ASSERT_EQUAL(bxx::python_object().m_obj, Py_None);
@@ -53,10 +54,11 @@ BXX_TEST(dict_set) {
     BXX_ASSERT_EQUAL(dict->get<int>("key"), 10);
 }
 
-BXX_TEST(setattr) {
-    bxx::py_ref<bxx::python_tuple> tup = bxx::create_python_tuple(1);
-    tup->setattr("key", 10);
-    BXX_ASSERT_EQUAL(tup->getattr<int>("key"), 10);
+BXX_TEST(from_exec) {
+    bxx::py_ref<bxx::python_object> obj = eval_pyobject("class eval_cls:\n    def __init__(self):\n        self.value = 10\n\nout = eval_cls()");
+    BXX_ASSERT_EQUAL(obj->getattr<int>("value"), 10);
+    obj->setattr<int>("value", 25);
+    BXX_ASSERT_EQUAL(obj->getattr<int>("value"), 25);
 }
 
 BXX_TEST(insert_complex) {

@@ -23,6 +23,7 @@ ctypedef cy_ptr_ct (*cy_eval_ptr_ct)(char*);
 ctypedef int (*cy_eval_int_ct)(char*)
 ctypedef float (*cy_eval_float_ct)(char*)
 ctypedef char* (*cy_eval_string_ct)(char*)
+ctypedef PyObject* (*cy_eval_pyobject_ct)(char*)
 ctypedef void (*cy_unregister_script_ct)(size_t)
 ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
 ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
@@ -41,6 +42,7 @@ cdef extern void setup_cxx(
     cy_eval_int_ct cy_eval_int,
     cy_eval_float_ct cy_eval_float,
     cy_eval_string_ct cy_eval_string,
+    cy_eval_pyobject_ct cy_eval_pyobject,
     cy_unregister_script_ct cy_unregister_script,
     cy_create_image_buffer_ct cy_create_image_buffer,
     cy_apply_image_buffer_ct cy_apply_image_buffer,
@@ -66,6 +68,7 @@ image_buffers = {}
 
 # eval
 last_str = None # string eval temp
+last_obj = None
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -174,6 +177,11 @@ cdef char* eval_string(char* exec_bytes):
         last_str = "".encode('utf-8')
     return last_str
 
+cdef PyObject* eval_pyobject(char* exec_bytes):
+    global last_obj
+    last_obj = cy_eval(exec_bytes)
+    return <PyObject*> last_obj
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 #   - Core API -
@@ -233,6 +241,7 @@ setup_cxx(
     eval_int,
     eval_float,
     eval_string,
+    eval_pyobject,
     unregister_script,
     create_image_buffer,
     apply_image_buffer,
