@@ -11,7 +11,7 @@ typedef void (*cy_unregister_script_ct)(size_t);
 typedef bxx::test_collection* (*register_tests_ct)();
 typedef void (*fire_operator_ct)(char* op, char* json);
 
-typedef void (*lib_fire_event_ct)(size_t index, PyObject* obj);
+typedef PyObject* (*lib_fire_event_ct)(size_t index, PyObject* obj);
 
 #if defined(WIN32) || defined (_WIN32) || defined(__WIN32)
 #include <windows.h>

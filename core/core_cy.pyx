@@ -29,7 +29,7 @@ ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
 ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
 # Core API
-cdef extern void core_fire_event(size_t script, size_t event, PyObject* state)
+cdef extern PyObject* core_fire_event(size_t script, size_t event, PyObject* state)
 cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
 cdef extern int run_tests(char* incl, char* excl);
 cdef extern void register_cxx();
@@ -97,7 +97,7 @@ cdef void unregister_script(size_t script):
         registered_property_groups[script] = []
 
 def fire_event(script,event,args):
-    core_fire_event(script,event,<PyObject*>args)
+    return <object> core_fire_event(script,event,<PyObject*>args)
 
 def register_property_group(script,target, name, property_group,is_collection):
     if not script in registered_property_groups:

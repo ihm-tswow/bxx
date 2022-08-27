@@ -101,6 +101,8 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
     auto cb = m_callback;
     size_t event_index = lib_register_event([cb](PyObject* obj) {
         cb(python_object(obj));
+        Py_IncRef(Py_None);
+        return Py_None;
     });
 
     class_header_builder::write(builder, [&]() {

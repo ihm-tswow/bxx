@@ -206,9 +206,9 @@ extern "C" {
         }
     }
 
-    void core_fire_event(size_t script, size_t evt, PyObject* obj)
+    PyObject* core_fire_event(size_t script, size_t evt, PyObject* obj)
     {
-        libraries[script].m_fire_event(evt, obj);
+        return libraries[script].m_fire_event(evt, obj);
     }
 
     int run_tests(char* include, char* exclude)

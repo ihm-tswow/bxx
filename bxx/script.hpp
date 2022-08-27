@@ -9,5 +9,5 @@ namespace bxx
 {
     std::string cur_script_name();
     size_t get_script_index();
-    size_t lib_register_event(std::function<void(PyObject*)> evt);
+    size_t lib_register_event(std::function<PyObject*(PyObject*)> evt);
 }
