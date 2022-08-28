@@ -30,7 +30,7 @@ namespace bxx
     template<> struct py2cxx_type<python_object>     { typedef py_ref<python_object> type; };
     template<> struct py2cxx_type<python_list>       { typedef py_ref<python_list> type; };
     template<> struct py2cxx_type<python_tuple>      { typedef py_ref<python_tuple> type; };
-    template<> struct py2cxx_type<python_dict> { typedef py_ref<python_dict> type; };
+    template<> struct py2cxx_type<python_dict>       { typedef py_ref<python_dict> type; };
 
     template <typename T>
     T py2cxx(PyObject*);
@@ -143,6 +143,13 @@ namespace bxx
     template <typename T>
     typename py2cxx_type<T>::type get_py_ref(PyObject* obj)
     {
+        return (typename py2cxx_type<T>::type)(py2cxx<T>(obj));
+    }
+
+    template <typename T>
+    typename py2cxx_type<T>::type get_py_ref_borrowed(PyObject* obj)
+    {
+        std::cout << "Normal ref borrowed\n";
         return (typename py2cxx_type<T>::type)(py2cxx<T>(obj));
     }
 
@@ -332,7 +339,7 @@ namespace bxx
         template <typename T>
         typename py2cxx_type<T>::type get(size_t index)
         {
-            return get_py_ref<T>(PyTuple_GetItem(m_obj, index));
+            return get_py_ref_borrowed<T>(PyTuple_GetItem(m_obj, index));
         }
 
         template <typename T>
@@ -359,7 +366,7 @@ namespace bxx
         template <typename T>
         typename py2cxx_type<T>::type get(std::string const& key)
         {
-            return get_py_ref<T>(PyDict_GetItemString(m_obj, key.c_str()));
+            return get_py_ref_borrowed<T>(PyDict_GetItemString(m_obj, key.c_str()));
         }
 
         template <typename T>
@@ -397,7 +404,7 @@ namespace bxx
         template <typename T>
         typename py2cxx_type<T>::type get(size_t index)
         {
-            return get_py_ref<T>(PyList_GetItem(m_obj, index));
+            return get_py_ref_borrowed<T>(PyList_GetItem(m_obj, index));
         }
 
         template <typename T>
@@ -498,6 +505,35 @@ namespace bxx
     {
         return py_ref<python_object>(cxx2py(value));
     }
+
+    template <>
+    inline typename py_ref<python_object> get_py_ref_borrowed<python_object>(PyObject* obj)
+    {
+        Py_IncRef(obj);
+        return py_ref<python_object>(obj);
+    }
+
+    template <>
+    inline typename py_ref<python_list> get_py_ref_borrowed<python_list>(PyObject* obj)
+    {
+        Py_IncRef(obj);
+        return py_ref<python_list>(obj);
+    }
+
+    template <>
+    inline typename py_ref<python_tuple> get_py_ref_borrowed<python_tuple>(PyObject* obj)
+    {
+        Py_IncRef(obj);
+        return py_ref<python_tuple>(obj);
+    }
+
+    template <>
+    inline typename py_ref<python_dict> get_py_ref_borrowed<python_dict>(PyObject* obj)
+    {
+        Py_IncRef(obj);
+        return py_ref<python_dict>(obj);
+    }
+
 
     py_ref<python_list> create_python_list(size_t size = 0);
     py_ref<python_tuple> create_python_tuple(size_t size);
