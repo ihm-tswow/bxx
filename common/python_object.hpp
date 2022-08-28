@@ -284,11 +284,6 @@ namespace bxx
         template <> bool is<python_list>() { return m_obj && PyList_Check(m_obj); };
         template <> bool is<python_dict>() { return m_obj && PyDict_Check(m_obj); };
         template <> bool is<python_object>() { return m_obj; };
-        operator long() const;
-        operator bool() const;
-        operator double() const;
-        operator std::string() const;
-        operator python_object();
         PyObject* m_obj;
     };
 
