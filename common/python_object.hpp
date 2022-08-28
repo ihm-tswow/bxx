@@ -197,6 +197,30 @@ namespace bxx
             Py_DecRef(m_obj);
         }
 
+        std::string str()
+        {
+            PyObject* str = PyObject_Str(m_obj);
+            if (!str)
+            {
+                return "<error str>";
+            }
+            char const* chr = _PyUnicode_AsString(str);
+            Py_DecRef(str);
+            return std::string(chr);
+        }
+
+        std::string repr()
+        {
+            PyObject* str = PyObject_Repr(m_obj);
+            if (!str)
+            {
+                return "<error repr>";
+            }
+            char const* chr = _PyUnicode_AsString(str);
+            Py_DecRef(str);
+            return std::string(chr);
+        }
+
         template <typename T>
         typename py2cxx_type<T>::type getattr(std::string const& arr) {
             return get_py_ref<T>(PyObject_GetAttrString(m_obj, arr.c_str()));
