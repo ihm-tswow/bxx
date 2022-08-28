@@ -20,7 +20,13 @@ FetchContent_Declare(
   URL https://github.com/nlohmann/json/releases/download/v3.10.5/json.tar.xz
 )
 
-FetchContent_MakeAvailable(fmt json)
+FetchContent_Declare(
+  magic_enum
+  GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+  GIT_TAG 1a57977ea3a286206b800e3e3fd79faa6f6e7404
+)
+
+FetchContent_MakeAvailable(fmt json magic_enum)
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -284,6 +290,7 @@ function(generate_blender_version build_version)
     ${Python_LIBRARIES}
     fmt::fmt-header-only
     nlohmann_json::nlohmann_json
+    magic_enum
   )
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -347,6 +354,7 @@ function(generate_blender_version build_version)
         ${bxx}
         ${Python_LIBRARIES}
         ${SCRIPT_LIBRARIES}
+        magic_enum
       )
       generate_filetree(${root} "${script_files_rel}")
     endif()
