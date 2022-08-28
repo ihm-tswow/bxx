@@ -166,6 +166,12 @@ namespace bxx
             m_value.dec_ref();
         }
 
+        PyObject* return_pyobj()
+        {
+            m_value.inc_ref();
+            return m_value.m_obj;
+        }
+
         T* operator ->() { return &m_value; }
 
         operator PyObject* () const { return m_value.m_obj; }
