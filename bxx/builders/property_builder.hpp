@@ -2,6 +2,9 @@
 
 #include "value_builder.hpp"
 #include "python_builder.hpp"
+#include "python_object.hpp"
+
+#include "../script.hpp"
 
 #include <string>
 #include <map>
@@ -248,6 +251,38 @@ namespace bxx
         T& add_enum_property(std::string const& id, std::string const& name, std::vector<enum_entry> const& values, std::string const& description = "")
         {
             return add_enum_property(id, name, values.begin()->m_id, values, description);
+        }
+
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(py_ref<python_object>,py_ref<python_object>)> callback, std::string const& description = "")
+        {
+            size_t event_index = bxx::lib_register_event([=](PyObject* ctx) {
+                python_tuple tup(ctx);
+                std::vector<enum_entry> vec = callback(tup.get<python_object>(0), tup.get<python_object>(1));
+                py_ref<python_list> list = create_python_list(0);
+                size_t cur_index = 0;
+                for (enum_entry const& entry : vec)
+                {
+                    py_ref<python_tuple> tup = create_python_tuple(5);
+                    if (entry.m_value.has_value())
+                    {
+                        cur_index = entry.m_value.value();
+                    }
+                    tup->set<std::string>(0, entry.m_id);
+                    tup->set<std::string>(1, entry.m_name);
+                    tup->set<std::string>(2, entry.m_description);
+                    tup->set<std::string>(3, entry.m_icon);
+                    tup->set<std::int64_t>(4, cur_index++);
+                    list->append(tup);
+                }
+                return list.return_pyobj();
+            });
+
+            return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
+                .add_option("name", name)
+                .add_option("description", description)
+                .add_option("items", python_code(fmt::format("lambda x,y: fire_event({},{},(x,y))", get_script_index(), event_index)))
+                ;
+            });
         }
 
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& code, std::string const& description = "")
