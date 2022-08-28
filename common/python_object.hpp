@@ -42,86 +42,6 @@ namespace bxx
         {}
     };
 
-    template <size_t size>
-    class pyobject_stack
-    {
-    public:
-        pyobject_stack() = default;
-        pyobject_stack(pyobject_stack const& stack) = delete;
-        ~pyobject_stack()
-        {
-            reset();
-        }
-
-        PyObject* convert(PyObject* value)
-        {
-            return value;
-        }
-
-        PyObject* convert(python_object value);
-
-        PyObject* convert(char const* value)
-        {
-            return add(PyBytes_FromString(value));
-        }
-
-        PyObject* convert(std::string const& value)
-        {
-            return add(PyUnicode_FromString(value.c_str()));
-        }
-
-        PyObject* convert(std::uint64_t value)
-        {
-            return add(PyLong_FromUnsignedLongLong(value));
-        }
-
-        PyObject* convert(std::int64_t value)
-        {
-            return add(PyLong_FromLongLong(value));
-        }
-
-        PyObject* convert(std::uint32_t value)
-        {
-            return add(PyLong_FromUnsignedLong(value));
-        }
-
-        PyObject* convert(std::int32_t value)
-        {
-            return add(PyLong_FromLong(value));
-        }
-
-        template <typename T>
-        PyObject* convert_fn(T value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
-        {
-            return args.emplace_back(convert(value));
-        }
-
-        template <typename T>
-        PyObject* convert_fn(kwarg<T> value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
-        {
-            PyObject* v = convert(value.value);
-            kwargs.emplace_back(kwarg<PyObject*>(value.key,v));
-            return v;
-        }
-
-        void reset()
-        {
-            for (size_t i = 0; i < m_idx; ++i)
-            {
-                Py_DecRef(m_objects[i]);
-            }
-            m_idx = 0;
-        }
-    protected:
-        PyObject* add(PyObject* obj)
-        {
-            m_objects[m_idx++] = obj;
-            return obj;
-        }
-        std::array<PyObject*, size> m_objects;
-        size_t m_idx = 0;
-    };
-
     class python_object
     {
     public:
@@ -211,8 +131,7 @@ namespace bxx
             std::vector<PyObject*> arg_objs;
             std::vector<kwarg<PyObject*>> kwarg_objs;
             arg_objs.reserve(sizeof...(Args));
-            pyobject_stack<sizeof...(Args)> stack;
-            ([&] { stack.convert_fn(args, arg_objs, kwarg_objs); }(), ...);
+            ([&] { convert_fn(args, arg_objs, kwarg_objs); }(), ...);
 
             PyObject* args = PyTuple_New(arg_objs.size());
             if (!args)
@@ -244,6 +163,7 @@ namespace bxx
             Py_DecRef(fn);
             
             T value = py2cxx<T>(res);
+            Py_DecRef(res);
             return value;
         }
 
@@ -292,6 +212,20 @@ namespace bxx
             {
                 inc_ref();
             }
+        }
+    private:
+        template <typename T>
+        PyObject* convert_fn(T value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
+        {
+            return args.emplace_back(cxx2py(value,true));
+        }
+
+        template <typename T>
+        PyObject* convert_fn(kwarg<T> value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
+        {
+            PyObject* v = cxx2py(value.value,false);
+            kwargs.emplace_back(kwarg<PyObject*>(value.key, v));
+            return v;
         }
     };
 
@@ -418,12 +352,6 @@ namespace bxx
             }
         }
     };
-
-    template <size_t size>
-    PyObject* pyobject_stack<size>::convert(python_object value)
-    {
-        return value.m_obj;
-    }
 
     // Python -> cxx conversions
 
