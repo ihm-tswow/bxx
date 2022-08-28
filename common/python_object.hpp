@@ -434,9 +434,15 @@ namespace bxx
     }
 
     template <>
+    inline double py2cxx(PyObject* py)
+    {
+        return PyFloat_AsDouble(py);
+    }
+
+    template <>
     inline bool py2cxx(PyObject* py)
     {
-        return PyObject_IsTrue(py) ? true : false;
+        return PyObject_IsTrue(py);
     }
 
     template <>
@@ -456,7 +462,6 @@ namespace bxx
     {
         return python_dict(py);
     }
-
 
     template <typename T>
     py_ref<python_object> create_python_object(T const& value)
