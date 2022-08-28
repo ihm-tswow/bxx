@@ -99,10 +99,9 @@ static void stream_keys(std::stringstream& ss, std::string const& wrap, T const&
 void bxx::operator_builder::write(bxx::python_builder& builder)
 {
     auto cb = m_callback;
-    size_t event_index = lib_register_event([cb](PyObject* obj) {
-        cb(python_object(obj));
-        Py_IncRef(Py_None);
-        return Py_None;
+    size_t event_index = lib_register_event([cb](python_tuple const& args) {
+        cb(python_object(args.get<python_object>(0)));
+        return python_object();
     });
 
     class_header_builder::write(builder, [&]() {

@@ -15,38 +15,21 @@ namespace bxx
     class python_dict;
     class python_tuple;
     class python_list;
-    template <typename T>
-    class py_ref;
-
-    // todo: should be possible with disjunctions, but didn't get it to work
-    template<class T> struct py2cxx_type;
-    template<> struct py2cxx_type<std::string>       { typedef std::string type; };
-    template<> struct py2cxx_type<std::uint32_t>     { typedef std::uint32_t type; };
-    template<> struct py2cxx_type<std::int32_t>      { typedef std::int32_t type; };
-    template<> struct py2cxx_type<std::uint64_t>     { typedef std::uint64_t type; };
-    template<> struct py2cxx_type<std::int64_t>      { typedef std::int64_t type; };
-    template<> struct py2cxx_type<bool>              { typedef bool type; };
-    template<> struct py2cxx_type<double>            { typedef double type; };
-    template<> struct py2cxx_type<python_object>     { typedef py_ref<python_object> type; };
-    template<> struct py2cxx_type<python_list>       { typedef py_ref<python_list> type; };
-    template<> struct py2cxx_type<python_tuple>      { typedef py_ref<python_tuple> type; };
-    template<> struct py2cxx_type<python_dict>       { typedef py_ref<python_dict> type; };
 
     template <typename T>
     T py2cxx(PyObject*);
 
-    python_object cxx2py(python_object);
-    python_object cxx2py(python_list);
-    python_object cxx2py(python_tuple);
-    python_object cxx2py(python_dict);
-    python_object cxx2py(std::string const&);
-    python_object cxx2py(std::uint32_t);
-    python_object cxx2py(std::int32_t);
-    python_object cxx2py(std::int64_t);
-    python_object cxx2py(std::uint64_t);
-    python_object cxx2py(double);
-    template <typename T>
-    python_object cxx2py(py_ref<T> ref);
+    PyObject* cxx2py(std::string const&, bool theft = false);
+    PyObject* cxx2py(std::uint32_t, bool theft = false);
+    PyObject* cxx2py(std::int32_t, bool theft = false);
+    PyObject* cxx2py(std::int64_t, bool theft = false);
+    PyObject* cxx2py(std::uint64_t, bool theft = false);
+    PyObject* cxx2py(double, bool theft = false);
+    PyObject* cxx2py(python_object const& obj, bool theft = false);
+    PyObject* cxx2py(python_dict const& obj, bool theft = false);
+    PyObject* cxx2py(python_tuple const& obj, bool theft = false);
+    PyObject* cxx2py(python_list const& obj, bool theft = false);
+    PyObject* cxx2py(PyObject* obj, bool theft = false);
 
     template <typename T>
     struct kwarg
@@ -75,8 +58,7 @@ namespace bxx
             return value;
         }
 
-        PyObject* convert(python_object const& value);
-
+        PyObject* convert(python_object value);
 
         PyObject* convert(char const* value)
         {
@@ -109,13 +91,13 @@ namespace bxx
         }
 
         template <typename T>
-        PyObject* convert_fn(T const& value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
+        PyObject* convert_fn(T value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
         {
             return args.emplace_back(convert(value));
         }
 
         template <typename T>
-        PyObject* convert_fn(kwarg<T> const& value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
+        PyObject* convert_fn(kwarg<T> value, std::vector<PyObject*>& args, std::vector<kwarg<PyObject*>>& kwargs)
         {
             PyObject* v = convert(value.value);
             kwargs.emplace_back(kwarg<PyObject*>(value.key,v));
@@ -140,59 +122,28 @@ namespace bxx
         size_t m_idx = 0;
     };
 
-    template <typename T>
-    typename py2cxx_type<T>::type get_py_ref(PyObject* obj)
-    {
-        return (typename py2cxx_type<T>::type)(py2cxx<T>(obj));
-    }
-
-    template <typename T>
-    typename py2cxx_type<T>::type get_py_ref_borrowed(PyObject* obj)
-    {
-        std::cout << "Normal ref borrowed\n";
-        return (typename py2cxx_type<T>::type)(py2cxx<T>(obj));
-    }
-
-    template <typename T>
-    class py_ref
-    {
-    public:
-        py_ref(T value)
-            : m_value(value)
-        {
-        }
-
-        py_ref(py_ref<T> const& value)
-            : m_value(value.m_value)
-        {
-            m_value.inc_ref();
-        }
-
-        ~py_ref()
-        {
-            m_value.dec_ref();
-        }
-
-        PyObject* return_pyobj()
-        {
-            m_value.inc_ref();
-            return m_value.m_obj;
-        }
-
-        T* operator ->() { return &m_value; }
-
-        operator PyObject* () const { return m_value.m_obj; }
-        T m_value;
-    };
-
     class python_object
     {
     public:
+        python_object(python_object const& obj)
+            : m_obj(obj.m_obj)
+        {
+            inc_ref();
+        }
+
         python_object() : python_object(Py_None)
-        {}
+        {
+            inc_ref();
+        }
 
         python_object(PyObject* obj)
             : m_obj(obj){
+            inc_ref();
+        }
+
+        ~python_object()
+        {
+            dec_ref();
         }
 
         size_t ref_count()
@@ -210,7 +161,7 @@ namespace bxx
             Py_DecRef(m_obj);
         }
 
-        std::string str()
+        std::string str() const
         {
             PyObject* str = PyObject_Str(m_obj);
             if (!str)
@@ -222,7 +173,7 @@ namespace bxx
             return std::string(chr);
         }
 
-        std::string repr()
+        std::string repr() const
         {
             PyObject* str = PyObject_Repr(m_obj);
             if (!str)
@@ -234,19 +185,28 @@ namespace bxx
             return std::string(chr);
         }
 
+        void delattr(std::string const& arr) const {
+            PyObject_DelAttrString(m_obj, arr.c_str());
+        }
+
         template <typename T>
-        typename py2cxx_type<T>::type getattr(std::string const& arr) {
-            return get_py_ref<T>(PyObject_GetAttrString(m_obj, arr.c_str()));
+        typename T getattr(std::string const& arr) const {
+            PyObject* obj = PyObject_GetAttrString(m_obj, arr.c_str());
+            T value = py2cxx<T>(obj);
+            Py_DecRef(obj);
+            return value;
         }
 
         template <typename T>
         void setattr(std::string const& arr, T const& value)
         {
-            PyObject_SetAttrString(m_obj, arr.c_str(), cxx2py(value).m_obj);
+            PyObject_SetAttrString(m_obj, arr.c_str(), cxx2py(value, false));
         }
 
-        template<class... Args>
-        python_object call(std::string const& method, Args&&... args)
+        // todo: function call result values are leaking memory
+
+        template<typename T, class... Args>
+        T call(std::string const& method, Args&&... args)
         {
             std::vector<PyObject*> arg_objs;
             std::vector<kwarg<PyObject*>> kwarg_objs;
@@ -282,12 +242,13 @@ namespace bxx
                 Py_DecRef(kwargs);
             Py_DecRef(args);
             Py_DecRef(fn);
-
-            return python_object(res);
+            
+            T value = py2cxx<T>(res);
+            return value;
         }
 
-        template<>
-        python_object call(std::string const& method)
+        template<typename T>
+        T call(std::string const& method)
         {
             PyObject* fn = PyObject_GetAttrString(m_obj, method.c_str());
             if (!fn)
@@ -306,7 +267,8 @@ namespace bxx
             PyObject* res = PyObject_Call(fn, tup, nullptr);
             Py_DecRef(fn);
             Py_DecRef(tup);
-            return python_object(res);
+            T value = py2cxx<T>(res);
+            return value;
         }
 
         // conversions
@@ -322,8 +284,16 @@ namespace bxx
         template <> bool is<python_dict>() { return m_obj && PyDict_Check(m_obj); };
         template <> bool is<python_object>() { return m_obj; };
         PyObject* m_obj;
+    protected:
+        python_object(PyObject* obj, bool is_new)
+            : m_obj(obj)
+        {
+            if (!is_new)
+            {
+                inc_ref();
+            }
+        }
     };
-
 
     class python_tuple : public python_object
     {
@@ -331,21 +301,28 @@ namespace bxx
         python_tuple(PyObject* obj)
             : python_object(obj) {}
 
-        size_t len()
+        python_tuple(size_t size)
+            : python_object(PyTuple_New(size), true)
+        {
+        }
+
+        python_tuple() = delete;
+
+        size_t len() const
         {
             return PyTuple_Size(m_obj);
         }
 
         template <typename T>
-        typename py2cxx_type<T>::type get(size_t index)
+        T get(size_t index) const
         {
-            return get_py_ref_borrowed<T>(PyTuple_GetItem(m_obj, index));
+            return py2cxx<T>(PyTuple_GetItem(m_obj, index));
         }
 
         template <typename T>
         void set(size_t index, T const& value)
         {
-            if (PyTuple_SetItem(m_obj, index, cxx2py(value).m_obj))
+            if (PyTuple_SetItem(m_obj, index, cxx2py(value, true)))
             {
                 throw std::runtime_error("Failed to insert tuple object");
             }
@@ -358,26 +335,30 @@ namespace bxx
         python_dict(PyObject* obj)
             : python_object(obj) {}
 
+        python_dict()
+            : python_object(PyDict_New(), true)
+        {}
+
         size_t len()
         {
             return PyDict_Size(m_obj);
         }
 
         template <typename T>
-        typename py2cxx_type<T>::type get(std::string const& key)
+        typename T get(std::string const& key)
         {
-            return get_py_ref_borrowed<T>(PyDict_GetItemString(m_obj, key.c_str()));
+            return py2cxx<T>(PyDict_GetItemString(m_obj, key.c_str()));
         }
 
         template <typename T>
         void set(std::string const& key, T const& value)
         {
-            PyDict_SetItemString(m_obj, key.c_str(), cxx2py(value).m_obj);
+            PyDict_SetItemString(m_obj, key.c_str(), cxx2py(value, false));
         }
 
-        void remove(std::string const& key)
+        void del(std::string const& key)
         {
-            PyDict_DelItemString(m_obj,key.c_str());
+            PyDict_DelItemString(m_obj, key.c_str());
         }
     };
 
@@ -385,7 +366,19 @@ namespace bxx
     {
     public:
         python_list()
-            : python_object(PyList_New(0))
+            : python_object(PyList_New(0), true)
+        {}
+
+        python_list(size_t size)
+            : python_object(PyList_New(size), true)
+        {}
+
+        python_list(int size) // <-- makes it so that python_list(0) resolves as a size and not nullptr
+            : python_object(PyList_New(size), true)
+        {}
+
+        python_list(std::nullptr_t)
+            : python_object()
         {}
 
         python_list(PyObject* obj)
@@ -402,15 +395,15 @@ namespace bxx
         }
 
         template <typename T>
-        typename py2cxx_type<T>::type get(size_t index)
+        typename T get(size_t index)
         {
-            return get_py_ref_borrowed<T>(PyList_GetItem(m_obj, index));
+            return py2cxx<T>(PyList_GetItem(m_obj, index));
         }
 
         template <typename T>
         void set(size_t index, T const& value)
         {
-            if (PyList_SetItem(m_obj, index, cxx2py(value).m_obj))
+            if (PyList_SetItem(m_obj, index, cxx2py(value, true)))
             {
                 throw std::runtime_error("Failed to set python list item");
             }
@@ -419,21 +412,15 @@ namespace bxx
         template <typename T>
         void append(T const& value)
         {
-            if (PyList_Append(m_obj, cxx2py(value).m_obj))
+            if (PyList_Append(m_obj, cxx2py(value, false)))
             {
                 throw std::runtime_error("Failed to append python list item");
             }
         }
     };
 
-    template <typename T>
-    python_object cxx2py(py_ref<T> ref)
-    {
-        return ref.m_value.m_obj;
-    }
-
     template <size_t size>
-    PyObject* pyobject_stack<size>::convert(python_object const& value)
+    PyObject* pyobject_stack<size>::convert(python_object value)
     {
         return value.m_obj;
     }
@@ -499,43 +486,4 @@ namespace bxx
     {
         return python_dict(py);
     }
-
-    template <typename T>
-    py_ref<python_object> create_python_object(T const& value)
-    {
-        return py_ref<python_object>(cxx2py(value));
-    }
-
-    template <>
-    inline typename py_ref<python_object> get_py_ref_borrowed<python_object>(PyObject* obj)
-    {
-        Py_IncRef(obj);
-        return py_ref<python_object>(obj);
-    }
-
-    template <>
-    inline typename py_ref<python_list> get_py_ref_borrowed<python_list>(PyObject* obj)
-    {
-        Py_IncRef(obj);
-        return py_ref<python_list>(obj);
-    }
-
-    template <>
-    inline typename py_ref<python_tuple> get_py_ref_borrowed<python_tuple>(PyObject* obj)
-    {
-        Py_IncRef(obj);
-        return py_ref<python_tuple>(obj);
-    }
-
-    template <>
-    inline typename py_ref<python_dict> get_py_ref_borrowed<python_dict>(PyObject* obj)
-    {
-        Py_IncRef(obj);
-        return py_ref<python_dict>(obj);
-    }
-
-
-    py_ref<python_list> create_python_list(size_t size = 0);
-    py_ref<python_tuple> create_python_tuple(size_t size);
-    py_ref<python_dict> create_python_dict();
 }

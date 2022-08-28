@@ -253,28 +253,27 @@ namespace bxx
             return add_enum_property(id, name, values.begin()->m_id, values, description);
         }
 
-        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(py_ref<python_object>,py_ref<python_object>)> callback, std::string const& description = "")
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::string const& description = "")
         {
-            size_t event_index = bxx::lib_register_event([=](PyObject* ctx) {
-                python_tuple tup(ctx);
-                std::vector<enum_entry> vec = callback(tup.get<python_object>(0), tup.get<python_object>(1));
-                py_ref<python_list> list = create_python_list(0);
+            size_t event_index = bxx::lib_register_event([=](python_tuple const& args) {
+                std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
+                python_list list(0);
                 size_t cur_index = 0;
                 for (enum_entry const& entry : vec)
                 {
-                    py_ref<python_tuple> tup = create_python_tuple(5);
+                    python_tuple tup(5);
                     if (entry.m_value.has_value())
                     {
                         cur_index = entry.m_value.value();
                     }
-                    tup->set<std::string>(0, entry.m_id);
-                    tup->set<std::string>(1, entry.m_name);
-                    tup->set<std::string>(2, entry.m_description);
-                    tup->set<std::string>(3, entry.m_icon);
-                    tup->set<std::int64_t>(4, cur_index++);
-                    list->append(tup);
+                    tup.set<std::string>(0, entry.m_id);
+                    tup.set<std::string>(1, entry.m_name);
+                    tup.set<std::string>(2, entry.m_description);
+                    tup.set<std::string>(3, entry.m_icon);
+                    tup.set<std::int64_t>(4, cur_index++);
+                    list.append(tup);
                 }
-                return list.return_pyobj();
+                return list;
             });
 
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
