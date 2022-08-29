@@ -18,6 +18,7 @@ namespace bxx
         {
             python_builder builder;
             write(builder);
+            std::cout << builder.get_code() << "\n";
             exec(builder.get_code());
         }
     }

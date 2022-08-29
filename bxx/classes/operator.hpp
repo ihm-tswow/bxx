@@ -11,8 +11,6 @@ namespace bxx
     class operator_class : public property_class
     {
     public:
-        operator_class<T>() {}
-
         virtual void execute() = 0;
 
         virtual void draw() {

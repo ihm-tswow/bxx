@@ -135,6 +135,11 @@ namespace bxx
             return value;
         }
 
+        bool hasattr(std::string const& arr) const
+        {
+            return PyObject_HasAttrString(m_obj, arr.c_str());
+        }
+
         template <typename T>
         void setattr(std::string const& arr, T const& value)
         {

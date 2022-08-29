@@ -2,7 +2,6 @@
 
 #include "makesdna/DNA_ID.h"
 #include "exec.hpp"
-#include "property_group.hpp"
 
 #include <fmt/core.h>
 
@@ -46,7 +45,8 @@ float bxx::id::get_float_prop(std::string const& prop)
     return eval_float({fmt::format("out = {}.{}",get_full_name(),prop)});
 }
 
-bxx::property_group bxx::id::get_property_group(std::string const& key, int index)
+bool bxx::id::hasattr(std::string const& key) const
 {
-    return bxx::property_group(get_full_name() + "." + key);
+    return to_python_object().hasattr(key);
 }
+

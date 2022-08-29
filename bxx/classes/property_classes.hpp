@@ -23,13 +23,9 @@ namespace bxx
         python_object get_python_object();
         std::string get_id() const { return m_id; }
         python_object get_owner() const;
-    protected:
         virtual void write_to(class_property_builder& builder) = 0;
+    protected:
         friend class property_class;
-
-        template<class T>
-        friend class operator_class;
-
         char const* m_id;
         property_class* m_owner;
     };
@@ -37,8 +33,11 @@ namespace bxx
     class property_class : public python_object
     {
     public:
-        property_class(property_class const& oth) = delete;
-        property_class() {};
+        property_class() = default;
+        property_class(property_class const&) = delete;
+        property_class(PyObject* obj)
+            : python_object(obj)
+        {}
     protected:
         virtual void register_class_internal() = 0;
         virtual std::string get_class_name() = 0;
@@ -214,6 +213,16 @@ namespace bxx
         }
     };
 
-#define PROPERTY_CLASS(cls,...) static void register_class() { cls().register_class_internal(); } std::string get_class_name() { return #cls; } cls(): __VA_ARGS__ {}
 #define PROPERTY_ENTRY(prop) prop(this, #prop)
+
+// todo: the fact i have to Py_IncRef twice here suggests something going very wrong elsewhere
+#define PROPERTY_GROUP(cls,...)\
+    static void register_class() { cls().register_class_internal(); }\
+    std::string get_class_name() { return #cls; }\
+    cls(): __VA_ARGS__ {} cls(PyObject* obj) : __VA_ARGS__ { m_obj = obj; Py_IncRef(obj); }\
+    template <typename T>\
+    cls(T const& obj): __VA_ARGS__ { m_obj = obj.getattr<python_object>(#cls).m_obj; Py_IncRef(m_obj); Py_IncRef(m_obj); }
+
+#define OPERATOR(cls,...) static void register_class() { cls().register_class_internal(); } std::string get_class_name() { return #cls; } cls(): __VA_ARGS__ {}
+#define OPERATOR_NO_PROPS(cls) static void register_class() { cls().register_class_internal(); } std::string get_class_name() { return #cls; } cls() {}
 }

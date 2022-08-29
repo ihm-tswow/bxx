@@ -2,11 +2,15 @@
 
 typedef struct ID bl_id;
 
+#include "python_object.hpp"
+#include "exec.hpp"
+
+#include <fmt/core.h>
 #include <string>
 
 namespace bxx
 {
-    class property_group;
+    class python_object;
     class id
     {
     public:
@@ -20,6 +24,25 @@ namespace bxx
 
         float get_float_prop(std::string const& prop);
 
-        property_group get_property_group(std::string const& key, int index = -1);
+        template <typename T = python_object>
+        T to_python_object() const
+        {
+            python_object obj = eval_pyobject(fmt::format("out = {}", get_full_name()));
+            return T(obj.m_obj);
+        }
+
+        template <typename T = python_object>
+        T getattr(std::string const& key) const
+        {
+            return to_python_object().getattr<T>(key);
+        }
+
+        template <typename T>
+        void setattr(std::string const& key, T const& value)
+        {
+            to_python_object().setattr<T>(key, value);
+        }
+
+        bool hasattr(std::string const& key) const;
     };
 }
