@@ -33,7 +33,8 @@ namespace bxx
         operator_builder& add_option(std::string const& option);
         operator_builder& add_option(std::initializer_list<std::string> const& option);
         operator_builder& set_callback(std::function<void(python_object)> callback);
-
+        operator_builder& set_draw(std::function<void(python_object)> callback);
+        operator_builder& set_disable_drawing(bool disable);
         operator_builder& begin_column();
         operator_builder& end_column();
         operator_builder& add_label(std::string const& label);
@@ -44,11 +45,13 @@ namespace bxx
         void write(python_builder& builder);
     private:
         std::function<void(python_object)> m_callback;
+        std::function<void(python_object)> m_draw;
         std::vector<operator_draw_instruction> m_draw_instructions = { { "cur = self.layout", true } };
         std::set<std::string> m_parents = { "bpy.types.Operator" };
         std::set<std::string> m_options = { "REGISTER" };
         std::string m_bl_id;
         bool m_registers;
+        bool m_disable_drawing = false;
         friend class operators;
     };
 

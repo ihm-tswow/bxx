@@ -44,6 +44,13 @@ bxx::operator_builder& bxx::operator_builder::set_callback(std::function<void(py
     return *this;
 }
 
+bxx::operator_builder& bxx::operator_builder::set_draw(std::function<void(python_object)> callback)
+{
+    m_draw = callback;
+    return *this;
+}
+
+
 bxx::operator_builder& bxx::operator_builder::add_option(std::string const& option)
 {
     m_options.insert(option);
@@ -115,7 +122,7 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
             builder.write_line("return True");
         }
 
-        if (m_properties.size() > 0)
+        if ((m_properties.size() > 0 || m_draw) && !m_disable_drawing)
         {
             builder.begin_line("def invoke(self, context, event):");
             {
@@ -124,8 +131,20 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
             }
 
             builder.begin_line("def draw(self, context):");
+            auto block = builder.scoped_block(python_builder::no_brackets, 1);
+
+            if (m_draw)
             {
-                auto block = builder.scoped_block(python_builder::no_brackets, 1);
+                auto draw = m_draw;
+                size_t draw_id = lib_register_event([draw](bxx::python_tuple const& tup) {
+                    draw(tup.get<python_object>(0));
+                    return python_object();
+                });
+                builder.write_line("fire_event({},{},self)",get_script_index(), draw_id);
+            }
+            else
+            {
+                // auto-draw
                 for_each_property([&](property_entry& entry, bool last) {
                     std::optional<std::string> const& draw = entry.get_draw_instruction();
                     if (draw.has_value())
@@ -156,6 +175,12 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
     }
 
     builder.write_line("register_operator({},{},show_{})", get_script_index(), get_class_name(), get_class_name());
+}
+
+bxx::operator_builder& bxx::operator_builder::set_disable_drawing(bool disable)
+{
+    m_disable_drawing = disable;
+    return *this;
 }
 
 
