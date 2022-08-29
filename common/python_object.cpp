@@ -43,6 +43,11 @@ namespace bxx
         return PyUnicode_FromString(str.c_str());
     }
 
+    PyObject* cxx2py(char const* str,bool)
+    {
+        return PyUnicode_FromString(str);
+    }
+
     PyObject* cxx2py(std::uint32_t val, bool)
     {
         return PyLong_FromUnsignedLong(val);

@@ -9,6 +9,20 @@
 #include <functional>
 #include <cassert>
 
+#define PYFIELD(type,name)\
+    void set_##name(type value) { setattr<type>(#name, value); }\
+    type get_##name() { return getattr<type>(#name); }
+
+#define PYFIELD_READ(type,name)\
+    type get_##name() { return getattr<type>(#name); }
+
+#define PYFIELD_STRINGENUM(type,name)\
+    void set_##name(type value) { setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
+    type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+
+#define PYFIELD_STRINGENUM_READ(type,name)\
+    type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+
 namespace bxx
 {
     class python_object;
@@ -17,9 +31,13 @@ namespace bxx
     class python_list;
 
     template <typename T>
-    T py2cxx(PyObject*);
+    T py2cxx(PyObject* obj)
+    {
+        return T(obj);
+    }
 
     PyObject* cxx2py(std::string const&, bool theft = false);
+    PyObject* cxx2py(char const*, bool theft = false);
     PyObject* cxx2py(std::uint32_t, bool theft = false);
     PyObject* cxx2py(std::int32_t, bool theft = false);
     PyObject* cxx2py(std::int64_t, bool theft = false);
@@ -36,7 +54,7 @@ namespace bxx
     {
         std::string key;
         T value;
-        kwarg(std::string const& _key, T const& _value)
+        kwarg(std::string const& _key, T _value)
             : key(_key)
             , value(_value)
         {}
@@ -389,6 +407,12 @@ namespace bxx
     inline double py2cxx(PyObject* py)
     {
         return PyFloat_AsDouble(py);
+    }
+
+    template <>
+    inline float py2cxx(PyObject* py)
+    {
+        return float(PyFloat_AsDouble(py));
     }
 
     template <>
