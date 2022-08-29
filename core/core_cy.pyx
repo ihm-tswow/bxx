@@ -99,7 +99,7 @@ cdef void unregister_script(size_t script):
             delattr(target,name)
         registered_property_groups[script] = []
 
-def fire_event(script,event,args):
+def fire_event(script,event,*args):
     return <object> core_fire_event(script,event,<PyObject*>args)
 
 def register_property_group(script,target, name, property_group,is_collection):

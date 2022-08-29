@@ -279,7 +279,7 @@ namespace bxx
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
                 .add_option("description", description)
-                .add_option("items", python_code(fmt::format("lambda x,y: fire_event({},{},(x,y))", get_script_index(), event_index)))
+                .add_option("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
                 ;
             });
         }
