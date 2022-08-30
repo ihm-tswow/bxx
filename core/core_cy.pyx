@@ -220,7 +220,7 @@ def auto_reload():
 
 def register():
     register_cxx()
-    bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
+    bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay(), persistent=True)
 
 def unregister():
     unregister_cxx();
@@ -228,7 +228,6 @@ def unregister():
 # called from test_runner.py, because blender does not accept cython methods
 def cy_run_tests(incl,excl):
     ret = run_tests(incl,excl)
-    bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay())
     return ret
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
