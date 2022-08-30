@@ -61,6 +61,7 @@ cdef extern void auto_reload_cxx();
 # python objects we need to unregister with the scripts
 registered_operators = {}
 registered_property_groups = {}
+registered_app_handlers = {}
 
 # image buffers
 cdef array.array cur_pixels # image buffer create temp
@@ -99,6 +100,11 @@ cdef void unregister_script(size_t script):
             delattr(target,name)
         registered_property_groups[script] = []
 
+    if script in registered_app_handlers:
+        for (target,func) in registered_app_handlers[script]:
+            target.remove(func)
+        registered_app_handlers[script] = []
+
 def fire_event(script,event,*args):
     return <object> core_fire_event(script,event,<PyObject*>args)
 
@@ -110,6 +116,12 @@ def register_property_group(script,target, name, property_group,is_collection):
         setattr(target,name,bpy.props.CollectionProperty(type=property_group))
     else:
         setattr(target,name,bpy.props.PointerProperty(type=property_group))
+
+def register_app_handler(script, target, func):
+    target.append(func)
+    if not script in registered_app_handlers:
+        registered_app_handlers[script] = []
+    registered_app_handlers[script].append((target,func))
 
 cdef float* create_image_buffer(unsigned long long id, int width ,int height):
     global cur_pixels
@@ -141,6 +153,7 @@ def build_context():
     context['register_operator'] = register_operator
     context['fire_event'] = fire_event
     context['register_property_group'] = register_property_group
+    context['register_app_handler'] = register_app_handler
     context['preferences'] = preferences
     context['get_addon_name'] = get_addon_name
     context['get_addon_path'] = get_addon_path

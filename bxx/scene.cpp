@@ -5,6 +5,11 @@
 #include "makesdna/DNA_scene_types.h"
 #include "fmt/core.h"
 
+bxx::scene::scene(python_object obj)
+    : m_raw(reinterpret_cast<bl_scene*>(obj.call<std::uint64_t>("as_pointer")))
+{
+}
+
 std::string bxx::scene::get_name() const
 {
     return m_raw->id.name + 2;

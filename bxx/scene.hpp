@@ -12,6 +12,7 @@ namespace bxx
     {
     public:
         scene(bl_scene* raw);
+        scene(python_object obj);
         void set_name(std::string const& name);
         std::string get_name() const override;
         std::string get_full_name() const override;
