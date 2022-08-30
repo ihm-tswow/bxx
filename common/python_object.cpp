@@ -81,4 +81,20 @@ namespace bxx
         }
         return obj;
     }
+
+    python_list python_dict::items()
+    {
+        return python_list(PyDict_Items(m_obj));
+    }
+
+    python_list python_dict::keys()
+    {
+        return python_list(PyDict_Keys(m_obj));
+    }
+
+    python_list python_dict::values()
+    {
+        return python_list(PyDict_Values(m_obj));
+    }
+
 }

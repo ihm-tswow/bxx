@@ -301,20 +301,9 @@ namespace bxx
             return PyDict_Size(m_obj);
         }
 
-        python_list items()
-        {
-            return python_list(PyDict_Items(m_obj));
-        }
-
-        python_list keys()
-        {
-            return python_list(PyDict_Keys(m_obj));
-        }
-
-        python_list values()
-        {
-            return python_list(PyDict_Values(m_obj));
-        }
+        python_list items();
+        python_list keys();
+        python_list values();
 
         template <typename T>
         typename T get(std::string const& key)
