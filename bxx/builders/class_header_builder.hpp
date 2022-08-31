@@ -16,13 +16,27 @@ namespace bxx
         class_header_builder(std::string const& name)
             : m_class_name(name)
         {
+            set_label(name);
+            set_id("bxx." + name);
         }
 
         virtual ~class_header_builder(){}
 
+        T& set_id(std::string const& id)
+        {
+            set_class_variable("bl_idname", id);
+            return *dynamic_cast<T*>(this);
+        }
+
+        T& set_label(std::string const& label)
+        {
+            return set_class_variable("bl_label", label);
+        }
+
         template <typename V>
         T& set_class_variable(std::string const& name, V const& value)
         {
+            m_variables.erase(name);
             m_variables.emplace(name, value);
             return *dynamic_cast<T*>(this);
         }

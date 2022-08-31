@@ -21,8 +21,6 @@ bxx::operator_builder::operator_builder(std::string const& bl_id, bool registers
     , m_registers(registers)
 {
     m_bl_id = bl_id;
-    set_class_variable("bl_idname", "bxx."+bl_id);
-    set_class_variable("bl_label", bl_id);
     set_class_variable("bl_description", "description");
     set_class_variable("bl_options", [](set_builder& set) { set
         .set_bracket_type(python_builder::squiggly_brackets)

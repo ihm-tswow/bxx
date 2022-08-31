@@ -62,6 +62,7 @@ cdef extern void auto_reload_cxx();
 registered_operators = {}
 registered_property_groups = {}
 registered_app_handlers = {}
+registered_classes = {}
 
 # image buffers
 cdef array.array cur_pixels # image buffer create temp
@@ -79,6 +80,13 @@ last_obj = None
 #   can access.
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+def register_class(script,cls):
+    global registered_classes
+    if not script in registered_classes:
+        registered_classes[script] = []
+    registered_classes[script].append(cls)
+    bpy.utils.register_class(cls)
 
 def register_operator(script,operator,show):
     global registered_operators
@@ -104,6 +112,11 @@ cdef void unregister_script(size_t script):
         for (target,func) in registered_app_handlers[script]:
             target.remove(func)
         registered_app_handlers[script] = []
+
+    if script in registered_classes:
+        for cls in registered_classes[script]:
+            bpy.utils.unregister_class(cls)
+        registered_classes[script] = []
 
 def fire_event(script,event,*args):
     return <object> core_fire_event(script,event,<PyObject*>args)
@@ -151,6 +164,7 @@ def build_context():
     context = {}
     context['bpy'] = bpy
     context['register_operator'] = register_operator
+    context['register_class'] = register_class
     context['fire_event'] = fire_event
     context['register_property_group'] = register_property_group
     context['register_app_handler'] = register_app_handler
