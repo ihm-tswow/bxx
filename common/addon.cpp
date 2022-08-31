@@ -1,34 +1,17 @@
 #include "addon.hpp"
 #include "exec.hpp"
+#include "python_object.hpp"
 
-// note: we avoid fmt::format in this file since core is using it
-
-std::string bxx::preferences::get_string(std::string const& id, std::string const& def)
+namespace bxx
 {
-    return eval_string("out = preferences.get('" + id + "', '" + def + "')");
+    std::string get_addon_name()
+    {
+        return eval_string("out = get_addon_name()");
+    }
+
+    fs::path get_addon_path()
+    {
+        return eval_string("out = get_addon_path()");
+    }
 }
 
-int bxx::preferences::get_int(std::string const& id, int def)
-{
-    return eval_int("out = preferences.get('" + id + "', " + std::to_string(def) + "");
-}
-
-float bxx::preferences::get_float(std::string const& id, float def)
-{
-    return eval_float("out = preferences.get('" + id + "', " + std::to_string(def) + "");
-}
-
-bool bxx::preferences::get_bool(std::string const& id, bool def)
-{
-    return bool(eval_int("out = int(preferences.get('" + id + "', " + (def ? "True" : "False") + "))"));
-}
-
-std::string bxx::get_addon_name()
-{
-    return eval_string("out = get_addon_name()");
-}
-
-fs::path bxx::get_addon_path()
-{
-    return eval_string("out = get_addon_path()");
-}

@@ -2,7 +2,6 @@ import os
 import bpy
 import json
 from cpython cimport array
-from ...preferences import preferences
 from ..common.auto_reload import AUTO_RELOAD_CONFIG_FILE, AUTO_RELOAD_LOCK_FILE
 from ..third_party.lock import FileLock
 from .util import get_addon_path, get_addon_name
@@ -168,7 +167,6 @@ def build_context():
     context['fire_event'] = fire_event
     context['register_property_group'] = register_property_group
     context['register_app_handler'] = register_app_handler
-    context['preferences'] = preferences
     context['get_addon_name'] = get_addon_name
     context['get_addon_path'] = get_addon_path
     return context
@@ -220,9 +218,6 @@ cdef PyObject* eval_pyobject(char* exec_bytes):
 def auto_reload_lockfile_path():
     return os.path.join(get_addon_path(), AUTO_RELOAD_LOCK_FILE)
 
-def auto_reload_delay():
-    return preferences.get('auto_reload_interval',0.25)
-
 def auto_reload():
     if os.path.exists(os.path.join(get_addon_path(), AUTO_RELOAD_CONFIG_FILE)):
         try:
@@ -230,11 +225,11 @@ def auto_reload():
                 auto_reload_cxx()
         except:
             print("Libraries were busy, not loading")
-    return auto_reload_delay()
+    return 0.25
 
 def register():
     register_cxx()
-    bpy.app.timers.register(auto_reload, first_interval=auto_reload_delay(), persistent=True)
+    bpy.app.timers.register(auto_reload, first_interval=0.25, persistent=True)
 
 def unregister():
     unregister_cxx();
