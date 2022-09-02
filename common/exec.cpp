@@ -46,14 +46,3 @@ std::string eval_string(std::initializer_list<std::string> const& python)
 {
     return eval_string(join_strings(python));
 }
-
-bxx::python_object eval_pyobject(std::string const& python)
-{
-    PyObject* obj = get_pointers()->cy_eval_pyobject(const_cast<char*>(python.c_str()));
-    return bxx::python_object(obj);
-}
-
-bxx::python_object eval_pyobject(std::initializer_list<std::string> const& python)
-{
-    return eval_pyobject(join_strings(python));
-}

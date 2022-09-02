@@ -1,6 +1,6 @@
 #pragma once
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 #include "property_classes.hpp"
 
 #include "magic_enum.hpp"

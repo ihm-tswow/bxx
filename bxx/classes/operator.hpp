@@ -2,8 +2,38 @@
 
 #include "property_classes.hpp"
 #include "../builders/operator_builder.hpp"
-
 #include "ui_layout.hpp"
+
+#define OPERATOR(cls,...)\
+    static void register_class()\
+    {\
+        cls().register_class_internal();\
+    }\
+    std::string get_class_name()\
+    {\
+        return #cls;\
+    }\
+    cls(): __VA_ARGS__ {}\
+    cls(PyObject* obj)\
+        : __VA_ARGS__\
+    {\
+        details::replace_python_object(*this, obj);\
+    }
+
+#define OPERATOR_NO_PROPS(cls)\
+    static void register_class()\
+    {\
+        cls().register_class_internal();\
+    }\
+    std::string get_class_name()\
+    {\
+        return #cls;\
+    }\
+    cls() {}\
+    cls(PyObject* obj)\
+    {\
+        details::replace_python_object(*this,obj);\
+    }\
 
 namespace bxx
 {
@@ -33,18 +63,12 @@ namespace bxx
             operator_builder op(get_class_name(), true);
             op.read_properties_from(tmp_builder);
             op.set_callback([this](bxx::python_object obj) {
-                T t;
-                t.m_obj = obj.m_obj;
-                t.execute();
-                t.m_obj = nullptr;
+                T(obj.get_pyobject()).execute();
             });
 
             op.set_disable_drawing(false);
             op.set_draw([this](bxx::python_object obj) {
-                T t;
-                t.m_obj = obj.m_obj;
-                t.draw();
-                t.m_obj = nullptr;
+                T(obj.get_pyobject()).draw();
             });
         }
     };

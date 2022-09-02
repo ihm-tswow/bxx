@@ -1,5 +1,5 @@
 #include "preferences.hpp"
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 #include "exec.hpp"
 #include "addon.hpp"
 

@@ -1,6 +1,7 @@
 #include "menu_builder.hpp"
 #include "python_builder.hpp"
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_tuple.hpp>
 #include "../script.hpp"
 
 namespace bxx

@@ -4,7 +4,7 @@
 #include "class_header_builder.hpp"
 
 #include <nlohmann/json.hpp>
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 
 #include <string>
 #include <functional>

@@ -2,7 +2,7 @@
 
 typedef struct ID bl_id;
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 #include "exec.hpp"
 
 #include <fmt/core.h>
@@ -28,7 +28,7 @@ namespace bxx
         T to_python_object() const
         {
             python_object obj = eval_pyobject(fmt::format("out = {}", get_full_name()));
-            return T(obj.m_obj);
+            return T(obj);
         }
 
         template <typename T = python_object>

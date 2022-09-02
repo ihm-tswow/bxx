@@ -1,7 +1,6 @@
 #pragma once
 
 #include "shared_functions.hpp"
-#include "python_object.hpp"
 
 #include <string>
 
@@ -15,9 +14,6 @@ float eval_float(std::string const& python);
 float eval_float(std::initializer_list<std::string> const& python);
 std::string eval_string(std::string const& python);
 std::string eval_string(std::initializer_list<std::string> const& python);
-
-bxx::python_object eval_pyobject(std::string const& python);
-bxx::python_object eval_pyobject(std::initializer_list<std::string> const& python);
 
 template <typename T>
 T* eval_ptr(std::string const& python)

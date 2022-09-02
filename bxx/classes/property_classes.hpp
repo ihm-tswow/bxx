@@ -1,11 +1,13 @@
 #pragma once
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 #include "../builders/property_builder.hpp"
 #include "magic_enum.hpp"
 
 #include <limits>
 #include <vector>
+
+#define PROPERTY_ENTRY(prop) prop(this, #prop)
 
 namespace bxx
 {
@@ -59,7 +61,7 @@ namespace bxx
 
     inline python_object property_base::get_owner() const
     {
-        return python_object(m_owner->m_obj);
+        return python_object(m_owner->get_pyobject());
     }
 
     template<size_t N>
@@ -188,7 +190,7 @@ namespace bxx
 
         T get_value()
         {
-            PyObject* attr = PyObject_GetAttrString(m_owner->m_obj,m_id);
+            PyObject* attr = PyObject_GetAttrString(m_owner->get_pyobject(), m_id);
             char const* c = _PyUnicode_AsString(attr);
             return magic_enum::enum_cast<T>(c).value();
         }
@@ -212,17 +214,4 @@ namespace bxx
             builder.add_enum_property(m_id, name.value, copy, description.value);
         }
     };
-
-#define PROPERTY_ENTRY(prop) prop(this, #prop)
-
-// todo: the fact i have to Py_IncRef twice here suggests something going very wrong elsewhere
-#define PROPERTY_GROUP(cls,...)\
-    static void register_class() { cls().register_class_internal(); }\
-    std::string get_class_name() { return #cls; }\
-    cls(): __VA_ARGS__ {} cls(PyObject* obj) : __VA_ARGS__ { m_obj = obj; Py_IncRef(obj); }\
-    template <typename T>\
-    cls(T const& obj): __VA_ARGS__ { m_obj = obj.getattr<python_object>(#cls).m_obj; Py_IncRef(m_obj); Py_IncRef(m_obj); }
-
-#define OPERATOR(cls,...) static void register_class() { cls().register_class_internal(); } std::string get_class_name() { return #cls; } cls(): __VA_ARGS__ {}
-#define OPERATOR_NO_PROPS(cls) static void register_class() { cls().register_class_internal(); } std::string get_class_name() { return #cls; } cls() {}
 }

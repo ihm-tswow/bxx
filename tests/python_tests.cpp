@@ -1,23 +1,26 @@
 #include "tests.hpp"
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_list.hpp>
+#include <bxx/objects/python_tuple.hpp>
+#include <bxx/objects/python_dict.hpp>
 #include "exec.hpp"
 
 using namespace bxx;
 
 BXX_TEST(python_object_empty_object) {
-    BXX_ASSERT_EQUAL(python_object().m_obj, Py_None);
+    BXX_ASSERT_EQUAL(python_object().get_pyobject(), Py_None);
 }
 
 BXX_TEST(python_list_initializes_empty) {
-    BXX_ASSERT_NOT_EQUAL(python_list().m_obj, Py_None);
-    BXX_ASSERT_NOT_EQUAL(python_list().m_obj, nullptr);
+    BXX_ASSERT_NOT_EQUAL(python_list().get_pyobject(), Py_None);
+    BXX_ASSERT_NOT_EQUAL(python_list().get_pyobject(), nullptr);
     BXX_ASSERT_EQUAL(python_list().ref_count(), 1);
 }
 
 BXX_TEST(python_dict_initializes_empty) {
-    BXX_ASSERT_NOT_EQUAL(python_dict().m_obj, Py_None);
-    BXX_ASSERT_NOT_EQUAL(python_dict().m_obj, nullptr);
+    BXX_ASSERT_NOT_EQUAL(python_dict().get_pyobject(), Py_None);
+    BXX_ASSERT_NOT_EQUAL(python_dict().get_pyobject(), nullptr);
     BXX_ASSERT_EQUAL(python_dict().ref_count(), 1);
 }
 
@@ -25,7 +28,7 @@ BXX_TEST(python_object_releases_refs) {
     PyObject* raw;
     {
         python_list list;
-        raw = list.m_obj;
+        raw = list.get_pyobject();
     }
     BXX_ASSERT_EQUAL(Py_REFCNT(raw), 0);
 }
@@ -44,7 +47,7 @@ BXX_TEST(python_list_append) {
     l1.append(10);
     BXX_ASSERT_EQUAL(l1.len(),2);
     BXX_ASSERT_EQUAL(l2.ref_count(), 2);
-    BXX_ASSERT_EQUAL(l1.get<python_list>(0).m_obj, l2.m_obj);
+    BXX_ASSERT_EQUAL(l1.get<python_list>(0).get_pyobject(), l2.get_pyobject());
     BXX_ASSERT_EQUAL(l1.get<int>(1), 10);
 }
 
@@ -54,7 +57,7 @@ BXX_TEST(python_list_set) {
     l1.set(0, l2);
     l1.set(1, 10);
     BXX_ASSERT_EQUAL(l2.ref_count(), 2);
-    BXX_ASSERT_EQUAL(l1.get<python_list>(0).m_obj, l2.m_obj);
+    BXX_ASSERT_EQUAL(l1.get<python_list>(0).get_pyobject(), l2.get_pyobject());
     BXX_ASSERT_EQUAL(l1.get<int>(1), 10);
 }
 
@@ -64,7 +67,7 @@ BXX_TEST(python_tuple_set) {
     tup.set(0, list);
     tup.set(1, 10);
     BXX_ASSERT_EQUAL(list.ref_count(), 2);
-    BXX_ASSERT_EQUAL(tup.get<python_list>(0).m_obj, list.m_obj);
+    BXX_ASSERT_EQUAL(tup.get<python_list>(0).get_pyobject(), list.get_pyobject());
     BXX_ASSERT_EQUAL(tup.get<int>(1), 10);
 }
 
@@ -74,7 +77,7 @@ BXX_TEST(python_dict_set) {
     dict.set("k1", list);
     dict.set("k2", 10);
     BXX_ASSERT_EQUAL(list.ref_count(), 2);
-    BXX_ASSERT_EQUAL(dict.get<python_list>("k1").m_obj, list.m_obj);
+    BXX_ASSERT_EQUAL(dict.get<python_list>("k1").get_pyobject(), list.get_pyobject());
     BXX_ASSERT_EQUAL(dict.get<int>("k2"), 10);
 }
 
@@ -98,8 +101,8 @@ python_object create_python_object()
 
 BXX_TEST(python_object_create) {
     python_object obj = create_python_object();
-    BXX_ASSERT_NOT_EQUAL(obj.m_obj, nullptr);
-    BXX_ASSERT_NOT_EQUAL(obj.m_obj, Py_None);
+    BXX_ASSERT_NOT_EQUAL(obj.get_pyobject(), nullptr);
+    BXX_ASSERT_NOT_EQUAL(obj.get_pyobject(), Py_None);
 }
 
 BXX_TEST(python_object_setattr) {
@@ -107,7 +110,7 @@ BXX_TEST(python_object_setattr) {
     python_list list;
     obj.setattr("list", list);
     BXX_ASSERT_EQUAL(list.ref_count(), 2);
-    BXX_ASSERT_EQUAL(obj.getattr<python_list>("list").m_obj, list.m_obj);
+    BXX_ASSERT_EQUAL(obj.getattr<python_list>("list").get_pyobject(), list.get_pyobject());
 }
 
 BXX_TEST(python_object_delattr) {
@@ -181,6 +184,22 @@ BXX_TEST(python_object_complex_arg) {
     BXX_ASSERT_EQUAL(list.ref_count(), 1);
 }
 
+// I just needed a sanity check for if this actually works
+BXX_TEST(python_object_kwarg_primitive_refcount) {
+    details::python_tempref r(details::cxx2py(std::uint32_t(10), false));
+    int cur_refcount = r.m_pyobj->ob_refcnt;
+    python_object obj = eval_pyobject({
+        "class TestClass:",
+        "    def __init__(self):",
+        "        pass",
+        "    def call(self,a):",
+        "        return a",
+        "out = TestClass()"
+        });
+    obj.call<python_object>("call", kwarg("a",r.m_pyobj));
+    BXX_ASSERT_EQUAL(cur_refcount, r.m_pyobj->ob_refcnt);
+}
+
 BXX_TEST(python_object_complex_kwarg) {
     python_list list;
     list.append(10);
@@ -192,6 +211,6 @@ BXX_TEST(python_object_complex_kwarg) {
         "        return a",
         "out = TestClass()"
     });
-    BXX_ASSERT_EQUAL(obj.call<python_list>("call",kwarg("b",5),kwarg("a",list)).get<int>(0), 10);
+    BXX_ASSERT_EQUAL(obj.call<python_list>("call",kwarg("b",5),kwarg<python_list>("a",list)).get<int>(0), 10);
     BXX_ASSERT_EQUAL(list.ref_count(), 1);
 }

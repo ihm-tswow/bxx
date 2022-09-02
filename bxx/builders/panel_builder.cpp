@@ -1,6 +1,7 @@
 #include "panel_builder.hpp"
 #include "../script.hpp"
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_tuple.hpp>
 
 #include "magic_enum.hpp"
 
@@ -62,20 +63,29 @@ namespace bxx
             auto draw = m_draw;
             auto draw_header = m_draw_header;
             auto poll = m_poll;
-            size_t event_index = lib_register_event([=](bxx::python_tuple const& tuple) {
-                draw(tuple.get<python_object>(0), tuple.get<python_object>(1));
-                return python_object();
-            });
-            builder.begin_line("def draw(self,context):");
+
+            if (draw)
             {
-                auto block = builder.scoped_block(python_builder::no_brackets);
-                builder.write_line("fire_event({},{},self,context)", get_script_index(), event_index);
+                size_t event_index = lib_register_event([=](bxx::python_tuple const& tuple) {
+                    draw(tuple.get<python_object>(0), tuple.get<python_object>(1));
+                    return python_object();
+                });
+                builder.begin_line("def draw(self,context):");
+                {
+                    auto block = builder.scoped_block(python_builder::no_brackets);
+                    builder.write_line("fire_event({},{},self,context)", get_script_index(), event_index);
+                }
+            }
+            else
+            {
+                builder.begin_line("def draw(self,context):");
+                builder.write_line("    pass");
             }
 
             if (poll)
             {
                 size_t poll_index = lib_register_event([=](bxx::python_tuple const& tuple) {
-                    return python_object(cxx2py(poll(tuple.get<python_object>(0), tuple.get<python_object>(1))));
+                    return python_object(poll(tuple.get<python_object>(0), tuple.get<python_object>(1)));
                 });
 
                 builder.write_line("@classmethod");

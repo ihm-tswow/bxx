@@ -1,6 +1,8 @@
 #include "script.hpp"
+#include "core/core_defines.hpp"
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_tuple.hpp>
 
 static std::string script_name = "";
 static size_t script_index;
@@ -26,4 +28,12 @@ size_t bxx::get_script_index()
 std::string bxx::cur_script_name()
 {
     return script_name;
+}
+
+BXX_API PyObject* lib_fire_event(size_t index, PyObject* raw)
+{
+    bxx::python_object res = events[index](bxx::python_tuple(raw));
+    PyObject* raw_res = res.get_pyobject();
+    Py_IncRef(raw_res);
+    return raw_res;
 }

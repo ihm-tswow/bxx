@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui_layout.hpp"
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
 
 #include <string>
 
@@ -9,7 +9,7 @@
     classname() = default;\
     classname(python_object const& obj)\
     {\
-        m_obj = obj.m_obj; Py_IncRef(obj.m_obj);\
+        details::replace_python_object(*this,obj.get_pyobject());\
     }\
     \
     std::string get_class_name()\

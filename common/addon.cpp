@@ -1,6 +1,5 @@
 #include "addon.hpp"
 #include "exec.hpp"
-#include "python_object.hpp"
 
 namespace bxx
 {

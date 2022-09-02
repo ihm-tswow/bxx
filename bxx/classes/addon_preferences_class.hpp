@@ -21,7 +21,7 @@
     cls(PyObject* obj): addon_preferences_class<cls>(obj), __VA_ARGS__ {}\
     static cls get()\
     {\
-        return cls(bxx::get_addon_preferences().m_obj);\
+        return cls(bxx::get_addon_preferences());\
     }\
 
 namespace bxx
@@ -57,10 +57,7 @@ namespace bxx
             addon_preferences_builder addon(get_class_name());
             addon.read_properties_from(tmp_builder);
             addon.set_draw([=](python_object self, python_object ctx) {
-                T t;
-                t.m_obj = self.m_obj;
-                t.draw(ctx);
-                t.m_obj = nullptr;
+                T(self).draw(ctx);
             });
         }
     };

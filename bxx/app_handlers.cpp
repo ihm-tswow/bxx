@@ -1,6 +1,7 @@
 #include "app_handlers.hpp"
 
-#include "python_object.hpp"
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_tuple.hpp>
 #include "exec.hpp"
 #include "script.hpp"
 

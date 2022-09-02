@@ -7,6 +7,31 @@
 
 #include "../id.hpp"
 
+#define PROPERTY_GROUP(cls,...)\
+    static void register_class()\
+    {\
+        cls().register_class_internal();\
+    }\
+    std::string get_class_name()\
+    {\
+        return #cls;\
+    }\
+    cls()\
+        : __VA_ARGS__\
+    {\
+    }\
+    cls(PyObject* obj)\
+        : __VA_ARGS__\
+    {\
+        details::replace_python_object(*this,obj);\
+    }\
+    template <typename T>\
+    cls(T const& obj)\
+        : __VA_ARGS__\
+    {\
+        details::replace_python_object(*this,obj.getattr<python_object>(#cls).get_pyobject());\
+    }
+
 namespace bxx
 {
     enum class property_group_targets

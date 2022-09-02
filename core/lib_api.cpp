@@ -21,9 +21,6 @@
 #include "nlohmann/json.hpp"
 #include "core_defines.hpp"
 
-#include <iostream>
-
-
 // Private functions
 void register_operators();
 void init_pointers_store(shared_functions* functions);
@@ -46,11 +43,4 @@ BXX_API void lib_script_register(char const* script_name, size_t index, shared_f
 BXX_API void lib_script_unregister()
 {
     script_unregister();
-}
-
-BXX_API PyObject* lib_fire_event(size_t index, PyObject* raw)
-{
-    bxx::python_object obj = events[index](bxx::python_tuple(raw)).m_obj;
-    obj.inc_ref();
-    return obj.m_obj;
 }

@@ -2,6 +2,7 @@
 #include "exec.hpp"
 #include "../script.hpp" // include dir not working for this one file for some bizarre reason
 #include "python_builder.hpp"
+#include <bxx/objects/python_tuple.hpp>
 
 #include "fmt/core.h"
 #include <nlohmann/json.hpp>
