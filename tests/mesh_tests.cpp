@@ -1,7 +1,7 @@
 #include "tests.hpp"
-#include "mesh.hpp"
-#include "context.hpp"
-#include "exec.hpp"
+#include <bxx/blender_types/mesh.hpp>
+#include <bxx/blender_types/context.hpp>
+#include <common/exec.hpp>
 
 BXX_TEST(mesh_created_with_name) {
     BXX_ASSERT_EQUAL(bxx::mesh::create("test_mesh").get_name(), "test_mesh");

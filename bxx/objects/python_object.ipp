@@ -1,6 +1,10 @@
 #pragma once
 
 #include <bxx/objects/python_object.hpp>
+#include <common/shared_functions.hpp>
+#include <bxx/mathutils.hpp>
+
+#include <fmt/core.h>
 
 #include <array>
 #include <optional>
@@ -51,6 +55,7 @@ namespace bxx
         {
             kwargs.add_pair(value.m_key, value.m_value);
         }
+
     }
 
     template <typename T>
@@ -59,9 +64,11 @@ namespace bxx
     {
     }
 
+    template <typename pyref_type>
     template <typename T, class ... Args>
-    T python_object::call(std::string const& method, Args&&... args) const
+    T python_object_base<pyref_type>::call(std::string const& method, Args&&... args)
     {
+        pyref_type self = get_pyobject();
         details::call_arg_stack<sizeof...(Args)> arg_refs;
         details::call_kwarg_stack<sizeof...(Args)> kwarg_refs;
         ([&] { details::convert_fn(args, arg_refs, kwarg_refs); }(), ...);
@@ -82,7 +89,7 @@ namespace bxx
             PyTuple_SetItem(arg_tup, i, arg_refs.m_refs[i].value().m_pyobj);
         }
 
-        PyObject* fn = PyObject_GetAttrString(get_pyobject(), method.c_str());
+        PyObject* fn = PyObject_GetAttrString(self, method.c_str());
         PyObject* res = PyObject_Call(fn, arg_tup, kwarg_dict);
         T value(details::py2cxx<T>(res));
         Py_DecRef(res);
@@ -95,10 +102,12 @@ namespace bxx
         return value;
     }
 
+    template <typename pyref_type>
     template<typename T>
-    inline T python_object::call(std::string const& method) const
+    inline T python_object_base<pyref_type>::call(std::string const& method)
     {
-        PyObject* fn = PyObject_GetAttrString(m_pyobject, method.c_str());
+        pyref_type self = get_pyobject();
+        PyObject* fn = PyObject_GetAttrString(self, method.c_str());
         PyObject* tup = PyTuple_New(0);
         PyObject* res = PyObject_Call(fn, tup, nullptr);
         Py_DecRef(fn);
@@ -108,19 +117,69 @@ namespace bxx
         return value;
     }
 
+    template <typename pyref_type>
     template <typename T>
-    inline T python_object::getattr(std::string const& arr) const
+    inline T python_object_base<pyref_type>::getattr(std::string const& arr)
     {
-        PyObject* obj = PyObject_GetAttrString(m_pyobject, arr.c_str());
+        pyref_type self = get_pyobject();
+        PyObject* obj = PyObject_GetAttrString(self, arr.c_str());
         T value(details::py2cxx<T>(obj));
         Py_DecRef(obj);
         return value;
     }
 
+    template <typename pyref_type>
     template <typename T>
-    void python_object::setattr(std::string const& arr, T value)
+    void python_object_base<pyref_type>::setattr(std::string const& arr, T value)
     {
-        PyObject_SetAttrString(m_pyobject, arr.c_str(), details::cxx2py(value, false));
+        pyref_type self = get_pyobject();
+        PyObject_SetAttrString(self, arr.c_str(), details::cxx2py(value, false));
+    }
+
+    template <typename pyref_type>
+    size_t python_object_base<pyref_type>::ref_count()
+    {
+        return Py_REFCNT(get_pyobject());
+    }
+
+    template <typename pyref_type>
+    std::string python_object_base<pyref_type>::str()
+    {
+        pyref_type self = get_pyobject();
+        PyObject* str = PyObject_Str(self);
+        if (!str)
+        {
+            return "<error str>";
+        }
+        char const* chr = _PyUnicode_AsString(str);
+        Py_DecRef(str);
+        return std::string(chr);
+    }
+
+    template <typename pyref_type>
+    std::string python_object_base<pyref_type>::repr()
+    {
+        pyref_type self = get_pyobject();
+        PyObject* str = PyObject_Repr(self);
+        if (!str)
+        {
+            return "<error repr>";
+        }
+        char const* chr = _PyUnicode_AsString(str);
+        Py_DecRef(str);
+        return std::string(chr);
+    }
+
+    template <typename pyref_type>
+    void python_object_base<pyref_type>::delattr(std::string const& arr)
+    {
+        PyObject_DelAttrString(get_pyobject(), arr.c_str());
+    }
+
+    template <typename pyref_type>
+    bool python_object_base<pyref_type>::hasattr(std::string const& arr)
+    {
+        return PyObject_HasAttrString(get_pyobject(), arr.c_str());
     }
 
     template <> inline bool python_object::is<bool>()
@@ -212,5 +271,50 @@ namespace bxx
         {
             return PyFloat_AsDouble(obj);
         }
+
+        template <> inline mathutils::vec2 py2cxx<mathutils::vec2>(PyObject* obj)
+        {
+            return {
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1)))
+            };
+        }
+
+        template <> inline mathutils::vec3 py2cxx<mathutils::vec3>(PyObject* obj)
+        {
+            return {
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2)))
+            };
+        }
+
+        template <> inline mathutils::quaternion py2cxx<mathutils::quaternion>(PyObject* obj)
+        {
+            return {
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,3)))
+            };
+        }
+
+        template <> inline mathutils::rgba py2cxx<mathutils::rgba>(PyObject* obj)
+        {
+            return {
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2))),
+                float(PyFloat_AsDouble(PyTuple_GetItem(obj,3)))
+            };
+        }
+    }
+
+    template <typename ...Args>
+    inline PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args... args)
+    {
+        return get_pointers()->cy_eval_pyobject(
+            const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
+        );
     }
 }

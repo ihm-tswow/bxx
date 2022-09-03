@@ -105,7 +105,7 @@ static void stream_keys(std::stringstream& ss, std::string const& wrap, T const&
 void bxx::operator_builder::write(bxx::python_builder& builder)
 {
     auto cb = m_callback;
-    size_t event_index = lib_register_event([cb](python_tuple const& args) {
+    size_t event_index = lib_register_event([cb](python_tuple args) {
         cb(python_object(args.get<python_object>(0)));
         return python_object();
     });
@@ -135,7 +135,7 @@ void bxx::operator_builder::write(bxx::python_builder& builder)
             if (m_draw)
             {
                 auto draw = m_draw;
-                size_t draw_id = lib_register_event([draw](bxx::python_tuple const& tup) {
+                size_t draw_id = lib_register_event([draw](bxx::python_tuple tup) {
                     draw(tup.get<python_object>(0));
                     return python_object();
                 });

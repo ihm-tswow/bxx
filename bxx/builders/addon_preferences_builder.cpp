@@ -36,7 +36,7 @@ namespace bxx
             if (m_draw)
             {
                 auto draw = m_draw;
-                size_t event_id = lib_register_event([draw](python_tuple const& tuple) {
+                size_t event_id = lib_register_event([draw](python_tuple tuple) {
                     draw(tuple.get<python_object>(0), tuple.get<python_object>(1));
                     return python_object();
                 });

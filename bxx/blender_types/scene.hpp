@@ -1,21 +1,22 @@
 #pragma once
 
-#include "id.hpp"
+#include <bxx/objects/id.hpp>
+#include <bxx/blender_types/blender_types.hpp>
 
-typedef struct Scene bl_scene;
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#include <makesdna/DNA_scene_types.h>
+#pragma warning(pop)
 
 namespace bxx
 {
     class view_layer;
 
-    class scene : public id
+    class scene : public id<bl_scene>
     {
     public:
-        scene(bl_scene* raw);
-        scene(python_object obj);
-        void set_name(std::string const& name);
-        std::string get_name() const override;
-        std::string get_full_name() const override;
+        using id<bl_scene>::id;
+        std::string get_type_path() const override;
         view_layer add_view_layer(std::string const& name);
         view_layer get_view_layer(std::string const& name);
         static bxx::scene create(std::string const& name);

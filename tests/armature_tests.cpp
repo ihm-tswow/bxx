@@ -1,8 +1,9 @@
 #include "tests.hpp"
-#include "armature.hpp"
-#include "object.hpp"
-#include "context.hpp"
-#include "view_layer.hpp"
+
+#include <bxx/blender_types/armature.hpp>
+#include <bxx/blender_types/object.hpp>
+#include <bxx/blender_types/context.hpp>
+#include <bxx/blender_types/view_layer.hpp>
 #include "exec.hpp"
 #include "fmt/core.h"
 

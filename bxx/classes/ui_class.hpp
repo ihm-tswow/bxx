@@ -7,7 +7,7 @@
 
 #define UI_CLASS(classname)\
     classname() = default;\
-    classname(python_object const& obj)\
+    classname(python_object obj)\
     {\
         details::replace_python_object(*this,obj.get_pyobject());\
     }\

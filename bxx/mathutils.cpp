@@ -1,49 +1,67 @@
 #include "mathutils.hpp"
 
-mathutils::vec3::vec3(float _x, float _y, float _z)
-    : x(_x),y(_y),z(_z)
-{}
-
-mathutils::vec2::vec2(float _x, float _y)
-    : x(_x), y(_y)
-{}
-
-
-mathutils::quaternion::quaternion(float _w, float _x, float _y, float _z)
-    : w(_w), x(_x), y(_y), z(_z)
-{}
-
-bool mathutils::operator==(const mathutils::vec3& lhs, const mathutils::vec3& rhs)
+namespace mathutils
 {
-    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
-}
+    mathutils::vec3::vec3(float _x, float _y, float _z)
+        : x(_x), y(_y), z(_z)
+    {}
 
-bool mathutils::operator==(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs)
-{
-    return lhs.w == rhs.w && lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
-}
+    mathutils::vec2::vec2(float _x, float _y)
+        : x(_x), y(_y)
+    {}
 
-bool mathutils::operator!=(const mathutils::vec3& lhs, const mathutils::vec3& rhs)
-{
-    return !(lhs == rhs);
-}
-bool mathutils::operator!=(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs)
-{
-    return !(lhs == rhs);
-}
 
-std::ostream& mathutils::operator<<(std::ostream& os, const mathutils::vec3& dt)
-{
-    os << "{" << dt.x << "," << dt.y << "," << dt.z << "}";
-    return os;
-}
+    mathutils::quaternion::quaternion(float _w, float _x, float _y, float _z)
+        : w(_w), x(_x), y(_y), z(_z)
+    {}
 
-std::ostream& mathutils::operator<<(std::ostream& os, const mathutils::quaternion& dt)
-{
-    os << "{" << dt.w << "," << dt.x << "," << dt.y << "," << dt.z << "}";
-    return os;
-}
+    bool mathutils::operator==(const mathutils::vec3& lhs, const mathutils::vec3& rhs)
+    {
+        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+    }
 
+    bool mathutils::operator==(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs)
+    {
+        return lhs.w == rhs.w && lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+    }
+
+    bool mathutils::operator!=(const mathutils::vec3& lhs, const mathutils::vec3& rhs)
+    {
+        return !(lhs == rhs);
+    }
+    bool mathutils::operator!=(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    std::ostream& mathutils::operator<<(std::ostream& os, const mathutils::vec3& dt)
+    {
+        os << "{" << dt.x << "," << dt.y << "," << dt.z << "}";
+        return os;
+    }
+
+    std::ostream& mathutils::operator<<(std::ostream& os, const mathutils::quaternion& dt)
+    {
+        os << "{" << dt.w << "," << dt.x << "," << dt.y << "," << dt.z << "}";
+        return os;
+    }
+
+    bool operator== (rgba const& a, rgba const& b)
+    {
+        return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+    }
+
+    bool operator!= (rgba const& a, rgba const& b)
+    {
+        return !(a == b);
+    }
+
+    std::ostream& operator<<(std::ostream& os, rgba const& rgba)
+    {
+        os << "{" << rgba.r << "," << rgba.g << "," << rgba.b << "," << rgba.a << "}";
+        return os;
+    }
+}
 
 bxx::quaternion::quaternion(bl_quat* raw)
     : m_raw(raw)

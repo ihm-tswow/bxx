@@ -348,6 +348,9 @@ function(generate_blender_version build_version)
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
+        ${${BLENDER_ID}_SOURCE_DIR}/source/blender
+        ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
+        ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
         ${SCRIPT_INCLUDE_DIRECTORIES}
         ${Python_INCLUDE_DIRS}
       )

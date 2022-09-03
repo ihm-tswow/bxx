@@ -4,6 +4,8 @@
 #include <bxx/objects/python_list.hpp>
 #include <bxx/objects/python_tuple.hpp>
 #include <bxx/objects/python_dict.hpp>
+
+#include <bxx/objects/blender_struct.hpp>
 #include "exec.hpp"
 
 using namespace bxx;

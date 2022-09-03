@@ -5,16 +5,15 @@
 // mathutils is for our own primitive math types
 namespace mathutils
 {
-    template <int max>
     struct rgba
     {
-        rgba(float _r, float _g, float _b, float _a = max)
+        rgba(float _r, float _g, float _b, float _a = 255)
             : r(_r), g(_g), b(_b), a(_a)
         {}
         float r;
         float g;
         float b;
-        float a = max;
+        float a;
     };
 
     struct vec3
@@ -43,29 +42,13 @@ namespace mathutils
 
     bool operator==(const mathutils::vec3& lhs, const mathutils::vec3& rhs);
     bool operator==(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs);
+    bool operator== (rgba const& a, rgba const& b);
     bool operator!=(const mathutils::vec3& lhs, const mathutils::vec3& rhs);
     bool operator!=(const mathutils::quaternion& lhs, const mathutils::quaternion& rhs);
+    bool operator!= (rgba const& a, rgba const& b);
     std::ostream& operator<<(std::ostream& os, const mathutils::vec3& dt);
     std::ostream& operator<<(std::ostream& os, const mathutils::quaternion& dt);
-
-    template <int max>
-    bool operator== (rgba<max> const& a, rgba<max> const& b)
-    {
-        return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
-    }
-
-    template <int max>
-    bool operator!= (rgba<max> const& a, rgba<max> const& b)
-    {
-        return !(a == b);
-    }
-
-    template <int max>
-    std::ostream& operator<<(std::ostream& os, rgba<max> const& rgba)
-    {
-        os << "{" << rgba.r << "," << rgba.g << "," << rgba.b << "," << rgba.a << "}";
-        return os;
-    }
+    std::ostream& operator<<(std::ostream& os, rgba const& rgba);
 }
 
 // bxx is for blender type references / functions

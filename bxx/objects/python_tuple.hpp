@@ -15,9 +15,9 @@ namespace bxx
         void set(size_t index, T value);
 
         template <typename T>
-        T get(size_t index) const;
+        T get(size_t index);
 
-        size_t len() const;
+        size_t len();
     };
 }
 

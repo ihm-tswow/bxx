@@ -1,21 +1,21 @@
 #pragma once
 
-#include "id.hpp"
-#include "mathutils.hpp"
+#include <bxx/blender_types/blender_types.hpp>
+#include <bxx/objects/id.hpp>
+#include <bxx/mathutils.hpp>
 
-typedef struct Mesh bl_mesh;
-typedef struct MVert bl_vert;
-typedef struct MPoly bl_poly;
-typedef struct MLoop bl_loop;
-typedef struct MLoopUV bl_loop_uv;
-typedef struct MLoopCol bl_loop_col;
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#include "makesdna/DNA_mesh_types.h"
+#include "makesdna/DNA_meshdata_types.h"
+#pragma warning(pop)
 
 namespace bxx
 {
-    class vert
+    class vert : public blender_struct<bl_vert>
     {
     public:
-        vert(bl_vert* vert);
+        using blender_struct<bl_vert>::blender_struct;
         void set_x(float value);
         void set_y(float value);
         void set_z(float value);
@@ -25,29 +25,23 @@ namespace bxx
         float get_x();
         float get_y();
         float get_z();
-        bl_vert* get_raw();
-    private:
-        bl_vert* m_vert;
     };
 
-    class loop
+    class loop : public blender_struct<bl_loop>
     {
     public:
-        loop(bl_loop* loop);
+        using blender_struct<bl_loop>::blender_struct;
         int get_edge();
         int get_vert();
         void set_edge(int edge);
         void set_vert(int vert);
         void set(int vert, int edge = 0);
-        bl_loop* get_raw();
-    private:
-        bl_loop* m_loop;
     };
 
-    class poly
+    class poly : public blender_struct<bl_poly>
     {
     public:
-        poly(bl_poly* poly);
+        using blender_struct<bl_poly>::blender_struct;
         void set_loop_start(int start);
         void set_loop_count(int count);
         void set(int start, int count);
@@ -55,36 +49,30 @@ namespace bxx
         int get_loop_count();
         short get_material();
         void set_material(short material);
-        bl_poly* get_raw();
-    private:
-        bl_poly* m_poly;
     };
 
-    class uv_wrapper
+    class uv_wrapper : public blender_struct<bl_loop_uv>
     {
     public:
-        uv_wrapper(bl_loop_uv* uv);
+        using blender_struct<bl_loop_uv>::blender_struct;
         void set_u(float u);
         void set_v(float v);
         void set(float u, float v);
         float get_u();
         float get_v();
-        bl_loop_uv* get_raw();
-    private:
-        bl_loop_uv* m_uv;
     };
 
-    class color
+    class color : public blender_struct<bl_loop_col>
     {
     public:
-        color(bl_loop_col* color);
+        using blender_struct<bl_loop_col>::blender_struct;
         void set_r(float r);
         void set_g(float g);
         void set_b(float b);
         void set_a(float a);
         void set(float r, float g, float b, float a = 255);
-        mathutils::rgba<255> get();
-        void set(mathutils::rgba<255> color);
+        mathutils::rgba get();
+        void set(mathutils::rgba color);
         float get_r();
         float get_g();
         float get_b();
@@ -94,12 +82,11 @@ namespace bxx
         bl_loop_col* m_col;
     };
 
-    class mesh : public id
+    class mesh : public id<bl_mesh>
     {
     public:
-        mesh(bl_mesh* raw);
-        std::string get_name() const override;
-        std::string get_full_name() const override;
+        using id<bl_mesh>::id;
+        std::string get_type_path() const final;
 
         void add_verts(int verts);
         void add_loops(int loops);
@@ -118,9 +105,6 @@ namespace bxx
         bxx::uv_wrapper uv(int loop);
         bxx::color color(int loop);
 
-        bl_mesh* get_raw();
         static bxx::mesh create(std::string const& name);
-    private:
-        bl_mesh* m_raw;
     };
 }

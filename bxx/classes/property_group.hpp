@@ -1,11 +1,9 @@
 #pragma once
 
 #include "property_classes.hpp"
-#include "../builders/property_group_builder.hpp"
+#include <bxx/builders/property_group_builder.hpp>
 
 #include "magic_enum.hpp"
-
-#include "../id.hpp"
 
 #define PROPERTY_GROUP(cls,...)\
     static void register_class()\
@@ -26,7 +24,7 @@
         details::replace_python_object(*this,obj);\
     }\
     template <typename T>\
-    cls(T const& obj)\
+    cls(T obj)\
         : __VA_ARGS__\
     {\
         details::replace_python_object(*this,obj.getattr<python_object>(#cls).get_pyobject());\
@@ -47,12 +45,7 @@ namespace bxx
     class property_group_class : public property_class
     {
     public:
-        T get(id const& id)
-        {
-            id.getattr<T>(get_class_name());
-        }
-
-        T get(python_object const& obj)
+        T get(python_object obj)
         {
             return obj.getattr<T>(get_class_name());
         }

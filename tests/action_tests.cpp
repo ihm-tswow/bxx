@@ -1,5 +1,5 @@
 #include "tests.hpp"
-#include "action.hpp"
+#include <bxx/blender_types/action.hpp>
 
 BXX_TEST(create_action_with_name) {
     BXX_ASSERT_EQUAL(bxx::action::create("test_action").get_name(), "test_action");

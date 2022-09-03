@@ -1,10 +1,14 @@
 #pragma once
 
-#include "id.hpp"
-#include "mathutils.hpp"
+#include <bxx/blender_types/blender_types.hpp>
+#include <bxx/objects/id.hpp>
+#include <bxx/mathutils.hpp>
 
-typedef struct Material bl_material;
-typedef struct bNode bl_material_node;
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#include "makesdna/DNA_material_types.h"
+#include "makesdna/DNA_Node_types.h"
+#pragma warning(pop)
 
 namespace bxx
 {
@@ -113,32 +117,28 @@ namespace bxx
     std::string node_type_to_string(bxx::material_node_type type);
 
     class material_node;
-    class material : public id
+    class material : public id<bl_material>
     {
     public:
+        using id<bl_material>::id;
         static bxx::material create(std::string const& name);
-        material(bl_material* raw);
-        std::string get_name() const override;
-        std::string get_full_name() const override;
+        std::string get_type_path() const final;
         material_node add_node(std::string const& type, mathutils::vec2 const& location = { 0,0 });
         material_node add_node(bxx::material_node_type type, mathutils::vec2 const& location = { 0,0 });
         material_node get_node(std::string const& name);
         void connect(material_node const& output_node, int output_socket, material_node const& input_node, int input_socket);
-        void set_use_nodes(bool use_nodes);
-        bl_material* get_raw();
-    private:
-        bl_material* m_raw;
+        PYFIELD(bool,use_nodes)
     };
 
-    class material_node : public id
+    class material_node : public blender_py_struct<bl_material_node>
     {
     public:
-        material_node(bxx::material const& parent, bl_material_node* node);
-        bl_material_node* get_raw();
-        bxx::material get_parent() const;
-        std::string get_name() const override;
-        std::string get_full_name() const override;
-        void set_location(mathutils::vec2 const& location);
+        PYFIELD(mathutils::vec2, location)
+        material_node(material const& parent, bl_material_node* node);
+        material get_parent();
+        python_object get_pyobject();
+        std::string get_name() const;
+        std::string get_name_full() const;
         void set_default_input(int index, std::string const& value);
         void set_default_input(int index, int value);
         void set_default_input(int index, float v1);
@@ -146,7 +146,6 @@ namespace bxx
         void set_default_input(int index, std::initializer_list<float> const& list);
     private:
         void _set_default_input_code(int index, std::string const& code);
-        bxx::material m_parent;
-        bl_material_node* m_raw;
+        material m_parent;
     };
 }

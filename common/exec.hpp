@@ -2,6 +2,8 @@
 
 #include "shared_functions.hpp"
 
+#include <fmt/core.h>
+
 #include <string>
 
 std::string join_strings(std::initializer_list<std::string> const& python);

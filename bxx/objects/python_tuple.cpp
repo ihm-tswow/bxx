@@ -14,7 +14,7 @@ namespace bxx
         : python_object(details::pyobject_steal(PyTuple_New(0)))
     {}
 
-    size_t python_tuple::len() const
+    size_t python_tuple::len()
     {
         return PyTuple_Size(get_pyobject());
     }

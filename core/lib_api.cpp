@@ -25,7 +25,7 @@
 void register_operators();
 void init_pointers_store(shared_functions* functions);
 void setup_script_data(std::string const& name, size_t index);
-extern std::vector<std::function<bxx::python_object(bxx::python_tuple const&)>> events;
+extern std::vector<std::function<bxx::python_object(bxx::python_tuple)>> events;
 
 // Provided by user
 void script_register();

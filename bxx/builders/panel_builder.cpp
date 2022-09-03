@@ -66,7 +66,7 @@ namespace bxx
 
             if (draw)
             {
-                size_t event_index = lib_register_event([=](bxx::python_tuple const& tuple) {
+                size_t event_index = lib_register_event([=](bxx::python_tuple tuple) {
                     draw(tuple.get<python_object>(0), tuple.get<python_object>(1));
                     return python_object();
                 });
@@ -84,7 +84,7 @@ namespace bxx
 
             if (poll)
             {
-                size_t poll_index = lib_register_event([=](bxx::python_tuple const& tuple) {
+                size_t poll_index = lib_register_event([=](bxx::python_tuple tuple) {
                     return python_object(poll(tuple.get<python_object>(0), tuple.get<python_object>(1)));
                 });
 
@@ -96,7 +96,7 @@ namespace bxx
 
             if (draw_header)
             {
-                size_t draw_header_index = lib_register_event([=](bxx::python_tuple const& tuple) {
+                size_t draw_header_index = lib_register_event([=](bxx::python_tuple tuple) {
                     draw_header(tuple.get<python_object>(0), tuple.get<python_object>(1));
                     return python_object();
                 });

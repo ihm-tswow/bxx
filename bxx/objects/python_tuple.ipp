@@ -11,9 +11,9 @@ namespace bxx
     }
 
     template <typename T>
-    T python_tuple::get(size_t index) const
+    T python_tuple::get(size_t index)
     {
-        PyObject* obj = PyTuple_GetItem(get_pyobject(), index);
+        PyObject* obj = PyTuple_GetItem(this->get_pyobject(), index);
         T value(details::py2cxx<T>(obj));
         return value;
     }

@@ -1,35 +1,41 @@
 #include <bxx/objects/python_object.hpp>
 #include <common/exec.hpp>
+#include <bxx/mathutils.hpp>
 
 namespace bxx
 {
+    // steal
     python_object::python_object(details::pyobject_steal obj)
         : m_pyobject(obj.obj)
     {
     }
 
+    // steal
     python_object::python_object(python_object&& obj) noexcept
         : m_pyobject(obj.get_pyobject())
     {
         obj.m_pyobject = nullptr;
     }
 
+    // null init
     python_object::python_object()
         : m_pyobject(Py_None)
-    {
-        Py_IncRef(m_pyobject);
-    }
+    {}
 
+    // copy
     python_object::python_object(PyObject* obj)
         : m_pyobject(obj)
     {
-        Py_IncRef(m_pyobject);
+        if (obj)
+        {
+            Py_IncRef(m_pyobject);
+        }
     }
 
+    // copy
     python_object::python_object(python_object const& obj)
-        : m_pyobject(obj.get_pyobject())
+        : python_object(obj.m_pyobject)
     {
-        Py_IncRef(m_pyobject);
     }
 
     python_object::~python_object()
@@ -38,50 +44,6 @@ namespace bxx
         {
             Py_DecRef(m_pyobject);
         }
-    }
-
-    size_t python_object::ref_count() const
-    {
-        return Py_REFCNT(get_pyobject());
-    }
-
-    PyObject* python_object::get_pyobject() const
-    {
-        return m_pyobject;
-    }
-
-    std::string python_object::str() const
-    {
-        PyObject* str = PyObject_Str(get_pyobject());
-        if (!str)
-        {
-            return "<error str>";
-        }
-        char const* chr = _PyUnicode_AsString(str);
-        Py_DecRef(str);
-        return std::string(chr);
-    }
-
-    std::string python_object::repr() const
-    {
-        PyObject* str = PyObject_Repr(get_pyobject());
-        if (!str)
-        {
-            return "<error repr>";
-        }
-        char const* chr = _PyUnicode_AsString(str);
-        Py_DecRef(str);
-        return std::string(chr);
-    }
-
-    void python_object::delattr(std::string const& arr)
-    {
-        PyObject_DelAttrString(get_pyobject(), arr.c_str());
-    }
-
-    bool python_object::hasattr(std::string const& arr) const
-    {
-        return PyObject_HasAttrString(get_pyobject(), arr.c_str());
     }
 
     void python_object::set_object(PyObject* pyobject)
@@ -98,11 +60,6 @@ namespace bxx
         Py_IncRef(m_pyobject);
     }
 
-    python_object::operator PyObject* ()
-    {
-        return get_pyobject();
-    }
-
     python_object eval_pyobject(std::string const& python)
     {
         PyObject* obj = get_pointers()->cy_eval_pyobject(const_cast<char*>(python.c_str()));
@@ -114,10 +71,29 @@ namespace bxx
         return eval_pyobject(join_strings(python));
     }
 
-    python_object& python_object::operator=(python_object const& rhs)
+    python_object::operator PyObject* ()
+    {
+        return get_pyobject();
+    }
+
+    python_object& python_object::operator=(python_object rhs)
     {
         set_object(rhs.m_pyobject);
         return *this;
+    }
+
+    python_object_weak::python_object_weak(PyObject* obj)
+        : m_pyobject(obj)
+    {}
+
+    PyObject* python_object_weak::get_pyobject()
+    {
+        return m_pyobject;
+    }
+
+    PyObject* python_object::get_pyobject()
+    {
+        return m_pyobject;
     }
 
     namespace details
@@ -127,7 +103,7 @@ namespace bxx
             return m_pyobj;
         }
 
-        python_tempref::python_tempref(python_tempref&& orig)
+        python_tempref::python_tempref(python_tempref&& orig) noexcept
         {
             m_needs_dec = orig.m_needs_dec;
             m_pyobj = orig.m_pyobj;
@@ -194,6 +170,43 @@ namespace bxx
                 Py_IncRef(value);
             }
             return { value , false };
+        }
+
+        python_tempref cxx2py(mathutils::vec2 const& vec, bool theft)
+        {
+            PyObject* tup = PyTuple_New(2);
+            PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.x));
+            PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.y));
+            return { tup, !theft };
+        }
+
+        python_tempref cxx2py(mathutils::vec3 const& vec, bool theft)
+        {
+            PyObject* tup = PyTuple_New(3);
+            PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.x));
+            PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.y));
+            PyTuple_SetItem(tup, 2, PyFloat_FromDouble(vec.z));
+            return { tup, !theft };
+        }
+
+        python_tempref cxx2py(mathutils::quaternion const& vec, bool theft)
+        {
+            PyObject* tup = PyTuple_New(4);
+            PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.w));
+            PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.x));
+            PyTuple_SetItem(tup, 2, PyFloat_FromDouble(vec.y));
+            PyTuple_SetItem(tup, 3, PyFloat_FromDouble(vec.z));
+            return { tup, !theft };
+        }
+
+        python_tempref cxx2py(mathutils::rgba const& rgba, bool theft)
+        {
+            PyObject* tup = PyTuple_New(4);
+            PyTuple_SetItem(tup, 0, PyFloat_FromDouble(rgba.r));
+            PyTuple_SetItem(tup, 1, PyFloat_FromDouble(rgba.g));
+            PyTuple_SetItem(tup, 2, PyFloat_FromDouble(rgba.b));
+            PyTuple_SetItem(tup, 3, PyFloat_FromDouble(rgba.a));
+            return { tup, !theft };
         }
 
         replace_python_object::replace_python_object(python_object& obj, PyObject* pyobj)

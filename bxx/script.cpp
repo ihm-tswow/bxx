@@ -6,7 +6,7 @@
 
 static std::string script_name = "";
 static size_t script_index;
-std::vector<std::function<bxx::python_object(bxx::python_tuple const&)>> events;
+std::vector<std::function<bxx::python_object(bxx::python_tuple)>> events;
 
 void setup_script_data(std::string const& name, size_t index)
 {
@@ -14,7 +14,7 @@ void setup_script_data(std::string const& name, size_t index)
     script_index = index;
 }
 
-size_t bxx::lib_register_event(std::function<python_object(bxx::python_tuple const&)> evt)
+size_t bxx::lib_register_event(std::function<python_object(bxx::python_tuple)> evt)
 {
     events.push_back(evt);
     return events.size() - 1;

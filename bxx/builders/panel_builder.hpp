@@ -75,8 +75,8 @@ namespace bxx
         panel_builder& set_poll(std::function<bool(python_object, python_object)> callback);
         void write(python_builder& builder);
     private:
-        std::function<void(python_object const&, python_object const&)> m_draw;
-        std::function<void(python_object const&, python_object const&)> m_draw_header;
-        std::function<bool(python_object const&, python_object const&)> m_poll;
+        std::function<void(python_object, python_object)> m_draw;
+        std::function<void(python_object, python_object)> m_draw_header;
+        std::function<bool(python_object, python_object)> m_poll;
     };
 }

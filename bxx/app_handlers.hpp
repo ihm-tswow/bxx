@@ -35,6 +35,6 @@ namespace bxx
         void undo_post(std::function<void(scene)> callback);
         void undo_pre(std::function<void(scene)> callback);
         void version_update(std::function<void()> callback);
-        void register_handler(std::string const& target, std::function<void(python_tuple const&)> callback);
+        void register_handler(std::string const& target, std::function<void(python_tuple)> callback);
     }
 }

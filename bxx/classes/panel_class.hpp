@@ -15,8 +15,8 @@ namespace bxx
     class panel_class: public ui_class
     {
     public:
-        virtual void draw(python_object const& ctx) = 0;
-        virtual void draw_header(python_object const& ctx) {}
+        virtual void draw(python_object ctx) = 0;
+        virtual void draw_header(python_object ctx) {}
     protected:
         void register_internal()
         {
@@ -25,7 +25,7 @@ namespace bxx
             builder.set_context(context);
             builder.set_space_type(space_type);
             builder.set_region_type(region_type);
-            builder.set_draw([this](python_object const& self, python_object const& ctx) {
+            builder.set_draw([this](python_object self, python_object ctx) {
                 T(self).draw(ctx);
             });
             /*
