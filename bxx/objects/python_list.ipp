@@ -5,6 +5,16 @@
 namespace bxx
 {
     template <typename T>
+    python_list::python_list(std::vector<T> const& values)
+        : python_list(values.size())
+    {
+        for (size_t i = 0; i < values.size(); ++i)
+        {
+            set<T>(i, values[i]);
+        }
+    }
+
+    template <typename T>
     void python_list::set(size_t index, T value)
     {
         PyList_SetItem(get_pyobject(), index, details::cxx2py(value, true).m_pyobj);

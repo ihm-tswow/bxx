@@ -2,6 +2,8 @@
 
 #include <bxx/objects/python_object.hpp>
 
+#include <vector>
+
 namespace bxx
 {
     class python_list: public python_object
@@ -9,6 +11,8 @@ namespace bxx
     public:
         python_list(size_t size);
         python_list(PyObject* obj);
+        template <typename T>
+        python_list(std::vector<T> const& values);
         python_list();
 
         template <typename T>

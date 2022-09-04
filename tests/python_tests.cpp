@@ -61,6 +61,14 @@ BXX_TEST(python_list_set) {
     BXX_ASSERT_EQUAL(l1.get<int>(1), 10);
 }
 
+BXX_TEST(python_list_from_vector) {
+    std::vector<int> my_vec = { 25,1007688 };
+    python_list li(my_vec);
+    BXX_ASSERT_EQUAL(li.len(), my_vec.size());
+    BXX_ASSERT_EQUAL(li.get<int>(0), my_vec[0]);
+    BXX_ASSERT_EQUAL(li.get<int>(1), my_vec[1]);
+}
+
 BXX_TEST(python_tuple_set) {
     python_tuple tup(2);
     python_list list;
