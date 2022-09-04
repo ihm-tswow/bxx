@@ -22,3 +22,7 @@ typedef struct MLoopUV bl_loop_uv;
 typedef struct MLoopCol bl_loop_col;
 
 typedef struct Scene bl_scene;
+
+typedef struct Image bl_image;
+
+typedef struct ViewLayer bl_view_layer;

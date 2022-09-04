@@ -1,9 +1,8 @@
 #pragma once
 
-#include <bxx/objects/id.hpp>
+#include <bxx/blender_types/blender_types.hpp>
 #include <bxx/blender_types/scene.hpp>
-
-typedef struct ViewLayer bl_view_layer;
+#include <bxx/objects/id.hpp>
 
 namespace bxx
 {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bxx/blender_types/blender_types.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
@@ -9,8 +10,6 @@
 #pragma warning(pop)
 
 #include <string>
-
-typedef struct Image bl_image;
 
 namespace bxx
 {
