@@ -48,6 +48,15 @@ namespace bxx
         return get_raw_struct()->co[2];
     }
 
+    mathutils::vec3 vert::get_normal()
+    {
+        return {
+            get_raw_struct()->no[0],
+            get_raw_struct()->no[1],
+            get_raw_struct()->no[2]
+        };
+    }
+
     int loop::get_edge()
     {
         return get_raw_struct()->e;

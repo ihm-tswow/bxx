@@ -22,6 +22,7 @@ namespace bxx
         void set(float x, float y, float z);
         void set(mathutils::vec3 vert);
         mathutils::vec3 get();
+        mathutils::vec3 get_normal();
         float get_x();
         float get_y();
         float get_z();
