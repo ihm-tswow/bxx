@@ -1,7 +1,7 @@
 #pragma once
 
-#include "python_builder.hpp"
-#include "value_builder.hpp"
+#include <bxx/builders/python_builder.hpp>
+#include <bxx/builders/value_builder.hpp>
 
 #include <string>
 #include <vector>

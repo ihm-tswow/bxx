@@ -1,8 +1,8 @@
-#include "collection.hpp"
-#include "object.hpp"
-#include "exec.hpp"
+#include <bxx/blender_types/collection.hpp>
+#include <bxx/blender_types/object.hpp>
+#include <common/exec.hpp>
 
-#include "fmt/core.h"
+#include <fmt/core.h>
 
 namespace bxx
 {

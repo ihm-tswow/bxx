@@ -1,12 +1,10 @@
-#include "tests.hpp"
-
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_list.hpp>
 #include <bxx/objects/python_tuple.hpp>
 #include <bxx/objects/python_dict.hpp>
-
 #include <bxx/objects/blender_struct.hpp>
-#include "exec.hpp"
+#include <common/tests.hpp>
+#include <common/exec.hpp>
 
 using namespace bxx;
 

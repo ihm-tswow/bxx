@@ -6,8 +6,8 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
-#include "makesdna/DNA_armature_types.h"
-#include "blenkernel/BKE_armature.h"
+#include <makesdna/DNA_armature_types.h>
+#include <blenkernel/BKE_armature.h>
 #pragma warning(pop)
 
 namespace bxx

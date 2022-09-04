@@ -1,8 +1,8 @@
 #pragma once
 
-#include "property_classes.hpp"
-#include "../builders/operator_builder.hpp"
-#include "ui_layout.hpp"
+#include <bxx/classes/property_classes.hpp>
+#include <bxx/classes/ui_layout.hpp>
+#include <bxx/builders/operator_builder.hpp>
 
 #define OPERATOR(cls,...)\
     static void register_class()\

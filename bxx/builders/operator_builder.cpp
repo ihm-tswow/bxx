@@ -1,10 +1,10 @@
-#include "operator_builder.hpp"
-#include "exec.hpp"
-#include "../script.hpp" // include dir not working for this one file for some bizarre reason
-#include "python_builder.hpp"
+#include <bxx/builders/operator_builder.hpp>
+#include <bxx/builders/python_builder.hpp>
 #include <bxx/objects/python_tuple.hpp>
+#include <bxx/script.hpp>
+#include <common/exec.hpp>
 
-#include "fmt/core.h"
+#include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
 #include <algorithm>

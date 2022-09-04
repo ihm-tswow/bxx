@@ -1,6 +1,6 @@
-#include "tests.hpp"
 #include <bxx/blender_types/mesh.hpp>
 #include <bxx/blender_types/object.hpp>
+#include <common/tests.hpp>
 
 static bxx::object create_test_object(std::string const& name)
 {

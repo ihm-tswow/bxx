@@ -1,9 +1,9 @@
-#include "panel_builder.hpp"
-#include "../script.hpp"
+#include <bxx/builders/panel_builder.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
+#include <bxx/script.hpp>
 
-#include "magic_enum.hpp"
+#include <magic_enum.hpp>
 
 namespace bxx
 {

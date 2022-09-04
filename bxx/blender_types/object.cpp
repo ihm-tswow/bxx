@@ -4,7 +4,7 @@
 #include <bxx/misc.hpp>
 #include <common/exec.hpp>
 
-#include "fmt/core.h"
+#include <fmt/core.h>
 
 namespace bxx
 {

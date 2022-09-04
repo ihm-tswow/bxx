@@ -1,11 +1,9 @@
-#include "app_handlers.hpp"
-
+#include <bxx/app_handlers.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
 #include <bxx/blender_types/scene.hpp>
-
-#include "exec.hpp"
-#include "script.hpp"
+#include <bxx/script.hpp>
+#include <common/exec.hpp>
 
 #include <fmt/core.h>
 

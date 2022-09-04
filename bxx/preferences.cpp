@@ -1,7 +1,7 @@
-#include "preferences.hpp"
+#include <bxx/preferences.hpp>
 #include <bxx/objects/python_object.hpp>
-#include "exec.hpp"
-#include "addon.hpp"
+#include <common/exec.hpp>
+#include <common/addon.hpp>
 
 #include <fmt/core.h>
 

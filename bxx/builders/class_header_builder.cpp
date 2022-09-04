@@ -1,4 +1,4 @@
-#include "class_header_builder.hpp"
+#include <bxx/builders/class_header_builder.hpp>
 
 namespace bxx
 {

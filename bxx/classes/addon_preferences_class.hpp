@@ -1,9 +1,9 @@
 #pragma once
 
-#include "property_classes.hpp"
-#include "exec.hpp"
-#include "../builders/addon_preferences_builder.hpp"
-#include "preferences.hpp"
+#include <bxx/classes/property_classes.hpp>
+#include <bxx/builders/addon_preferences_builder.hpp>
+#include <bxx/preferences.hpp>
+#include <common/exec.hpp>
 
 #define ADDON_PREFERENCES(cls,...)\
     static void register_class()\

@@ -6,8 +6,8 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
-#include "makesdna/DNA_material_types.h"
-#include "makesdna/DNA_Node_types.h"
+#include <makesdna/DNA_material_types.h>
+#include <makesdna/DNA_Node_types.h>
 #pragma warning(pop)
 
 namespace bxx

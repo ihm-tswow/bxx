@@ -1,9 +1,8 @@
-#include "material.hpp"
-#include "exec.hpp"
+#include <bxx/blender_types/material.hpp>
+#include <common/exec.hpp>
 
-#include "fmt/core.h"
-
-#include "magic_enum.hpp"
+#include <fmt/core.h>
+#include <magic_enum.hpp>
 
 namespace bxx
 {

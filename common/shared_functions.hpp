@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Python.h"
+#include <Python.h>
 
 typedef unsigned long long cy_ptr_ct;
 typedef void(*cy_exec_ct)(char*);

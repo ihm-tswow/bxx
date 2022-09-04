@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../common/shared_functions.hpp"
-#include "../common/tests.hpp"
+#include <common/shared_functions.hpp>
+#include <common/tests.hpp>
 
-#include "Python.h"
+#include <Python.h>
 
 typedef void (*script_register_ct)(char const* script_name, size_t index, shared_functions* functions);
 typedef void (*script_unregister_ct)();

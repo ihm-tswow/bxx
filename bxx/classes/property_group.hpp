@@ -1,9 +1,9 @@
 #pragma once
 
-#include "property_classes.hpp"
+#include <bxx/classes/property_classes.hpp>
 #include <bxx/builders/property_group_builder.hpp>
 
-#include "magic_enum.hpp"
+#include <magic_enum.hpp>
 
 #define PROPERTY_GROUP(cls,...)\
     static void register_class()\

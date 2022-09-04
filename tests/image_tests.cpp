@@ -1,5 +1,5 @@
-#include "tests.hpp"
 #include <bxx/blender_types/image.hpp>
+#include <common/tests.hpp>
 
 BXX_TEST(create_image)
 {

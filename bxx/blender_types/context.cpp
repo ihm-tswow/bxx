@@ -1,12 +1,11 @@
-#include "context.hpp"
-#include "exec.hpp"
-#include "view_layer.hpp"
-#include "scene.hpp"
-#include "object.hpp"
+#include <bxx/blender_types/context.hpp>
+#include <bxx/blender_types/view_layer.hpp>
+#include <bxx/blender_types/scene.hpp>
+#include <bxx/blender_types/object.hpp>
+#include <common/exec.hpp>
 
-#include "fmt/core.h"
-
-#include "magic_enum.hpp"
+#include <fmt/core.h>
+#include <magic_enum.hpp>
 
 namespace bxx
 {

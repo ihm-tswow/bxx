@@ -16,10 +16,12 @@
 //
 // =============================================================
 
-#include "shared_functions.hpp"
-#include "builders/operator_builder.hpp"
-#include "nlohmann/json.hpp"
-#include "core_defines.hpp"
+#include <core/core_defines.hpp>
+#include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_tuple.hpp>
+#include <common/shared_functions.hpp>
+
+#include <nlohmann/json.hpp>
 
 // Private functions
 void register_operators();

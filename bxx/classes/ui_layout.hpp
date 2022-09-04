@@ -1,9 +1,9 @@
 #pragma once
 
 #include <bxx/objects/python_object.hpp>
-#include "property_classes.hpp"
+#include <bxx/classes/property_classes.hpp>
 
-#include "magic_enum.hpp"
+#include <magic_enum.hpp>
 
 namespace bxx
 {

@@ -1,7 +1,7 @@
-#include "image.hpp"
-#include "exec.hpp"
+#include <bxx/blender_types/image.hpp>
+#include <common/exec.hpp>
 
-#include "fmt/core.h"
+#include <fmt/core.h>
 
 namespace bxx
 {

@@ -4,10 +4,7 @@ import os
 import sys
 import platform
 
-include_dirs = [
-    '../common',
-    '../'
-]
+include_dirs = ['../']
 
 for arg in sys.argv:
     if arg.startswith('includes='):

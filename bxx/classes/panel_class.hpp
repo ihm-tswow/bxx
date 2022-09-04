@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ui_class.hpp"
-#include "../builders/panel_builder.hpp"
+#include <bxx/classes/ui_class.hpp>
+#include <bxx/builders/panel_builder.hpp>
 
 namespace bxx
 {

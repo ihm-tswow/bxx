@@ -1,11 +1,10 @@
-#include "tests.hpp"
-
-#include "builders/class_header_builder.hpp"
-#include "builders/value_builder.hpp"
-#include "builders/python_builder.hpp"
-#include "builders/property_builder.hpp"
-#include "builders/operator_builder.hpp"
-#include "addon.hpp"
+#include <bxx/builders/class_header_builder.hpp>
+#include <bxx/builders/value_builder.hpp>
+#include <bxx/builders/python_builder.hpp>
+#include <bxx/builders/property_builder.hpp>
+#include <bxx/builders/operator_builder.hpp>
+#include <common/tests.hpp>
+#include <common/addon.hpp>
 
 #define ASSERT_VALUE_CODE(value,code)\
     {\

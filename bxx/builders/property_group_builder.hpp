@@ -1,7 +1,7 @@
 #pragma once
 
-#include "property_builder.hpp"
-#include "class_header_builder.hpp"
+#include <bxx/builders/property_builder.hpp>
+#include <bxx/builders/class_header_builder.hpp>
 
 #include <string>
 #include <set>

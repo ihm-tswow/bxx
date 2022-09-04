@@ -1,8 +1,7 @@
-#include "script.hpp"
-#include "core/core_defines.hpp"
-
+#include <bxx/script.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
+#include <core/core_defines.hpp>
 
 static std::string script_name = "";
 static size_t script_index;

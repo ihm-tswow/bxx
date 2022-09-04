@@ -1,4 +1,4 @@
-#include "mathutils.hpp"
+#include <bxx/mathutils.hpp>
 
 namespace mathutils
 {

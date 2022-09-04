@@ -5,7 +5,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
-#include "makesdna/DNA_image_types.h"
+#include <makesdna/DNA_image_types.h>
 #pragma warning(pop)
 
 #include <string>

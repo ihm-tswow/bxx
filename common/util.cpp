@@ -1,5 +1,4 @@
-#include "util.hpp"
-
+#include <common/util.hpp>
 #include <ostream>
 
 bool bxx::ends_with(std::string const & value, std::string const & ending)

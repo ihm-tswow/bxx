@@ -1,11 +1,11 @@
-#include "tests.hpp"
+#include <common/tests.hpp>
 
 #include <bxx/blender_types/armature.hpp>
 #include <bxx/blender_types/object.hpp>
 #include <bxx/blender_types/context.hpp>
 #include <bxx/blender_types/view_layer.hpp>
-#include "exec.hpp"
-#include "fmt/core.h"
+#include <common/exec.hpp>
+#include <fmt/core.h>
 
 BXX_TEST(create_armature)
 {

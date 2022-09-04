@@ -1,4 +1,4 @@
-#include "tests.hpp"
+#include <common/tests.hpp>
 #include <bxx/blender_types/action.hpp>
 
 BXX_TEST(create_action_with_name) {

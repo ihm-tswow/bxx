@@ -6,9 +6,9 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
-#include "makesdna/DNA_object_types.h"
-#include "makesdna/DNA_mesh_types.h"
-#include "makesdna/DNA_armature_types.h"
+#include <makesdna/DNA_object_types.h>
+#include <makesdna/DNA_mesh_types.h>
+#include <makesdna/DNA_armature_types.h>
 #pragma warning(pop)
 
 namespace bxx

@@ -1,7 +1,7 @@
-#include "property_group_builder.hpp"
-#include "string_builder.hpp"
-#include "exec.hpp"
-#include "../script.hpp"
+#include <bxx/builders/property_group_builder.hpp>
+#include <bxx/builders/string_builder.hpp>
+#include <bxx/script.hpp>
+#include <common/exec.hpp>
 
 namespace bxx
 {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bxx/objects/python_object.hpp>
-#include "../builders/property_builder.hpp"
-#include "magic_enum.hpp"
+#include <bxx/builders/property_builder.hpp>
+#include <magic_enum.hpp>
 
 #include <limits>
 #include <vector>

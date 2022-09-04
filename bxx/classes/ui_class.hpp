@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui_layout.hpp"
+#include <bxx/classes/ui_layout.hpp>
 #include <bxx/objects/python_object.hpp>
 
 #include <string>

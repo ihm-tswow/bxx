@@ -1,11 +1,9 @@
-#include "addon_preferences_builder.hpp"
-
+#include <bxx/builders/addon_preferences_builder.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
-
-#include "python_builder.hpp"
-#include "addon.hpp"
-#include "../script.hpp"
+#include <bxx/builders/python_builder.hpp>
+#include <bxx/script.hpp>
+#include <common/addon.hpp>
 
 namespace bxx
 {

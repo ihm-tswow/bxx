@@ -278,11 +278,10 @@ function(generate_blender_version build_version)
   target_include_directories(
     ${bxx} PRIVATE
     ${Python_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/bxx
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
-    bxx
   )
 
 
@@ -346,8 +345,6 @@ function(generate_blender_version build_version)
       target_include_directories(
         ${script_name} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/bxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/bxx/common
         ${${BLENDER_ID}_SOURCE_DIR}/source/blender
         ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
         ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna

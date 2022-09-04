@@ -1,11 +1,11 @@
 #pragma once
 
-#include "value_builder.hpp"
-#include "python_builder.hpp"
+#include <bxx/builders/value_builder.hpp>
+#include <bxx/builders/python_builder.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_list.hpp>
 
-#include "../script.hpp"
+#include <bxx/script.hpp>
 
 #include <string>
 #include <map>

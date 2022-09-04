@@ -1,5 +1,5 @@
-#include "tests.hpp"
-#include "addon.hpp"
+#include <common/tests.hpp>
+#include <common/addon.hpp>
 
 namespace bxx
 {

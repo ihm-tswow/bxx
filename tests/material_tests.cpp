@@ -1,5 +1,5 @@
-#include "tests.hpp"
 #include <bxx/blender_types/material.hpp>
+#include <common/tests.hpp>
 
 BXX_TEST(create_material)
 {
