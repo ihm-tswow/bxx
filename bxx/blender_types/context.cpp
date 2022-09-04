@@ -12,29 +12,25 @@ namespace bxx
 {
     void context::set_mode(bxx::editor_mode mode)
     {
-        exec(fmt::format("bpy.ops.object.mode_set(mode='{}')", std::string(magic_enum::enum_name<bxx::editor_mode>(mode))));
+        exec("bpy.ops.object.mode_set(mode='{}')", std::string(magic_enum::enum_name<bxx::editor_mode>(mode)));
     }
 
     view_layer context::get_view_layer()
     {
         // todo: is it _always_ the current scene containing the current view layer?
-        return bxx::view_layer(get_scene(), eval_ptr<bl_view_layer>({
-            "out = bpy.context.view_layer.as_pointer()"
-        }));
+        return bxx::view_layer(get_scene(), eval_ptr<bl_view_layer>("out = bpy.context.view_layer.as_pointer()"));
     }
 
     scene context::get_scene()
     {
-        return bxx::scene(eval_ptr<bl_scene>({
-            "out = bpy.context.scene.as_pointer()"
-            }));
+        return bxx::scene(eval_ptr<bl_scene>("out = bpy.context.scene.as_pointer()"));
     }
 
     editor_mode context::get_mode()
     {
-        return magic_enum::enum_cast<editor_mode>(eval_string({
+        return magic_enum::enum_cast<editor_mode>(eval_string(
             "out = bpy.context.mode"
-        })).value();
+        )).value();
     }
 
     void context::select_all()
@@ -65,14 +61,12 @@ namespace bxx
 
     object context::get_active_object()
     {
-        return object(eval_ptr<bl_object>({
-            "out = bpy.context.view_layer.objects.active.as_pointer()"
-            }));
+        return object(eval_ptr<bl_object>("out = bpy.context.view_layer.objects.active.as_pointer()"));
     }
 
     void context::link_object(object const& obj)
     {
-        exec(fmt::format("bpy.context.collection.objects.link({})", obj.get_name_full()));
+        exec("bpy.context.collection.objects.link({})", obj.get_name_full());
     }
 
     void context::update()

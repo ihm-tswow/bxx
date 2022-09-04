@@ -20,9 +20,7 @@ namespace bxx
 
     void view_layer::link_object(object const& obj)
     {
-        exec({
-            fmt::format("{}.active_layer_collection.collection.objects.link({})",m_parent.get_name_full(), obj.get_name_full())
-        });
+        exec("{}.active_layer_collection.collection.objects.link({})",m_parent.get_name_full(), obj.get_name_full());
     }
 
     python_object view_layer::get_pyobject()
@@ -43,6 +41,6 @@ namespace bxx
 
     void view_layer::update()
     {
-        exec(fmt::format("{}.update()", get_full_name()));
+        exec("{}.update()", get_full_name());
     }
 }

@@ -18,7 +18,7 @@ namespace bxx
         {
             python_builder builder;
             write(builder);
-            exec(builder.get_code());
+            exec({ builder.get_code() });
         }
     }
 

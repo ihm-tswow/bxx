@@ -189,7 +189,7 @@ BXX_TEST(python_object_complex_arg) {
 // I just needed a sanity check for if this actually works
 BXX_TEST(python_object_kwarg_primitive_refcount) {
     details::python_tempref r(details::cxx2py(std::uint32_t(10), false));
-    int cur_refcount = r.m_pyobj->ob_refcnt;
+    size_t cur_refcount = r.m_pyobj->ob_refcnt;
     python_object obj = eval_pyobject(
         "class TestClass:\n"
         "    def __init__(self):\n"

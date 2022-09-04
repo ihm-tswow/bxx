@@ -189,7 +189,7 @@ bxx::operator_builder::~operator_builder()
     {
         bxx::python_builder builder;
         write(builder);
-        exec(builder.get_code());
+        exec({ builder.get_code() });
     }
 }
 

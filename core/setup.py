@@ -4,10 +4,14 @@ import os
 import sys
 import platform
 
-python_include = ''
+include_dirs = [
+    '../common',
+    '../'
+]
+
 for arg in sys.argv:
-    if arg.startswith('python-include='):
-        python_include = arg[len('python-include='):]
+    if arg.startswith('includes='):
+        include_dirs += arg[len('includes='):].split('|')
         sys.argv.remove(arg)
 
 source_files = [
@@ -17,11 +21,6 @@ source_files = [
     '../common/util.cpp',
     'core_cxx.cpp',
     'core_cy.pyx',
-]
-
-include_dirs = [
-    '../common',
-    python_include,
 ]
 
 extensions = [

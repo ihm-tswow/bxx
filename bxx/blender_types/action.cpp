@@ -7,7 +7,7 @@ namespace bxx
 {
     fcurve action::find_fcurve(std::string const& name, int index)
     {
-        return fcurve(*this, eval_ptr<bl_fcurve>(fmt::format("out = {}.fcurves.find('{}',index = {})", get_name_full(), name, index)));
+        return fcurve(*this, eval_ptr<bl_fcurve>("out = {}.fcurves.find('{}',index = {})", get_name_full(), name, index));
     }
 
     std::string action::get_type_path() const
@@ -17,7 +17,7 @@ namespace bxx
 
     fcurve action::add_fcurve(std::string const& group, std::string const& name, int index)
     {
-        return fcurve(*this,eval_ptr<bl_fcurve>(fmt::format("out = {}.fcurves.new('{}', index = {}, action_group='{}').as_pointer()",get_name_full(),name,index, group)));
+        return fcurve(*this,eval_ptr<bl_fcurve>("out = {}.fcurves.new('{}', index = {}, action_group='{}').as_pointer()",get_name_full(),name,index, group));
     }
 
     void keyframe::set(float time, float value)
@@ -83,7 +83,7 @@ namespace bxx
 
     action action::create(std::string const& name)
     {
-        return action(eval_ptr<bl_action>(fmt::format("out = bpy.data.actions.new(name='{}').as_pointer()",name)));
+        return action(eval_ptr<bl_action>("out = bpy.data.actions.new(name='{}').as_pointer()",name));
     }
 }
 

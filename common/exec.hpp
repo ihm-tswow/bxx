@@ -1,33 +1,32 @@
 #pragma once
 
-#include "shared_functions.hpp"
-
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif
 #include <fmt/core.h>
-
-#include <string>
 
 std::string join_strings(std::initializer_list<std::string> const& python);
 
-void exec(std::string const& python);
-void exec(std::initializer_list<std::string> const& python);
+template <typename ...Args>
+void exec(fmt::format_string<Args...> str, Args... args);
+void exec(std::initializer_list<std::string> lines);
 
+template <typename ...Args>
+int eval_int(fmt::format_string<Args...> str, Args... args);
+int eval_int(std::initializer_list<std::string> lines);
 
+template <typename ...Args>
+float eval_float(fmt::format_string<Args...> str, Args... args);
+float eval_float(std::initializer_list<std::string> lines);
 
-int eval_int(std::string const& python);
-int eval_int(std::initializer_list<std::string> const& python);
-float eval_float(std::string const& python);
-float eval_float(std::initializer_list<std::string> const& python);
-std::string eval_string(std::string const& python);
-std::string eval_string(std::initializer_list<std::string> const& python);
+template <typename ...Args>
+std::string eval_string(fmt::format_string<Args...> str, Args... args);
+std::string eval_string(std::initializer_list<std::string> lines);
+
+template <typename T, typename ...Args>
+T* eval_ptr(fmt::format_string<Args...> str, Args... args);
 
 template <typename T>
-T* eval_ptr(std::string const& python)
-{
-    return (T*)get_pointers()->cy_eval_ptr(const_cast<char*>(python.c_str()));
-}
+T* eval_ptr(std::initializer_list<std::string> lines);
 
-template <typename T>
-T* eval_ptr(std::initializer_list<std::string> const& python)
-{
-    return eval_ptr<T>(join_strings(python));
-}
+#include <common/exec.ipp>

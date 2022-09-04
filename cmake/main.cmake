@@ -246,7 +246,7 @@ function(generate_blender_version build_version)
     ${core}
     ALL
     COMMAND
-      ${PYTHON_BIN} setup.py build_ext --inplace python-include="${${PYTHON_SOURCE}_SOURCE_DIR}/Include"
+      ${PYTHON_BIN} setup.py build_ext --inplace includes="${fmt_SOURCE_DIR}/include|${${PYTHON_SOURCE}_SOURCE_DIR}/Include" 
     WORKING_DIRECTORY
       ${CMAKE_CURRENT_SOURCE_DIR}/bxx/core
     SOURCES

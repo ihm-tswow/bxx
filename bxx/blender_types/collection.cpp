@@ -13,8 +13,6 @@ namespace bxx
 
     void bxx::collection::link_object(bxx::object const& obj)
     {
-        exec(
-            fmt::format("{}.objects.link({})", get_name_full(), obj.get_name_full())
-        );
+        exec("{}.objects.link({})", get_name_full(), obj.get_name_full());
     }
 }

@@ -15,16 +15,16 @@ namespace bxx
 
     object object::create(std::string const& name, mesh ms)
     {
-        return eval_ptr<bl_object>({
-            fmt::format("out = bpy.data.objects.new('{}',{}).as_pointer()", name, ms.get_name_full())
-        });
+        return eval_ptr<bl_object>(
+            "out = bpy.data.objects.new('{}',{}).as_pointer()", name, ms.get_name_full()
+        );
     }
 
     object object::create(std::string const& name, armature arma)
     {
-        return eval_ptr<bl_object>({
-            fmt::format("out = bpy.data.objects.new('{}',{}).as_pointer()", name, arma.get_name_full())
-        });
+        return eval_ptr<bl_object>(
+            "out = bpy.data.objects.new('{}',{}).as_pointer()", name, arma.get_name_full()
+        );
     }
 
     vec3 object::location()
@@ -54,15 +54,15 @@ namespace bxx
 
     mesh object::get_mesh()
     {
-        return mesh(eval_ptr<bl_mesh>({
-            fmt::format("out = {}.data.as_pointer()", get_name_full())
-        }));
+        return mesh(eval_ptr<bl_mesh>(
+            "out = {}.data.as_pointer()", get_name_full()
+        ));
     }
 
     armature object::get_armature()
     {
-        return armature(eval_ptr<bl_armature>({
-            fmt::format("out = {}.data.as_pointer()", get_name_full())
-        }));
+        return armature(eval_ptr<bl_armature>(
+            "out = {}.data.as_pointer()", get_name_full()
+        ));
     }
 }

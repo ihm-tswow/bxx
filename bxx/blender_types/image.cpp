@@ -7,16 +7,16 @@ namespace bxx
 {
     image image::create(std::string const& name, int width, int height)
     {
-        return image(eval_ptr<bl_image>({
-            fmt::format("out = bpy.data.images.new(name='{}', width={}, height={}).as_pointer()", name, width, height)
-        }), width, height);
+        return image(eval_ptr<bl_image>(
+            "out = bpy.data.images.new(name='{}', width={}, height={}).as_pointer()", name, width, height
+        ), width, height);
     }
 
     image image::get(std::string const& name, int width, int height)
     {
-        return image(eval_ptr <bl_image>({
-            fmt::format("out = bpy.data.images['{}']", name)
-        }), width, height);
+        return image(eval_ptr <bl_image>(
+            "out = bpy.data.images['{}']", name
+        ), width, height);
     }
 
     image::image(bl_image* image, int width, int height)

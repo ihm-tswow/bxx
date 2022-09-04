@@ -191,23 +191,17 @@ namespace bxx
 
     void mesh::add_verts(int verts)
     {
-        exec({
-            fmt::format("{}.vertices.add({})", get_name_full(), verts)
-        });
+        exec("{}.vertices.add({})", get_name_full(), verts);
     }
 
     void mesh::add_loops(int loops)
     {
-        exec({
-            fmt::format("{}.loops.add({})", get_name_full(), loops)
-        });
+        exec("{}.loops.add({})", get_name_full(), loops);
     }
 
     void mesh::add_polygons(int polygons)
     {
-        exec({
-            fmt::format("{}.polygons.add({})", get_name_full(), polygons)
-        });
+        exec("{}.polygons.add({})", get_name_full(), polygons);
     }
 
     int mesh::get_num_verts()
@@ -227,23 +221,19 @@ namespace bxx
 
     void mesh::add_uv_channel(std::string const& name)
     {
-        exec({
-            fmt::format("bpy.data.meshes['{}'].uv_layers.new(name='{}')", get_name(), name)
-        });
+        exec("bpy.data.meshes['{}'].uv_layers.new(name='{}')", get_name(), name);
     }
 
     void mesh::add_color_channel(std::string const& name)
     {
-        exec({
-            fmt::format("bpy.data.meshes['{}'].vertex_colors.new(name='{}')", get_name(), name)
-        });
+        exec("bpy.data.meshes['{}'].vertex_colors.new(name='{}')", get_name(), name);
     }
 
     mesh mesh::create(std::string const& name)
     {
-        return mesh(eval_ptr<bl_mesh>({
-            fmt::format("out = bpy.data.meshes.new(name='{}').as_pointer()", name)
-        }));
+        return mesh(eval_ptr<bl_mesh>(
+            "out = bpy.data.meshes.new(name='{}').as_pointer()", name
+        ));
     }
 
     vert mesh::vert(int index)
