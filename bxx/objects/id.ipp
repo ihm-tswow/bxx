@@ -11,7 +11,7 @@ namespace bxx
     template <typename pointer_type>
     python_object id<pointer_type>::get_pyobject()
     {
-        return eval_pyobject(fmt::format("out = {}", get_name_full()));
+        return eval_pyobject("out = {}", get_name_full());
     }
 
     template <typename pointer_type>

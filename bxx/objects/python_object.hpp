@@ -150,8 +150,8 @@ namespace bxx
         T py2cxx(PyObject* obj);
     }
 
-    python_object eval_pyobject(std::string const& python);
-    python_object eval_pyobject(std::initializer_list<std::string> const& python);
+    template <typename ...Args>
+    python_object eval_pyobject(fmt::format_string<Args...> str, Args...);
 
     template <typename ...Args>
     PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args...);

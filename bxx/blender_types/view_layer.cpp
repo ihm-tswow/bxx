@@ -27,7 +27,8 @@ namespace bxx
 
     python_object view_layer::get_pyobject()
     {
-        return eval_pyobject(fmt::format(""));
+        // todo: fix
+        return eval_pyobject("");
     }
 
     std::string view_layer::get_name() const

@@ -78,7 +78,7 @@ namespace bxx
 
     python_object fcurve::get_pyobject()
     {
-        return eval_pyobject(fmt::format("out = {}.fcurves.find('{}',index={})", m_action.get_name_full(), get_raw_struct()->rna_path, get_raw_struct()->array_index));
+        return eval_pyobject("out = {}.fcurves.find('{}',index={})", m_action.get_name_full(), get_raw_struct()->rna_path, get_raw_struct()->array_index);
     }
 
     action action::create(std::string const& name)

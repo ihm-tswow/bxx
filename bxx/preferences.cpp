@@ -9,6 +9,6 @@ namespace bxx
 {
     python_object get_addon_preferences()
     {
-        return eval_pyobject(fmt::format("out = bpy.context.preferences.addons[\"{}\"].preferences", get_addon_name()));
+        return eval_pyobject("out = bpy.context.preferences.addons[\"{}\"].preferences", get_addon_name());
     }
 }

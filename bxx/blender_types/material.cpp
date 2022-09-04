@@ -19,7 +19,7 @@ namespace bxx
 
     python_object material_node::get_pyobject()
     {
-        return eval_pyobject(fmt::format("out = {}.node_tree.nodes['{}']", get_parent().get_name_full(), get_name()));
+        return eval_pyobject("out = {}.node_tree.nodes['{}']", get_parent().get_name_full(), get_name());
     }
 
     material material_node::get_parent()

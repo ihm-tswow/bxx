@@ -311,6 +311,14 @@ namespace bxx
     }
 
     template <typename ...Args>
+    inline python_object eval_pyobject(fmt::format_string<Args...> str, Args... args)
+    {
+        return get_pointers()->cy_eval_pyobject(
+            const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
+        );
+    }
+
+    template <typename ...Args>
     inline PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args... args)
     {
         return get_pointers()->cy_eval_pyobject(

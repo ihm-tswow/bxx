@@ -93,12 +93,12 @@ BXX_TEST(python_dict_del) {
 
 python_object create_python_object()
 {
-    return eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "out = TestClass()"
-    });
+    return eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "out = TestClass()\n"
+    );
 }
 
 BXX_TEST(python_object_create) {
@@ -124,64 +124,64 @@ BXX_TEST(python_object_delattr) {
 }
 
 BXX_TEST(python_object_call_no_args) {
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self):",
-        "        return 10",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self):\n"
+        "        return 10\n"
         "out = TestClass()"
-    });
+    );
     BXX_ASSERT_EQUAL(obj.call<int>("call"),10);
 }
 
 BXX_TEST(python_object_call_simple_args) {
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,a):",
-        "        return a",
-        "out = TestClass()"
-    });
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,a):\n"
+        "        return a\n"
+        "out = TestClass()\n"
+    );
     BXX_ASSERT_EQUAL(obj.call<int>("call",25),25);
 }
 
 BXX_TEST(python_object_call_varargs) {
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,*args):",
-        "        return args[0] + args[1]",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,*args):\n"
+        "        return args[0] + args[1]\n"
         "out = TestClass()"
-    });
+    );
     BXX_ASSERT_EQUAL(obj.call<int>("call",25,10),35);
 }
 
 BXX_TEST(python_object_call_kwarg) {
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,a,b):",
-        "        return a",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,a,b):\n"
+        "        return a\n"
         "out = TestClass()"
-    });
+    );
     BXX_ASSERT_EQUAL(obj.call<int>("call",kwarg{"b",25}, kwarg{"a",30}), 30);
 }
 
 BXX_TEST(python_object_complex_arg) {
     python_list list;
     list.append(10);
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,a):",
-        "        return a",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,a):\n"
+        "        return a\n"
         "out = TestClass()"
-    });
+    );
     BXX_ASSERT_EQUAL(obj.call<python_list>("call",list).get<int>(0), 10);
     BXX_ASSERT_EQUAL(list.ref_count(), 1);
 }
@@ -190,14 +190,14 @@ BXX_TEST(python_object_complex_arg) {
 BXX_TEST(python_object_kwarg_primitive_refcount) {
     details::python_tempref r(details::cxx2py(std::uint32_t(10), false));
     int cur_refcount = r.m_pyobj->ob_refcnt;
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,a):",
-        "        return a",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,a):\n"
+        "        return a\n"
         "out = TestClass()"
-        });
+        );
     obj.call<python_object>("call", kwarg("a",r.m_pyobj));
     BXX_ASSERT_EQUAL(cur_refcount, r.m_pyobj->ob_refcnt);
 }
@@ -205,14 +205,14 @@ BXX_TEST(python_object_kwarg_primitive_refcount) {
 BXX_TEST(python_object_complex_kwarg) {
     python_list list;
     list.append(10);
-    python_object obj = eval_pyobject({
-        "class TestClass:",
-        "    def __init__(self):",
-        "        pass",
-        "    def call(self,a,b):",
-        "        return a",
+    python_object obj = eval_pyobject(
+        "class TestClass:\n"
+        "    def __init__(self):\n"
+        "        pass\n"
+        "    def call(self,a,b):\n"
+        "        return a\n"
         "out = TestClass()"
-    });
+    );
     BXX_ASSERT_EQUAL(obj.call<python_list>("call",kwarg("b",5),kwarg<python_list>("a",list)).get<int>(0), 10);
     BXX_ASSERT_EQUAL(list.ref_count(), 1);
 }

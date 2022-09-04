@@ -28,7 +28,7 @@ namespace bxx
 
     python_object bone::get_pyobject()
     {
-        return eval_pyobject(fmt::format("{}.edit_bones['{}']", m_armature.get_name_full(), get_name()));
+        return eval_pyobject("{}.edit_bones['{}']", m_armature.get_name_full(), get_name());
     }
 
     mathutils::vec3 bone::get_head()
