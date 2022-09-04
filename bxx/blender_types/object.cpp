@@ -1,6 +1,7 @@
 #include <bxx/blender_types/object.hpp>
 #include <bxx/blender_types/mesh.hpp>
 #include <bxx/blender_types/armature.hpp>
+#include <bxx/blender_types/vertex_group.hpp>
 #include <bxx/misc.hpp>
 #include <common/exec.hpp>
 
@@ -64,5 +65,15 @@ namespace bxx
         return armature(eval_ptr<bl_armature>(
             "out = {}.data.as_pointer()", get_name_full()
         ));
+    }
+
+    vertex_group object::add_vertex_group(std::string const& name)
+    {
+        return vertex_group(*this, eval_ptr<bl_vertex_group>("out = {}.vertex_groups.new(name='{}').as_pointer()",get_name_full(), name));
+    }
+
+    vertex_group object::get_vertex_group(std::string const& name)
+    {
+        return vertex_group(*this, eval_ptr<bl_vertex_group>("out = {}.vertex_groups['{}'].as_pointer()",get_name_full(), name));
     }
 }

@@ -15,6 +15,7 @@ namespace bxx
 {
     class mesh;
     class armature;
+    class vertex_group;
 
     class object : public id<bl_object>
     {
@@ -28,6 +29,8 @@ namespace bxx
         vec3 scale();
         mesh get_mesh();
         armature get_armature();
+        vertex_group add_vertex_group(std::string const& name);
+        vertex_group get_vertex_group(std::string const& name);
         static object create(std::string const& name, bxx::mesh mesh);
         static object create(std::string const& name, bxx::armature armature);
     };
