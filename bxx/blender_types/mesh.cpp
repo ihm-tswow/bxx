@@ -51,9 +51,9 @@ namespace bxx
     mathutils::vec3 vert::get_normal()
     {
         return {
-            get_raw_struct()->no[0],
-            get_raw_struct()->no[1],
-            get_raw_struct()->no[2]
+            float(get_raw_struct()->no[0]),
+            float(get_raw_struct()->no[1]),
+            float(get_raw_struct()->no[2])
         };
     }
 
