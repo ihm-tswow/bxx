@@ -182,6 +182,46 @@ namespace bxx
         return PyObject_HasAttrString(get_pyobject(), arr.c_str());
     }
 
+    template <typename pyref_type>
+    template <typename T>
+    T python_object_base<pyref_type>::get_item(std::string const& key)
+    {
+        pyref_type self = get_pyobject();
+        PyObject* obj = PyObject_GetItemString(self, key.c_str());
+        T value(details::py2cxx<T>(obj));
+        Py_DecRef(obj);
+        return value;
+    }
+
+    template <typename pyref_type>
+    template <typename T>
+    T python_object_base<pyref_type>::get_item(std::uint32_t key)
+    {
+        pyref_type self = get_pyobject();
+        PyObject* num = PyLong_FromLong(key);
+        PyObject* obj = PyObject_GetItem(self, num);
+        Py_DecRef(num);
+        T value(details::py2cxx<T>(obj));
+        Py_DecRef(obj);
+        return value;
+    }
+
+
+    template <typename pyref_type>
+    template <typename T>
+    void python_object_base<pyref_type>::set_item(std::string const& key, T value)
+    {
+        pyref_type self = get_pyobject();
+        PyObject_SetItemString(self, key.c_str(), details::cxx2py(value, false));
+    }
+
+    template <typename pyref_type>
+    void python_object_base<pyref_type>::del_item(std::string const& key)
+    {
+        pyref_type self = get_pyobject();
+        PyObject_DelItemString(self, key.c_str());
+    }
+
     template <> inline bool python_object::is<bool>()
     {
         return PyBool_Check(get_pyobject());

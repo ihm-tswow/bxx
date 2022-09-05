@@ -6,19 +6,55 @@
 
 #include <string>
 
+// PYFIELD
+
 #define PYFIELD(type,name)\
     void set_##name(type value) { setattr<type>(#name, value); }\
     type get_##name() { return getattr<type>(#name); }
 
+#define PYFIELD_DECL(type,name)\
+    void set_##name(type value);\
+    type get_##name();
+
+#define PYFIELD_IMPL(cls,type,name)\
+    void cls::set_##name(type value) { setattr<type>(#name, value); }\
+    type cls::get_##name() { return getattr<type>(#name); }
+
+// PYFIELD_READ
+
 #define PYFIELD_READ(type,name)\
     type get_##name() { return getattr<type>(#name); }
+
+#define PYFIELD_READ_DECL(type,name)\
+    type get_##name();
+
+#define PYFIELD_READ_IMPL(cls,type,name)\
+    type cls::get_##name();
+
+// PYFIELD_STRINGENUM
 
 #define PYFIELD_STRINGENUM(type,name)\
     void set_##name(type value) { setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
     type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
 
+#define PYFIELD_STRINGENUM_DECL(type,name)\
+    void set_##name(type value);\
+    type get_##name();
+
+#define PYFIELD_STRINGENUM_IMPL(cls,type,name)\
+    void cls::set_##name(type value) { setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
+    type cls::get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+
+// PYFIELD_STRINGENUM_READ
+
 #define PYFIELD_STRINGENUM_READ(type,name)\
     type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+
+#define PYFIELD_STRINGENUM_READ_DECL(type,name)\
+    type get_##name();
+
+#define PYFIELD_STRINGENUM_READ_IMPL(cls,type,name)\
+    type cls::get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
 
 namespace mathutils
 {
@@ -73,6 +109,17 @@ namespace bxx
 
         template <typename T>
         void setattr(std::string const& arr, T value);
+
+        template <typename T = python_object>
+        T get_item(std::string const& key);
+
+        template <typename T = python_object>
+        T get_item(std::uint32_t key);
+
+        template <typename T>
+        void set_item(std::string const& key, T value);
+
+        void del_item(std::string const& key);
 
         size_t ref_count();
         std::string str();
