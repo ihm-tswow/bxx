@@ -15,7 +15,6 @@ namespace bxx
     class collection : public id<bl_collection>
     {
     public:
-        std::string get_type_path() const final;
         void link_object(bxx::object const& obj);
     };
 }

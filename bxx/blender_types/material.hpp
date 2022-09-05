@@ -122,7 +122,6 @@ namespace bxx
     public:
         using id<bl_material>::id;
         static bxx::material create(std::string const& name);
-        std::string get_type_path() const final;
         material_node add_node(std::string const& type, mathutils::vec2 const& location = { 0,0 });
         material_node add_node(bxx::material_node_type type, mathutils::vec2 const& location = { 0,0 });
         material_node get_node(std::string const& name);
@@ -134,11 +133,9 @@ namespace bxx
     {
     public:
         PYFIELD(mathutils::vec2, location)
-        material_node(material const& parent, bl_material_node* node);
+        material_node(material const& parent, python_object const& obj);
         material get_parent();
-        python_object get_pyobject();
         std::string get_name() const;
-        std::string get_name_full() const;
         void set_default_input(int index, std::string const& value);
         void set_default_input(int index, int value);
         void set_default_input(int index, float v1);

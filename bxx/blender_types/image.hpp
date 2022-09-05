@@ -43,8 +43,7 @@ namespace bxx
     public:
         static image create(std::string const& name, int width, int height);
         static image get(std::string const& name, int width, int height);
-        image(bl_image * image, int width, int height);
-        std::string get_type_path() const final;
+        image(python_object const& obj, int width, int height);
         void apply_buffer(image_buffer const& buffer);
         image_buffer create_buffer();
         int get_width();

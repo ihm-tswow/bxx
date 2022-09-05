@@ -18,12 +18,12 @@ namespace bxx
     template <typename blender_type>
     class blender_py_struct
         : public blender_struct<blender_type>
-        , public python_object_base<python_object>
+        , public python_object
     {
     public:
-        using blender_struct<blender_type>::blender_struct;
         blender_py_struct(PyObject* obj);
-        blender_py_struct(python_object obj);
+        blender_py_struct(python_object const& obj);
+        blender_py_struct(python_object&& obj) noexcept;
     };
 }
 

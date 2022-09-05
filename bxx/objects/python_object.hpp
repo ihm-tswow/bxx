@@ -9,52 +9,52 @@
 // PYFIELD
 
 #define PYFIELD(type,name)\
-    void set_##name(type value) { setattr<type>(#name, value); }\
-    type get_##name() { return getattr<type>(#name); }
+    void set_##name(type value) { this->setattr<type>(#name, value); }\
+    type get_##name() const { return this->getattr<type>(#name); }
 
 #define PYFIELD_DECL(type,name)\
     void set_##name(type value);\
-    type get_##name();
+    type get_##name() const;
 
 #define PYFIELD_IMPL(cls,type,name)\
-    void cls::set_##name(type value) { setattr<type>(#name, value); }\
-    type cls::get_##name() { return getattr<type>(#name); }
+    void cls::set_##name(type value) { this->setattr<type>(#name, value); }\
+    type cls::get_##name() const { return this->getattr<type>(#name); }
 
 // PYFIELD_READ
 
 #define PYFIELD_READ(type,name)\
-    type get_##name() { return getattr<type>(#name); }
+    type get_##name() const { return this->getattr<type>(#name); }
 
 #define PYFIELD_READ_DECL(type,name)\
-    type get_##name();
+    type get_##name() const;
 
 #define PYFIELD_READ_IMPL(cls,type,name)\
-    type cls::get_##name();
+    type cls::get_##name() const;
 
 // PYFIELD_STRINGENUM
 
 #define PYFIELD_STRINGENUM(type,name)\
-    void set_##name(type value) { setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
-    type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+    void set_##name(type value) { this->setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
+    type get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
 
 #define PYFIELD_STRINGENUM_DECL(type,name)\
     void set_##name(type value);\
-    type get_##name();
+    type get_##name() const;
 
 #define PYFIELD_STRINGENUM_IMPL(cls,type,name)\
-    void cls::set_##name(type value) { setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
-    type cls::get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+    void cls::set_##name(type value) { this->setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
+    type cls::get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
 
 // PYFIELD_STRINGENUM_READ
 
 #define PYFIELD_STRINGENUM_READ(type,name)\
-    type get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+    type get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
 
 #define PYFIELD_STRINGENUM_READ_DECL(type,name)\
-    type get_##name();
+    type get_##name() const;
 
 #define PYFIELD_STRINGENUM_READ_IMPL(cls,type,name)\
-    type cls::get_##name() { return magic_enum::enum_cast<type>(getattr<std::string>(#name)).value(); }
+    type cls::get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
 
 namespace mathutils
 {
@@ -92,11 +92,10 @@ namespace bxx
         };
     }
 
-    template <typename pyref_type>
     class python_object_base
     {
     public:
-        virtual pyref_type get_pyobject() = 0;
+        virtual PyObject* get_pyobject() const = 0;
 
         template <typename T = python_object, class ... Args>
         T call(std::string const& method, Args&&... args);
@@ -105,30 +104,30 @@ namespace bxx
         T call(std::string const& method);
 
         template <typename T = python_object>
-        T getattr(std::string const& arr);
+        T getattr(std::string const& arr) const;
 
         template <typename T>
         void setattr(std::string const& arr, T value);
 
         template <typename T = python_object>
-        T get_item(std::string const& key);
+        T get_item(std::string const& key) const;
 
         template <typename T = python_object>
-        T get_item(std::uint32_t key);
+        T get_item(std::uint32_t key) const;
 
         template <typename T>
         void set_item(std::string const& key, T value);
 
         void del_item(std::string const& key);
 
-        size_t ref_count();
-        std::string str();
-        std::string repr();
+        size_t ref_count() const;
+        std::string str() const;
+        std::string repr() const;
         void delattr(std::string const& arr);
-        bool hasattr(std::string const& arr);
+        bool hasattr(std::string const& arr) const;
     };
 
-    class python_object : public python_object_base<PyObject*>
+    class python_object : public python_object_base
     {
     public:
         python_object(PyObject* obj);
@@ -136,7 +135,7 @@ namespace bxx
         python_object(python_object && obj) noexcept;
         python_object();
         ~python_object();
-        PyObject* get_pyobject() final;
+        PyObject* get_pyobject() const final;
         template <typename T>
         python_object(T value);
         python_object& operator=(python_object rhs);
@@ -154,11 +153,11 @@ namespace bxx
         friend struct details::replace_python_object;
     };
 
-    class python_object_weak : public python_object_base<PyObject*>
+    class python_object_weak : public python_object_base
     {
     public:
         python_object_weak(PyObject* obj);
-        PyObject* get_pyobject() final;
+        PyObject* get_pyobject() const final;
     private:
         PyObject* m_pyobject;
     };

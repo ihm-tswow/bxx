@@ -64,11 +64,10 @@ namespace bxx
     {
     }
 
-    template <typename pyref_type>
     template <typename T, class ... Args>
-    T python_object_base<pyref_type>::call(std::string const& method, Args&&... args)
+    T python_object_base::call(std::string const& method, Args&&... args)
     {
-        pyref_type self = get_pyobject();
+        PyObject* self = get_pyobject();
         details::call_arg_stack<sizeof...(Args)> arg_refs;
         details::call_kwarg_stack<sizeof...(Args)> kwarg_refs;
         ([&] { details::convert_fn(args, arg_refs, kwarg_refs); }(), ...);
@@ -102,11 +101,10 @@ namespace bxx
         return value;
     }
 
-    template <typename pyref_type>
     template<typename T>
-    inline T python_object_base<pyref_type>::call(std::string const& method)
+    inline T python_object_base::call(std::string const& method)
     {
-        pyref_type self = get_pyobject();
+        PyObject* self = get_pyobject();
         PyObject* fn = PyObject_GetAttrString(self, method.c_str());
         PyObject* tup = PyTuple_New(0);
         PyObject* res = PyObject_Call(fn, tup, nullptr);
@@ -117,87 +115,39 @@ namespace bxx
         return value;
     }
 
-    template <typename pyref_type>
     template <typename T>
-    inline T python_object_base<pyref_type>::getattr(std::string const& arr)
+    inline T python_object_base::getattr(std::string const& arr) const
     {
-        pyref_type self = get_pyobject();
+        PyObject* self = get_pyobject();
         PyObject* obj = PyObject_GetAttrString(self, arr.c_str());
         T value(details::py2cxx<T>(obj));
         Py_DecRef(obj);
         return value;
     }
 
-    template <typename pyref_type>
     template <typename T>
-    void python_object_base<pyref_type>::setattr(std::string const& arr, T value)
+    void python_object_base::setattr(std::string const& arr, T value)
     {
-        pyref_type self = get_pyobject();
+        PyObject* self = get_pyobject();
         PyObject_SetAttrString(self, arr.c_str(), details::cxx2py(value, false));
     }
 
-    template <typename pyref_type>
-    size_t python_object_base<pyref_type>::ref_count()
-    {
-        return Py_REFCNT(get_pyobject());
-    }
-
-    template <typename pyref_type>
-    std::string python_object_base<pyref_type>::str()
-    {
-        pyref_type self = get_pyobject();
-        PyObject* str = PyObject_Str(self);
-        if (!str)
-        {
-            return "<error str>";
-        }
-        char const* chr = _PyUnicode_AsString(str);
-        Py_DecRef(str);
-        return std::string(chr);
-    }
-
-    template <typename pyref_type>
-    std::string python_object_base<pyref_type>::repr()
-    {
-        pyref_type self = get_pyobject();
-        PyObject* str = PyObject_Repr(self);
-        if (!str)
-        {
-            return "<error repr>";
-        }
-        char const* chr = _PyUnicode_AsString(str);
-        Py_DecRef(str);
-        return std::string(chr);
-    }
-
-    template <typename pyref_type>
-    void python_object_base<pyref_type>::delattr(std::string const& arr)
-    {
-        PyObject_DelAttrString(get_pyobject(), arr.c_str());
-    }
-
-    template <typename pyref_type>
-    bool python_object_base<pyref_type>::hasattr(std::string const& arr)
-    {
-        return PyObject_HasAttrString(get_pyobject(), arr.c_str());
-    }
-
-    template <typename pyref_type>
     template <typename T>
-    T python_object_base<pyref_type>::get_item(std::string const& key)
+    T python_object_base::get_item(std::string const& key) const
     {
-        pyref_type self = get_pyobject();
-        PyObject* obj = PyObject_GetItemString(self, key.c_str());
+        PyObject* self = get_pyobject();
+        PyObject* str = PyUnicode_FromString(key.c_str());
+        PyObject* obj = PyObject_GetItem(self, str);
+        Py_DecRef(str);
         T value(details::py2cxx<T>(obj));
         Py_DecRef(obj);
         return value;
     }
 
-    template <typename pyref_type>
     template <typename T>
-    T python_object_base<pyref_type>::get_item(std::uint32_t key)
+    T python_object_base::get_item(std::uint32_t key) const
     {
-        pyref_type self = get_pyobject();
+        PyObject* self = get_pyobject();
         PyObject* num = PyLong_FromLong(key);
         PyObject* obj = PyObject_GetItem(self, num);
         Py_DecRef(num);
@@ -206,20 +156,13 @@ namespace bxx
         return value;
     }
 
-
-    template <typename pyref_type>
     template <typename T>
-    void python_object_base<pyref_type>::set_item(std::string const& key, T value)
+    void python_object_base::set_item(std::string const& key, T value)
     {
-        pyref_type self = get_pyobject();
-        PyObject_SetItemString(self, key.c_str(), details::cxx2py(value, false));
-    }
-
-    template <typename pyref_type>
-    void python_object_base<pyref_type>::del_item(std::string const& key)
-    {
-        pyref_type self = get_pyobject();
-        PyObject_DelItemString(self, key.c_str());
+        PyObject* self = get_pyobject();
+        PyObject* str = PyUnicode_FromString(key.c_str());
+        PyObject_SetItem(self, str, details::cxx2py(value, false));
+        Py_DecRef(str);
     }
 
     template <> inline bool python_object::is<bool>()

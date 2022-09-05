@@ -87,7 +87,6 @@ namespace bxx
     {
     public:
         using id<bl_mesh>::id;
-        std::string get_type_path() const final;
 
         void add_verts(int verts);
         void add_loops(int loops);

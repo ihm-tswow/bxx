@@ -18,11 +18,9 @@ namespace bxx
     class vertex_group : public blender_py_struct<bl_vertex_group>
     {
     public:
-        vertex_group(object parent, bl_vertex_group* group);
+        using blender_py_struct<bl_vertex_group>::blender_py_struct;
 
         PYFIELD(std::uint32_t, index)
-
-        python_object get_pyobject();
         std::string get_name();
         void add(
             std::vector<std::uint32_t> const& indices,
@@ -32,7 +30,5 @@ namespace bxx
 
         void remove(std::vector<std::uint32_t> const& indices);
         float weight(std::uint32_t index);
-    private:
-        object m_parent;
     };
 }

@@ -10,22 +10,6 @@
 
 namespace bxx
 {
-    constraint::constraint(object parent, bl_constraint* raw)
-        : blender_py_struct<bl_constraint>(raw)
-        , m_parent(parent)
-    {}
-
-    // constraint
-    python_object constraint::get_pyobject()
-    {
-        return eval_pyobject("{}.constraints['{}']",m_parent.getattr<std::string>("name_full"), get_name());
-    }
-
-    std::string constraint::get_name()
-    {
-        return get_raw_struct()->name;
-    }
-
     PYFIELD_IMPL(constraint, bool, active)
     PYFIELD_IMPL(constraint, bool, enabled)
     PYFIELD_IMPL(constraint, float, error_location)
@@ -36,7 +20,7 @@ namespace bxx
     PYFIELD_IMPL(constraint, bool, mute)
     PYFIELD_STRINGENUM_IMPL(constraint, owner_space, owner_space)
     PYFIELD_IMPL(constraint, bool, show_expanded)
-    //PYFIELD_IMPL(constraint, object, space_object)
+    PYFIELD_IMPL(constraint, object, space_object)
     PYFIELD_IMPL(constraint, std::string, space_subtarget)
     PYFIELD_STRINGENUM_IMPL(constraint, target_space, target_space)
     PYFIELD_STRINGENUM_IMPL(constraint, constraint_type, type)

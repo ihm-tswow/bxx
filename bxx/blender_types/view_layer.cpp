@@ -13,34 +13,18 @@
 
 namespace bxx
 {
-    view_layer::view_layer(scene const& parent, bl_view_layer* layer)
-        : blender_py_struct<bl_view_layer>(layer)
-        , m_parent(parent)
-    {}
-
     void view_layer::link_object(object const& obj)
     {
-        exec("{}.active_layer_collection.collection.objects.link({})",m_parent.get_name_full(), obj.get_name_full());
+        getattr("objects").call("link", obj);
     }
 
-    python_object view_layer::get_pyobject()
-    {
-        // todo: fix
-        return eval_pyobject("");
-    }
-
-    std::string view_layer::get_name() const
+    std::string view_layer::get_name()
     {
         return get_raw_struct()->name;
     }
 
-    std::string view_layer::get_full_name() const
-    {
-        return fmt::format("{}.view_layers['{}']", m_parent.get_name_full(), get_name());
-    }
-
     void view_layer::update()
     {
-        exec("{}.update()", get_full_name());
+        call("update");
     }
 }

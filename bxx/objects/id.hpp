@@ -10,11 +10,8 @@ namespace bxx
     {
     public:
         using blender_py_struct<pointer_type>::blender_py_struct;
-        std::string get_name_full() const;
-        std::string get_name() const;
-        virtual std::string get_type_path() const = 0;
-        python_object get_pyobject() final;
-    protected:
+        PYFIELD(std::string,name)
+        PYFIELD(std::string,name_full)
     };
 }
 

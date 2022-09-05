@@ -7,17 +7,12 @@ namespace bxx
 {
     fcurve action::find_fcurve(std::string const& name, int index)
     {
-        return fcurve(*this, eval_ptr<bl_fcurve>("out = {}.fcurves.find('{}',index = {})", get_name_full(), name, index));
-    }
-
-    std::string action::get_type_path() const
-    {
-        return "bpy.data.actions";
+        return getattr("fcurves").call("find", name, kwarg("index", index));
     }
 
     fcurve action::add_fcurve(std::string const& group, std::string const& name, int index)
     {
-        return fcurve(*this,eval_ptr<bl_fcurve>("out = {}.fcurves.new('{}', index = {}, action_group='{}').as_pointer()",get_name_full(),name,index, group));
+        return getattr("fcurves").call("new", name, kwarg("index", index), kwarg("action_group", group));
     }
 
     void keyframe::set(float time, float value)
@@ -46,11 +41,6 @@ namespace bxx
         return get_raw_struct()->vec[1][1];
     }
 
-    fcurve::fcurve(action parent, bl_fcurve* curve)
-        : blender_py_struct<bl_fcurve>(curve)
-        , m_action(parent)
-    {}
-
     void fcurve::add_points(int amount)
     {
         getattr("keyframe_points").call("add", amount);
@@ -76,14 +66,9 @@ namespace bxx
         return get_raw_struct()->array_index;
     }
 
-    python_object fcurve::get_pyobject()
-    {
-        return eval_pyobject("out = {}.fcurves.find('{}',index={})", m_action.get_name_full(), get_raw_struct()->rna_path, get_raw_struct()->array_index);
-    }
-
     action action::create(std::string const& name)
     {
-        return action(eval_ptr<bl_action>("out = bpy.data.actions.new(name='{}').as_pointer()",name));
+        return action(eval_pyobject("out = bpy.data.actions.new(name='{}')",name));
     }
 }
 

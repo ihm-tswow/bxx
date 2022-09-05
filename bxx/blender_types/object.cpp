@@ -9,23 +9,14 @@
 
 namespace bxx
 {
-    std::string object::get_type_path() const
-    {
-        return "bpy.data.objects";
-    }
-
     object object::create(std::string const& name, mesh ms)
     {
-        return eval_ptr<bl_object>(
-            "out = bpy.data.objects.new('{}',{}).as_pointer()", name, ms.get_name_full()
-        );
+        return eval_pyobject("out = bpy.data.objects").call("new", name, ms);
     }
 
     object object::create(std::string const& name, armature arma)
     {
-        return eval_ptr<bl_object>(
-            "out = bpy.data.objects.new('{}',{}).as_pointer()", name, arma.get_name_full()
-        );
+        return eval_pyobject("out = bpy.data.objects").call("new", name, arma);
     }
 
     vec3 object::location()
@@ -55,30 +46,26 @@ namespace bxx
 
     mesh object::get_mesh()
     {
-        return mesh(eval_ptr<bl_mesh>(
-            "out = {}.data.as_pointer()", get_name_full()
-        ));
+        return getattr("data");
     }
 
     armature object::get_armature()
     {
-        return armature(eval_ptr<bl_armature>(
-            "out = {}.data.as_pointer()", get_name_full()
-        ));
+        return getattr("data");
     }
 
     size_t object::constraints_len()
     {
-        return eval_int("out = len({}.constraints)", get_name_full());
+        return PyObject_Size(getattr("constraints"));
     }
 
     vertex_group object::add_vertex_group(std::string const& name)
     {
-        return vertex_group(*this, eval_ptr<bl_vertex_group>("out = {}.vertex_groups.new(name='{}').as_pointer()",get_name_full(), name));
+        return getattr("vertex_groups").call("new", kwarg("name", name));
     }
 
     vertex_group object::get_vertex_group(std::string const& name)
     {
-        return vertex_group(*this, eval_ptr<bl_vertex_group>("out = {}.vertex_groups['{}'].as_pointer()",get_name_full(), name));
+        return getattr("vertex_groups").get_item(name);
     }
 }

@@ -6,14 +6,31 @@
 
 namespace bxx
 {
+    namespace details
+    {
+        template <typename blender_type>
+        blender_type* blender_py_ptr(PyObject* obj)
+        {
+            return reinterpret_cast<blender_type*>(python_object_weak(obj).call<std::uint64_t>("as_pointer"));
+        }
+    }
+
     template <typename blender_type>
     blender_py_struct<blender_type>::blender_py_struct(PyObject* obj)
-        : blender_struct<blender_type>(reinterpret_cast<blender_type*>(python_object_weak(obj).getattr<std::uint64_t>("as_pointer")))
+        : blender_struct<blender_type>(details::blender_py_ptr<blender_type>(obj))
+        , python_object(obj)
     {}
 
     template <typename blender_type>
-    blender_py_struct<blender_type>::blender_py_struct(python_object obj)
-        : blender_struct<blender_type>(reinterpret_cast<blender_type*>(obj.getattr<std::uint64_t>("as_pointer")))
+    blender_py_struct<blender_type>::blender_py_struct(python_object const& obj)
+        : blender_py_struct(obj.get_pyobject())
+    {}
+
+    template <typename blender_type>
+    blender_py_struct<blender_type>::blender_py_struct(python_object&& obj) noexcept
+        : blender_py_struct<blender_type>(obj.get_pyobject())
+        //: blender_struct<blender_type>(details::blender_py_ptr<blender_type>(obj))
+        //, python_object(obj)
     {}
 
     template <typename blender_type>

@@ -17,7 +17,6 @@ namespace bxx
     {
     public:
         using id<bl_armature>::id;
-        std::string get_type_path() const override;
         bone add_bone(
             std::string const& name,
             mathutils::vec3 const& head = { 0,0,0 },
@@ -30,7 +29,7 @@ namespace bxx
     class bone : public blender_py_struct<bl_bone>
     {
     public:
-        bone(armature const& armature, bl_bone* bone);
+        using blender_py_struct<bl_bone>::blender_py_struct;
         void set_head(mathutils::vec3 const& head);
         void set_tail(mathutils::vec3 const& tail);
         // radians
@@ -40,10 +39,5 @@ namespace bxx
         // radians
         float get_roll();
         std::string get_name();
-    protected:
-        python_object get_pyobject() final;
-    private:
-        armature m_armature;
-        bl_bone* m_bone;
     };
 }

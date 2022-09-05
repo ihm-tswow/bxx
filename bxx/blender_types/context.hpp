@@ -36,9 +36,9 @@ namespace bxx
         void select_all();
         void deselect_all();
         void clear_active_object();
-        void set_active_object(bxx::object const& object);
+        void set_active_object(object const& object);
         bxx::object get_active_object();
-        void link_object(bxx::object const& object);
+        void link_object(object const& object);
         void update();
     };
 

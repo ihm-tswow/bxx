@@ -11,15 +11,10 @@ namespace bxx
         return std::string(magic_enum::enum_name<material_node_type>(type));
     }
 
-    material_node::material_node(material const& parent, bl_material_node* node)
-        : blender_py_struct<bl_material_node>(node)
+    material_node::material_node(material const& parent, python_object const& obj)
+        : blender_py_struct<bl_material_node>(obj)
         , m_parent(parent)
     {}
-
-    python_object material_node::get_pyobject()
-    {
-        return eval_pyobject("out = {}.node_tree.nodes['{}']", get_parent().get_name_full(), get_name());
-    }
 
     material material_node::get_parent()
     {
@@ -33,23 +28,16 @@ namespace bxx
 
     material material::create(std::string const& name)
     {
-        return eval_ptr<bl_material>(
-            "out = bpy.data.materials.new(name='{}').as_pointer()", name
+        return eval_pyobject(
+            "out = bpy.data.materials.new(name='{}')", name
         );
-    }
-
-    std::string material::get_type_path() const
-    {
-        return "bpy.data.materials";
     }
 
     material_node material::add_node(std::string const& type, mathutils::vec2 const& location)
     {
         set_use_nodes(true);
         material_node node = material_node(*this,
-            eval_ptr<bl_material_node>(
-                "out = {}.node_tree.nodes.new('{}').as_pointer()", get_name_full(), type
-            )
+            getattr("node_tree").getattr("nodes").call("new",type)
         );
         node.set_location(location);
         return node;
@@ -63,15 +51,8 @@ namespace bxx
     material_node material::get_node(std::string const& name)
     {
         return material_node(*this,
-            eval_ptr<bl_material_node>(
-                "out = {}.node_tree.nodes['{}'].as_pointer()", get_name_full(), name
-            )
+            getattr("node_tree").getattr("nodes").get_item(name)
         );
-    }
-
-    std::string material_node::get_name_full() const
-    {
-        return fmt::format("{}.node_tree.nodes['{}']", m_parent.get_name_full(), get_name());
     }
 
     void material_node::_set_default_input_code(int index, std::string const& code)
@@ -110,12 +91,9 @@ namespace bxx
 
     void material::connect(material_node const& output_node, int output_socket, material_node const& input_node, int input_socket)
     {
-        exec("{}.node_tree.links.new({}.outputs[{}], {}.inputs[{}])"
-            , get_name_full()
-            , output_node.get_name_full()
-            , output_socket
-            , input_node.get_name_full()
-            , input_socket
+        getattr("node_tree").getattr("links").call("new"
+            , output_node.getattr("outputs").get_item(output_socket)
+            , input_node.getattr("inputs").get_item(input_socket)
         );
     }
 }

@@ -6,13 +6,8 @@
 
 namespace bxx
 {
-    std::string collection::get_type_path() const
-    {
-        return "bpy.data.collections";
-    }
-
     void bxx::collection::link_object(bxx::object const& obj)
     {
-        exec("{}.objects.link({})", get_name_full(), obj.get_name_full());
+        getattr("objects").call("link", obj);
     }
 }

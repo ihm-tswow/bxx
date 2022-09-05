@@ -193,24 +193,19 @@ namespace bxx
         return get_raw_struct();
     }
 
-    std::string mesh::get_type_path() const
-    {
-        return "bpy.data.meshes";
-    }
-
     void mesh::add_verts(int verts)
     {
-        exec("{}.vertices.add({})", get_name_full(), verts);
+        getattr("vertices").call("add", verts);
     }
 
     void mesh::add_loops(int loops)
     {
-        exec("{}.loops.add({})", get_name_full(), loops);
+        getattr("loops").call("add", loops);
     }
 
     void mesh::add_polygons(int polygons)
     {
-        exec("{}.polygons.add({})", get_name_full(), polygons);
+        getattr("polygons").call("add", polygons);
     }
 
     int mesh::get_num_verts()
@@ -240,9 +235,7 @@ namespace bxx
 
     mesh mesh::create(std::string const& name)
     {
-        return mesh(eval_ptr<bl_mesh>(
-            "out = bpy.data.meshes.new(name='{}').as_pointer()", name
-        ));
+        return eval_pyobject("out = bpy.data.meshes.new(name='{}')", name);
     }
 
     vert mesh::vert(int index)

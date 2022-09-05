@@ -75,14 +75,61 @@ namespace bxx
         : m_pyobject(obj)
     {}
 
-    PyObject* python_object_weak::get_pyobject()
+    PyObject* python_object_weak::get_pyobject() const
     {
         return m_pyobject;
     }
 
-    PyObject* python_object::get_pyobject()
+    PyObject* python_object::get_pyobject() const
     {
         return m_pyobject;
+    }
+
+    size_t python_object_base::ref_count() const
+    {
+        return Py_REFCNT(get_pyobject());
+    }
+
+    std::string python_object_base::str() const
+    {
+        PyObject* self = get_pyobject();
+        PyObject* str = PyObject_Str(self);
+        if (!str)
+        {
+            return "<error str>";
+        }
+        char const* chr = _PyUnicode_AsString(str);
+        Py_DecRef(str);
+        return std::string(chr);
+    }
+
+    std::string python_object_base::repr() const
+    {
+        PyObject* self = get_pyobject();
+        PyObject* str = PyObject_Repr(self);
+        if (!str)
+        {
+            return "<error repr>";
+        }
+        char const* chr = _PyUnicode_AsString(str);
+        Py_DecRef(str);
+        return std::string(chr);
+    }
+
+    void python_object_base::delattr(std::string const& arr)
+    {
+        PyObject_DelAttrString(get_pyobject(), arr.c_str());
+    }
+
+    bool python_object_base::hasattr(std::string const& arr) const
+    {
+        return PyObject_HasAttrString(get_pyobject(), arr.c_str());
+    }
+
+    void python_object_base::del_item(std::string const& key)
+    {
+        PyObject* self = get_pyobject();
+        PyObject_DelItemString(self, key.c_str());
     }
 
     namespace details
@@ -159,6 +206,15 @@ namespace bxx
                 Py_IncRef(value);
             }
             return { value , false };
+        }
+
+        python_tempref cxx2py(python_object value, bool theft)
+        {
+            if (theft)
+            {
+                Py_IncRef(value.get_pyobject());
+            }
+            return { value.get_pyobject() , false};
         }
 
         python_tempref cxx2py(mathutils::vec2 const& vec, bool theft)

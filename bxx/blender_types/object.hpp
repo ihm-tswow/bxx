@@ -22,7 +22,6 @@ namespace bxx
     public:
         PYFIELD(bool, selected)
         using id<bl_object>::id;
-        std::string get_type_path() const final;
         vec3 location();
         vec3 rotation_euler();
         quaternion rotation_quaternion();

@@ -66,9 +66,7 @@ namespace bxx
     class constraint : public blender_py_struct<bl_constraint>
     {
     public:
-        constraint(object parent, bl_constraint* raw);
-        python_object get_pyobject() final;
-        std::string get_name();
+        using blender_py_struct<bl_constraint>::blender_py_struct;
         PYFIELD_DECL(bool, active)
         PYFIELD_DECL(bool, enabled)
         PYFIELD_DECL(float, error_location)
@@ -79,12 +77,10 @@ namespace bxx
         PYFIELD_DECL(bool, mute)
         PYFIELD_STRINGENUM_DECL(owner_space, owner_space)
         PYFIELD_DECL(bool, show_expanded)
-        //PYFIELD_DECL(object, space_object)
+        PYFIELD_DECL(object, space_object)
         PYFIELD_DECL(std::string, space_subtarget)
         PYFIELD_STRINGENUM_DECL(target_space, target_space)
         PYFIELD_STRINGENUM_DECL(constraint_type, type)
-    private:
-        object m_parent;
     };
 
     enum class mix_mode {
@@ -128,6 +124,7 @@ namespace bxx
     class armature_constraint : public constraint
     {
     public:
+        using constraint::constraint;
         // todo: add targets handlers
         PYFIELD_DECL(bool,use_bone_envelopes)
         PYFIELD_DECL(bool,use_current_location)
@@ -137,6 +134,7 @@ namespace bxx
     class camera_solver_constraint : public constraint
     {
     public:
+        using constraint::constraint;
         PYFIELD_DECL(python_object, clip)
         PYFIELD_DECL(bool,use_active_clip)
     };

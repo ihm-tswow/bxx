@@ -7,28 +7,23 @@ namespace bxx
 {
     image image::create(std::string const& name, int width, int height)
     {
-        return image(eval_ptr<bl_image>(
-            "out = bpy.data.images.new(name='{}', width={}, height={}).as_pointer()", name, width, height
+        return image(eval_pyobject(
+            "out = bpy.data.images.new(name='{}', width={}, height={})", name, width, height
         ), width, height);
     }
 
     image image::get(std::string const& name, int width, int height)
     {
-        return image(eval_ptr <bl_image>(
+        return image(eval_pyobject(
             "out = bpy.data.images['{}']", name
         ), width, height);
     }
 
-    image::image(bl_image* image, int width, int height)
-        : id<bl_image>(image)
+    image::image(python_object const& obj, int width, int height)
+        : id<bl_image>(obj)
         , m_width(width)
         , m_height(height)
     {}
-
-    std::string image::get_type_path() const
-    {
-        return "bpy.data.image";
-    }
 
     void image::apply_buffer(image_buffer const& buffer)
     {

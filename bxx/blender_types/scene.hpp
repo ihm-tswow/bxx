@@ -16,7 +16,6 @@ namespace bxx
     {
     public:
         using id<bl_scene>::id;
-        std::string get_type_path() const override;
         view_layer add_view_layer(std::string const& name);
         view_layer get_view_layer(std::string const& name);
         static bxx::scene create(std::string const& name);

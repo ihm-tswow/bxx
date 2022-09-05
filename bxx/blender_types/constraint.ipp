@@ -24,7 +24,7 @@ namespace bxx
         python_object constraints = getattr("constraints");
         python_object constraint_py = constraints.call("new", kwarg("type", type_name));
         constraint_py.setattr("name", name);
-        return T(*this, reinterpret_cast<bl_constraint*>(constraint_py.call<size_t>("as_pointer")));
+        return T(constraint_py);
     }
 
     template <typename T>
@@ -34,6 +34,6 @@ namespace bxx
         std::string type_name = std::string(magic_enum::enum_name<constraint_type>(type));
         python_object constraints = getattr("constraints");
         python_object constraint_py = constraints.get_item(index);
-        return T(*this, reinterpret_cast<bl_constraint*>(constraint_py.call<size_t>("as_pointer")));
+        return T(constraint_py);
     }
 }

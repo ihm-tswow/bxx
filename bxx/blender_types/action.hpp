@@ -20,8 +20,6 @@ namespace bxx
         fcurve find_fcurve(std::string const& name, int index = 0);
         fcurve add_fcurve(std::string const& group, std::string const& name, int index = 0);
         static action create(std::string const& name);
-    protected:
-        std::string get_type_path() const final;
     };
 
     class keyframe : public blender_struct<bl_keyframe>
@@ -37,14 +35,11 @@ namespace bxx
     class fcurve : public blender_py_struct<bl_fcurve>
     {
     public:
-        fcurve(action parent, bl_fcurve* curve);
+        using blender_py_struct<bl_fcurve>::blender_py_struct;
         void add_points(int amount);
         int num_points() const;
         keyframe get_point(int index);
         std::string get_data_path() const;
         int get_index() const;
-        python_object get_pyobject() final;
-    private:
-        action m_action;
     };
 }
