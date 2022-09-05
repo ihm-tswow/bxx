@@ -107,7 +107,7 @@ namespace bxx
     {
     public:
         using constraint::constraint;
-        //PYFIELD_DECL(action, action)
+        PYFIELD_DECL(action, action)
         PYFIELD_DECL(float, eval_time)
         PYFIELD_DECL(std::int32_t, frame_end)
         PYFIELD_DECL(std::int32_t, frame_start)
@@ -115,7 +115,7 @@ namespace bxx
         PYFIELD_DECL(float, min)
         PYFIELD_STRINGENUM_DECL(mix_mode, mix_mode)
         PYFIELD_DECL(std::string, subtarget)
-        //PYFIELD_DECL(object, target)
+        PYFIELD_DECL(object, target)
         PYFIELD_STRINGENUM_DECL(transform_channel, transform_channel)
         PYFIELD_DECL(bool,use_bone_object_action)
         PYFIELD_DECL(bool,use_eval_time)

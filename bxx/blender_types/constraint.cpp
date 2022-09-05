@@ -26,7 +26,7 @@ namespace bxx
     PYFIELD_STRINGENUM_IMPL(constraint, constraint_type, type)
 
     // action_constraint
-    //PYFIELD_IMPL(action_constraint, action, action)
+    PYFIELD_IMPL(action_constraint, action, action)
     PYFIELD_IMPL(action_constraint, float, eval_time)
     PYFIELD_IMPL(action_constraint, std::int32_t, frame_end)
     PYFIELD_IMPL(action_constraint, std::int32_t, frame_start)
@@ -34,7 +34,7 @@ namespace bxx
     PYFIELD_IMPL(action_constraint, float, min)
     PYFIELD_STRINGENUM_IMPL(action_constraint, mix_mode, mix_mode)
     PYFIELD_IMPL(action_constraint, std::string, subtarget)
-    //PYFIELD_IMPL(action_constraint, object, target)
+    PYFIELD_IMPL(action_constraint, object, target)
     PYFIELD_STRINGENUM_IMPL(action_constraint, transform_channel, transform_channel)
     PYFIELD_IMPL(action_constraint, bool, use_bone_object_action)
     PYFIELD_IMPL(action_constraint, bool, use_eval_time)
