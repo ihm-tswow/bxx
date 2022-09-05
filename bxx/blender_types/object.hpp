@@ -31,7 +31,18 @@ namespace bxx
         armature get_armature();
         vertex_group add_vertex_group(std::string const& name);
         vertex_group get_vertex_group(std::string const& name);
+
+        template <typename T>
+        T add_constraint(std::string const& name);
+
+        template <typename T>
+        T get_constraint(std::uint32_t index);
+
+        size_t constraints_len();
+
         static object create(std::string const& name, bxx::mesh mesh);
         static object create(std::string const& name, bxx::armature armature);
     };
 }
+
+#include <bxx/blender_types/object.ipp>

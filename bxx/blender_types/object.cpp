@@ -67,6 +67,11 @@ namespace bxx
         ));
     }
 
+    size_t object::constraints_len()
+    {
+        return eval_int("out = len({}.constraints)", get_name_full());
+    }
+
     vertex_group object::add_vertex_group(std::string const& name)
     {
         return vertex_group(*this, eval_ptr<bl_vertex_group>("out = {}.vertex_groups.new(name='{}').as_pointer()",get_name_full(), name));

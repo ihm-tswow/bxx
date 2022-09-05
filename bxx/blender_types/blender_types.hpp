@@ -28,3 +28,5 @@ typedef struct Image bl_image;
 typedef struct ViewLayer bl_view_layer;
 
 typedef struct bDeformGroup bl_vertex_group;
+
+typedef struct bConstraint bl_constraint;
