@@ -18,7 +18,7 @@ namespace bxx
         template <typename T>
         void set(size_t index, T value);
 
-        template <typename T>
+        template <typename T = python_object>
         T get(size_t index);
 
         template <typename T>

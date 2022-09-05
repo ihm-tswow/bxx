@@ -14,7 +14,7 @@ namespace bxx
         template <typename T>
         void set(std::string const& key, T value);
 
-        template <typename T>
+        template <typename T = python_object>
         T get(std::string const& key);
 
         void del(std::string const& key);
