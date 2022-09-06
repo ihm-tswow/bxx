@@ -1,7 +1,5 @@
 #pragma once
 
-#include <bxx/blender_types/object.hpp>
-
 #include <type_traits>
 
 namespace bxx
@@ -17,23 +15,21 @@ namespace bxx
     }
 
     template <typename T>
-    T object::add_constraint(std::string const& name)
+    T constraints::add(std::string const& name)
     {
         constraint_type type = get_constraint_type<T>();
         std::string type_name = std::string(magic_enum::enum_name<constraint_type>(type));
-        python_object constraints = getattr("constraints");
-        python_object constraint_py = constraints.call("new", kwarg("type", type_name));
+        python_object constraint_py = call("new", kwarg("type", type_name));
         constraint_py.setattr("name", name);
         return T(constraint_py);
     }
 
     template <typename T>
-    T object::get_constraint(std::uint32_t index)
+    T constraints::get(std::uint32_t index)
     {
         constraint_type type = get_constraint_type<T>();
         std::string type_name = std::string(magic_enum::enum_name<constraint_type>(type));
-        python_object constraints = getattr("constraints");
-        python_object constraint_py = constraints.get_item(index);
+        python_object constraint_py = get_item(index);
         return T(constraint_py);
     }
 }

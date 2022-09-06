@@ -7,8 +7,8 @@ BXX_TEST(create_action_with_name) {
 
 BXX_TEST(create_fcurve) {
     bxx::action action = bxx::action::create("test_action");
-    bxx::fcurve fcurve1 = action.add_fcurve("test_group", "test_name", 0);
-    bxx::fcurve fcurve2 = action.add_fcurve("test_group", "test_name", 1);
+    bxx::fcurve fcurve1 = action.fcurves().add("test_group", "test_name", 0);
+    bxx::fcurve fcurve2 = action.fcurves().add("test_group", "test_name", 1);
 
     BXX_ASSERT_EQUAL(fcurve1.get_data_path(),"test_name");
     BXX_ASSERT_EQUAL(fcurve1.get_index(),0);
@@ -19,7 +19,7 @@ BXX_TEST(create_fcurve) {
 
 BXX_TEST(create_keyframes) {
     bxx::fcurve curve = bxx::action::create("test_action")
-        .add_fcurve("test_group", "test_name", 0);
+        .fcurves().add("test_group", "test_name", 0);
     curve.add_points(10);
 
     BXX_ASSERT_EQUAL(curve.points().len(), 10);

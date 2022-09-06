@@ -5,14 +5,21 @@
 
 namespace bxx
 {
-    fcurve action::find_fcurve(std::string const& name, int index)
+
+    fcurve fcurves::find(std::string const& name, int index)
     {
-        return getattr("fcurves").call("find", name, kwarg("index", index));
+        return call("find", name, kwarg("index", index));
     }
 
-    fcurve action::add_fcurve(std::string const& group, std::string const& name, int index)
+
+    fcurve fcurves::add(std::string const& group, std::string const& name, int index)
     {
-        return getattr("fcurves").call("new", name, kwarg("index", index), kwarg("action_group", group));
+        return call("new", name, kwarg("index", index), kwarg("action_group", group));
+    }
+
+    fcurves action::fcurves()
+    {
+        return getattr<bxx::fcurves>("fcurves");
     }
 
     void keyframe::set(float time, float value)

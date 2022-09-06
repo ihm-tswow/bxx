@@ -13,9 +13,9 @@ BXX_TEST(create_basic_constraint)
 {
     mesh m = mesh::create("constraint_mesh");
     object o = object::create("constraint_object",m);
-    o.add_constraint<action_constraint>("my_action_constraint");
-    BXX_ASSERT_EQUAL(o.constraints_len(), 1);
-    BXX_ASSERT_NOT_EQUAL(o.get_constraint<action_constraint>(0).get_raw_struct(), nullptr);
+    o.constraints().add<action_constraint>("my_action_constraint");
+    BXX_ASSERT_EQUAL(o.constraints().len(), 1);
+    BXX_ASSERT_NOT_EQUAL(o.constraints().get<action_constraint>(0).get_raw_struct(), nullptr);
 }
 
 BXX_TEST(constraint_action_reference)
@@ -40,7 +40,7 @@ BXX_TEST(constraint_object_reference_obj)
     mesh m2 = mesh::create("mesh2");
     object o2 = object::create("obj2",m1);
 
-    action_constraint con = o2.add_constraint<action_constraint>("armature_constraint");
+    action_constraint con = o2.constraints().add<action_constraint>("armature_constraint");
     con.set_target(o1);
     BXX_ASSERT_EQUAL(con.get_target().get_raw_struct(), o1.get_raw_struct());
 }

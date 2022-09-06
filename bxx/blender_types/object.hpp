@@ -1,6 +1,9 @@
 #pragma once
 
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/vertex_group.hpp>
+#include <bxx/blender_types/iterables.hpp>
+#include <bxx/blender_types/constraint.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
@@ -16,6 +19,8 @@ namespace bxx
     class mesh;
     class armature;
     class vertex_group;
+    class vertex_groups;
+    class child_objects;
 
     class object : public id<bl_object>
     {
@@ -28,16 +33,8 @@ namespace bxx
         vec3 scale();
         mesh get_mesh();
         armature get_armature();
-        vertex_group add_vertex_group(std::string const& name);
-        vertex_group get_vertex_group(std::string const& name);
-
-        template <typename T>
-        T add_constraint(std::string const& name);
-
-        template <typename T>
-        T get_constraint(std::uint32_t index);
-
-        size_t constraints_len();
+        constraints constraints();
+        vertex_groups vertex_groups();
 
         static object create(std::string const& name, bxx::mesh mesh);
         static object create(std::string const& name, bxx::armature armature);

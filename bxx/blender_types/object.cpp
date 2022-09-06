@@ -54,18 +54,13 @@ namespace bxx
         return getattr("data");
     }
 
-    size_t object::constraints_len()
+    constraints object::constraints()
     {
-        return PyObject_Size(getattr("constraints"));
+        return getattr<bxx::constraints>("constraints");
     }
 
-    vertex_group object::add_vertex_group(std::string const& name)
+    vertex_groups object::vertex_groups()
     {
-        return getattr("vertex_groups").call("new", kwarg("name", name));
-    }
-
-    vertex_group object::get_vertex_group(std::string const& name)
-    {
-        return getattr("vertex_groups").get_item(name);
+        return getattr<bxx::vertex_groups>("vertex_groups");
     }
 }

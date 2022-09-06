@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include <bxx/objects/blender_struct.hpp>
+#include <bxx/string_literal.hpp>
 
 namespace bxx
 {
@@ -36,6 +37,31 @@ namespace bxx
         iterator end() { return _get(this->get_raw_struct(), len()); }
         size_t len() { return _len(this->get_raw_struct()); }
         bxx_type get(size_t index) { return _get(this->get_raw_struct(), index); }
+    };
+
+    template <typename T>
+    class blender_py_iterable : public python_object
+    {
+    public:
+        using python_object::python_object;
+        struct iterator
+        {
+            using iterator_category = std::forward_iterator_tag;
+            using value_type = T;
+            T operator*() const { return m_obj.get_item<T>(m_index); }
+            iterator& operator++() { m_index++; return *this; }
+            iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
+            friend bool operator== (const iterator& a, const iterator& b) { return a.m_obj.get_pyobject() == b.m_obj.get_pyobject() && a.m_index == b.m_index; }
+            friend bool operator!= (const iterator& a, const iterator& b) { return !(a == b); }
+        private:
+            python_object m_obj;
+            size_t m_index;
+        };
+
+        T get(size_t i) { return get_item<T>(i); }
+        iterator begin() { return iterator(*this, 0); }
+        iterator end() { return iterator(*this, len()); }
+        size_t len() { return PyObject_Size(get_pyobject()); }
     };
 }
 

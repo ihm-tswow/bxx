@@ -12,16 +12,11 @@
 
 namespace bxx
 {
-    class fcurve;
-
-    class action : public id<bl_action>
+    namespace details
     {
-    public:
-        using id<bl_action>::id;
-        fcurve find_fcurve(std::string const& name, int index = 0);
-        fcurve add_fcurve(std::string const& group, std::string const& name, int index = 0);
-        static action create(std::string const& name);
-    };
+        size_t keyframe_len(bl_fcurve* curve);
+        bl_keyframe* get_keyframe(bl_fcurve* curve, size_t index);
+    }
 
     class keyframe : public blender_struct<bl_keyframe>
     {
@@ -34,22 +29,32 @@ namespace bxx
         float get_value();
     };
 
-    namespace details
-    {
-        size_t keyframe_len(bl_fcurve* curve);
-        bl_keyframe* get_keyframe(bl_fcurve* curve, size_t index);
-    }
-
     class fcurve : public blender_py_struct<bl_fcurve>
     {
     public:
         using blender_py_struct<bl_fcurve>::blender_py_struct;
 
         blender_ptr_iterable<bl_fcurve, bl_keyframe, keyframe, details::keyframe_len, details::get_keyframe>
-        points();
+            points();
 
         void add_points(int amount);
         std::string get_data_path() const;
         int get_index() const;
+    };
+
+    class fcurves : public blender_py_iterable<fcurve>
+    {
+    public:
+        using blender_py_iterable<fcurve>::blender_py_iterable;
+        fcurve find(std::string const& name, int index = 0);
+        fcurve add(std::string const& group, std::string const& name, int index = 0);
+    };
+
+    class action : public id<bl_action>
+    {
+    public:
+        using id<bl_action>::id;
+        fcurves fcurves();
+        static action create(std::string const& name);
     };
 }

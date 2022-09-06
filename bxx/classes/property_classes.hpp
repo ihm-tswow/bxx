@@ -2,6 +2,7 @@
 
 #include <bxx/objects/python_object.hpp>
 #include <bxx/builders/property_builder.hpp>
+#include <bxx/string_literal.hpp>
 #include <magic_enum.hpp>
 
 #include <limits>
@@ -63,14 +64,6 @@ namespace bxx
     {
         return python_object(m_owner->get_pyobject());
     }
-
-    template<size_t N>
-    struct string_literal {
-        constexpr string_literal(const char(&str)[N]) {
-            std::copy_n(str, N, value);
-        }
-        char value[N];
-    };
 
     template <
         string_literal name,

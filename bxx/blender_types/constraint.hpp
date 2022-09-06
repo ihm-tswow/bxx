@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bxx/blender_types/blender_types.hpp>
-#include <bxx/blender_types/object.hpp>
+#include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/blender_struct.hpp>
 
 #include <magic_enum.hpp>
@@ -137,6 +137,17 @@ namespace bxx
         using constraint::constraint;
         PYFIELD_DECL(python_object, clip)
         PYFIELD_DECL(bool,use_active_clip)
+    };
+
+    class constraints : public blender_py_iterable<constraint>
+    {
+    public:
+        using blender_py_iterable<constraint>::blender_py_iterable;
+        template <typename T>
+        T add(std::string const& name);
+
+        template <typename T>
+        T get(std::uint32_t index);
     };
 }
 
