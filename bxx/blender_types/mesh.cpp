@@ -5,6 +5,41 @@
 
 namespace bxx
 {
+    float deform_weight::get_weight()
+    {
+        return get_raw_struct()->weight;
+    }
+
+    void deform_weight::set_weight(float weight)
+    {
+        get_raw_struct()->weight = weight;
+    }
+
+    int deform_weight::get_group_id()
+    {
+        return get_raw_struct()->def_nr;
+    }
+
+    void deform_weight::set_group_id(int group)
+    {
+        get_raw_struct()->def_nr = group;
+    }
+
+    deform_weight deform_vert::get_weight(int index)
+    {
+        return get_raw_struct()->dw + index;
+    }
+
+    int deform_vert::get_num_weights()
+    {
+        return get_raw_struct()->totweight;
+    }
+
+    int deform_vert::get_flags()
+    {
+        return get_raw_struct()->flag;
+    }
+
     void vert::set(mathutils::vec3 vert)
     {
         set(vert.x, vert.y, vert.z);
@@ -208,6 +243,12 @@ namespace bxx
         getattr("polygons").call("add", polygons);
     }
 
+    int mesh::get_num_deform_verts()
+    {
+        // meshes without group data has null dvert ptr, otherwise data for all verts
+        return !get_raw_struct()->dvert ? 0 : get_raw_struct()->totvert;
+    }
+
     int mesh::get_num_verts()
     {
         return get_raw_struct()->totvert;
@@ -241,6 +282,11 @@ namespace bxx
     vert mesh::vert(int index)
     {
         return get_raw_struct()->mvert + index;
+    }
+
+    deform_vert mesh::deform_vert(int index)
+    {
+        return get_raw_struct()->dvert + index;
     }
 
     poly mesh::poly(int poly)

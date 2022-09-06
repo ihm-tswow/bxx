@@ -12,6 +12,25 @@
 
 namespace bxx
 {
+    class deform_weight : public blender_struct<bl_deform_weight>
+    {
+    public:
+        using blender_struct<bl_deform_weight>::blender_struct;
+        float get_weight();
+        void set_weight(float weight);
+        int get_group_id();
+        void set_group_id(int group);
+    };
+
+    class deform_vert : public blender_struct<bl_deform_vert>
+    {
+    public:
+        using blender_struct<bl_deform_vert>::blender_struct;
+        deform_weight get_weight(int index);
+        int get_num_weights();
+        int get_flags();
+    };
+
     class vert : public blender_struct<bl_vert>
     {
     public:
@@ -96,15 +115,17 @@ namespace bxx
         void add_color_channel(std::string const& name = "Color Channel");
 
         int get_num_verts();
+        int get_num_deform_verts();
         int get_num_polys();
         int get_num_loops();
 
-        bxx::vert vert(int index);
-        bxx::poly poly(int poly);
-        bxx::loop loop(int loop);
-        bxx::uv_wrapper uv(int loop);
-        bxx::color color(int loop);
+        vert vert(int index);
+        deform_vert deform_vert(int index);
+        poly poly(int poly);
+        loop loop(int loop);
+        uv_wrapper uv(int loop);
+        color color(int loop);
 
-        static bxx::mesh create(std::string const& name);
+        static mesh create(std::string const& name);
     };
 }

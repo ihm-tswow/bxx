@@ -21,6 +21,9 @@ typedef struct MLoop bl_loop;
 typedef struct MLoopUV bl_loop_uv;
 typedef struct MLoopCol bl_loop_col;
 
+typedef struct MDeformVert bl_deform_vert;
+typedef struct MDeformWeight bl_deform_weight;
+
 typedef struct Scene bl_scene;
 
 typedef struct Image bl_image;
