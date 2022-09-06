@@ -34,3 +34,14 @@ BXX_TEST(scale_object) {
     obj.scale().set(1, 2, 3);
     BXX_ASSERT_EQUAL(obj.scale().get(), mathutils::vec3(1, 2, 3));
 }
+
+BXX_TEST(object_children) {
+    bxx::mesh m1 = bxx::mesh::create("m1");
+    bxx::object o1 = bxx::object::create("o1",m1);
+
+    bxx::mesh m2 = bxx::mesh::create("m2");
+    bxx::object o2 = bxx::object::create("o2",m2);
+
+    o2.set_parent(o1);
+    BXX_ASSERT_EQUAL(o1.children().len(), 1);
+}

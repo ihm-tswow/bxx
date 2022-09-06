@@ -19,6 +19,11 @@ namespace bxx
         return eval_pyobject("out = bpy.data.objects").call("new", name, arma);
     }
 
+    object_children object::children()
+    {
+        return getattr<object_children>("children");
+    }
+
     vec3 object::location()
     {
         return vec3(&get_raw_struct()->loc);

@@ -20,12 +20,13 @@ namespace bxx
     class armature;
     class vertex_group;
     class vertex_groups;
-    class child_objects;
+    class object_children;
 
     class object : public id<bl_object>
     {
     public:
         PYFIELD(bool, selected)
+        PYFIELD(object, parent)
         using id<bl_object>::id;
         vec3 location();
         vec3 rotation_euler();
@@ -35,9 +36,15 @@ namespace bxx
         armature get_armature();
         constraints constraints();
         vertex_groups vertex_groups();
-
+        object_children children();
         static object create(std::string const& name, bxx::mesh mesh);
         static object create(std::string const& name, bxx::armature armature);
+    };
+
+    class object_children : public blender_py_iterable<object>
+    {
+    public:
+        using blender_py_iterable<object>::blender_py_iterable;
     };
 }
 
