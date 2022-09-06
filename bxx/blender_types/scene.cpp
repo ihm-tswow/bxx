@@ -6,13 +6,8 @@
 
 namespace bxx
 {
-    view_layer scene::add_view_layer(std::string const& name)
+    view_layers scene::view_layers()
     {
-        return getattr("view_layers").call("new", kwarg("name", name));
-    }
-
-    view_layer scene::get_view_layer(std::string const& name)
-    {
-        return getattr("view_layers").get_item(name);
+        return getattr<bxx::view_layers>("view_layers");
     }
 }

@@ -12,13 +12,13 @@
 namespace bxx
 {
     class view_layer;
+    class view_layers;
 
     class scene : public id<bl_scene>
     {
     public:
         using id<bl_scene>::id;
-        view_layer add_view_layer(std::string const& name);
-        view_layer get_view_layer(std::string const& name);
+        view_layers view_layers();
     private:
         bl_scene *m_raw;
     };

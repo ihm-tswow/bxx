@@ -27,4 +27,14 @@ namespace bxx
     {
         call("update");
     }
+
+    view_layer view_layers::create(std::string const& name)
+    {
+        return call("new", kwarg("name", name));
+    }
+
+    view_layer view_layers::find(std::string const& name)
+    {
+        return get_item(name);
+    }
 }
