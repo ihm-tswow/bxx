@@ -55,6 +55,13 @@ namespace bxx
     public:
         using id<bl_action>::id;
         fcurves fcurves();
-        static action create(std::string const& name);
+    };
+
+    class action_data : public blender_py_iterable<action>
+    {
+    public:
+        using blender_py_iterable<action>::blender_py_iterable;
+        action create(std::string const& name);
+        action find(std::string const& name);
     };
 }

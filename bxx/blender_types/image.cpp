@@ -5,20 +5,6 @@
 
 namespace bxx
 {
-    image image::create(std::string const& name, int width, int height)
-    {
-        return image(eval_pyobject(
-            "out = bpy.data.images.new(name='{}', width={}, height={})", name, width, height
-        ), width, height);
-    }
-
-    image image::get(std::string const& name, int width, int height)
-    {
-        return image(eval_pyobject(
-            "out = bpy.data.images['{}']", name
-        ), width, height);
-    }
-
     image::image(python_object const& obj, int width, int height)
         : id<bl_image>(obj)
         , m_width(width)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bxx/blender_types/iterables.hpp>
 #include <bxx/blender_types/blender_types.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
@@ -121,7 +122,6 @@ namespace bxx
     {
     public:
         using id<bl_material>::id;
-        static material create(std::string const& name);
         material_node add_node(std::string const& type, mathutils::vec2 const& location = { 0,0 });
         material_node add_node(material_node_type type, mathutils::vec2 const& location = { 0,0 });
         material_node get_node(std::string const& name);
@@ -144,5 +144,13 @@ namespace bxx
     private:
         void _set_default_input_code(int index, std::string const& code);
         material m_parent;
+    };
+
+    class material_data : public blender_py_iterable<material>
+    {
+    public:
+        using blender_py_iterable<material>::blender_py_iterable;
+        material create(std::string const& name);
+        material find(std::string const& name);
     };
 }

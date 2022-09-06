@@ -48,9 +48,4 @@ namespace bxx
     {
         return get_raw_struct()->roll;
     }
-
-    armature armature::create(std::string const& name)
-    {
-        return armature(eval_pyobject("out = bpy.data.armatures.new('{}')", name));
-    }
 }

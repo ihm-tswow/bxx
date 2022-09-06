@@ -1,3 +1,4 @@
+#include <bxx/blender_types/data.hpp>
 #include <bxx/blender_types/image.hpp>
 #include <common/tests.hpp>
 
@@ -5,7 +6,7 @@ using namespace bxx;
 
 BXX_TEST(create_image)
 {
-    image image = image::create("test_image", 1, 2);
+    image image = get_data().images().create("test_image", 1, 2);
     BXX_ASSERT_EQUAL(image.get_name(), "test_image");
     BXX_ASSERT_EQUAL(image.get_width(), 1);
     BXX_ASSERT_EQUAL(image.get_height(), 2);
@@ -44,7 +45,7 @@ BXX_TEST(image_buffer_by_coord)
 
 BXX_TEST(apply_image_buffer)
 {
-    image image = image::create("test_image", 10, 10);
+    image image = get_data().images().create("test_image", 10, 10);
     image_buffer buffer = image.create_buffer();
     image.apply_buffer(buffer);
 }

@@ -1,3 +1,4 @@
+#include <bxx/blender_types/data.hpp>
 #include <bxx/blender_types/mesh.hpp>
 #include <bxx/blender_types/object.hpp>
 #include <bxx/blender_types/vertex_group.hpp>
@@ -7,9 +8,9 @@ using namespace bxx;
 
 BXX_TEST(vertex_group_create)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(3);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g = o.vertex_groups().add("vertex_group");
     g.add({ 0,1 }, 1, VertexAssignMode::ADD);
     BXX_ASSERT_EQUAL(g.weight(0), 1);
@@ -18,9 +19,9 @@ BXX_TEST(vertex_group_create)
 
 BXX_TEST(remove_vertex_group)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(1);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g = o.vertex_groups().add("vertex_group");
     g.add({ 0 }, 1, VertexAssignMode::ADD);
     g.remove({ 0 });
@@ -28,9 +29,9 @@ BXX_TEST(remove_vertex_group)
 
 BXX_TEST(vertex_group_vertices)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(1);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g = o.vertex_groups().add("vertex_group");
     g.add({ 0 }, 0.5, VertexAssignMode::ADD);
     BXX_ASSERT_EQUAL(m.deform_verts().get(0).len(), 1);
@@ -39,9 +40,9 @@ BXX_TEST(vertex_group_vertices)
 
 BXX_TEST(vertex_group_multiple_vertices)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(2);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g = o.vertex_groups().add("vertex_group");
     g.add({ 0 }, 0.5, VertexAssignMode::ADD);
     g.add({ 1 }, 0.75, VertexAssignMode::ADD);
@@ -55,9 +56,9 @@ BXX_TEST(vertex_group_multiple_vertices)
 
 BXX_TEST(vertex_group_multiple_groups)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(2);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g1 = o.vertex_groups().add("vertex_group_1");
     vertex_group g2 = o.vertex_groups().add("vertex_group_2");
 
@@ -72,9 +73,9 @@ BXX_TEST(vertex_group_multiple_groups)
 
 BXX_TEST(vertex_group_deform_count)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(2);
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g1 = o.vertex_groups().add("vertex_group_1");
 
     // only add the first vert
@@ -93,11 +94,11 @@ BXX_TEST(vertex_group_deform_count)
 
 BXX_TEST(vertex_group_num_deform_verts)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(2);
     BXX_ASSERT_EQUAL(m.deform_verts().len(), 0);
 
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g1 = o.vertex_groups().add("vertex_group_1");
     BXX_ASSERT_EQUAL(m.deform_verts().len(), 0);
 
@@ -111,10 +112,10 @@ BXX_TEST(vertex_group_num_deform_verts)
 // changing raw weight affects python value
 BXX_TEST(vertex_group_weight)
 {
-    mesh m = mesh::create("vertex_group_mesh");
+    mesh m = get_data().meshes().create("vertex_group_mesh");
     m.add_verts(1);
 
-    object o = object::create("vertex_group_object", m);
+    object o = get_data().objects().create("vertex_group_object", m);
     vertex_group g = o.vertex_groups().add("vertex_group");
     g.add({ 0 }, 0.1f, VertexAssignMode::ADD);
 

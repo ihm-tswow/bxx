@@ -37,14 +37,21 @@ namespace bxx
         constraints constraints();
         vertex_groups vertex_groups();
         object_children children();
-        static object create(std::string const& name, mesh mesh);
-        static object create(std::string const& name, armature armature);
     };
 
     class object_children : public blender_py_iterable<object>
     {
     public:
         using blender_py_iterable<object>::blender_py_iterable;
+    };
+
+    class object_data : public blender_py_iterable<object>
+    {
+    public:
+        using blender_py_iterable<object>::blender_py_iterable;
+        object create(std::string const& name, armature const& arma);
+        object create(std::string const& name, mesh const& arma);
+        object find(std::string const& name);
     };
 }
 

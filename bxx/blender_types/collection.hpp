@@ -23,7 +23,6 @@ namespace bxx
         void link_object(object const& obj);
         collection_objects objects();
         collection_children children();
-        static collection create(std::string const& name);
     };
 
     class collection_objects : public blender_py_iterable<object>
@@ -38,5 +37,13 @@ namespace bxx
     public:
         using blender_py_iterable<collection>::blender_py_iterable;
         void add(collection child);
+    };
+
+    class collection_data : public blender_py_iterable<collection>
+    {
+    public:
+        using blender_py_iterable<collection>::blender_py_iterable;
+        collection create(std::string const& name);
+        collection find(std::string const& name);
     };
 }

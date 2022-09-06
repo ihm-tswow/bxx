@@ -1,3 +1,4 @@
+#include <bxx/blender_types/data.hpp>
 #include <bxx/blender_types/mesh.hpp>
 #include <bxx/blender_types/object.hpp>
 #include <common/tests.hpp>
@@ -6,8 +7,8 @@ using namespace bxx;
 
 static object create_test_object(std::string const& name)
 {
-    mesh mesh = mesh::create(name + "_mesh");
-    return object::create(name, mesh);
+    mesh mesh = get_data().meshes().create(name + "_mesh");
+    return get_data().objects().create(name, mesh);
 }
 
 BXX_TEST(object_created_with_name) {
@@ -38,11 +39,11 @@ BXX_TEST(scale_object) {
 }
 
 BXX_TEST(object_children) {
-    mesh m1 = mesh::create("m1");
-    object o1 = object::create("o1",m1);
+    mesh m1 = get_data().meshes().create("m1");
+    object o1 = get_data().objects().create("o1",m1);
 
-    mesh m2 = mesh::create("m2");
-    object o2 = object::create("o2",m2);
+    mesh m2 = get_data().meshes().create("m2");
+    object o2 = get_data().objects().create("o2",m2);
 
     o2.set_parent(o1);
     BXX_ASSERT_EQUAL(o1.children().len(), 1);

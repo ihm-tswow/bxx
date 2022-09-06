@@ -248,11 +248,6 @@ namespace bxx
         exec("bpy.data.meshes['{}'].vertex_colors.new(name='{}')", get_name(), name);
     }
 
-    mesh mesh::create(std::string const& name)
-    {
-        return eval_pyobject("out = bpy.data.meshes.new(name='{}')", name);
-    }
-
     mathutils::rgba color::get()
     {
         return { get_r(), get_g(), get_b(), get_a() };

@@ -6,11 +6,6 @@
 
 namespace bxx
 {
-    collection collection::create(std::string const& name)
-    {
-        return eval_pyobject("out = bpy.data.collections.new(name='{}')", name);
-    }
-
     void collection::link_object(bxx::object const& obj)
     {
         getattr("objects").call("link", obj);

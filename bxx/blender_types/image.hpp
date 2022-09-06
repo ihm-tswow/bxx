@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
@@ -41,8 +42,6 @@ namespace bxx
     class image : public id<bl_image>
     {
     public:
-        static image create(std::string const& name, int width, int height);
-        static image get(std::string const& name, int width, int height);
         image(python_object const& obj, int width, int height);
         void apply_buffer(image_buffer const& buffer);
         image_buffer create_buffer();
@@ -51,5 +50,13 @@ namespace bxx
     private:
         bl_image * m_raw;
         int m_width, m_height;
+    };
+
+    class image_data: public blender_py_iterable<image>
+    {
+    public:
+        using blender_py_iterable<image>::blender_py_iterable;
+        image create(std::string const& name, int width, int height);
+        image find(std::string const& name, int width, int height);
     };
 }

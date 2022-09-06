@@ -15,14 +15,4 @@ namespace bxx
     {
         return getattr("view_layers").get_item(name);
     }
-
-    scene scene::create(std::string const& name)
-    {
-        return eval_pyobject("out = bpy.data.scenes.new(name='{}')", name);
-    }
-
-    scene scene::get(std::string const& name)
-    {
-        return eval_pyobject("out = bpy.data.scenes['{}']", name);
-    }
 }

@@ -1,3 +1,4 @@
+#include <bxx/blender_types/data.hpp>
 #include <bxx/blender_types/object.hpp>
 #include <bxx/blender_types/mesh.hpp>
 #include <bxx/blender_types/constraint.hpp>
@@ -11,8 +12,8 @@ using namespace bxx;
 
 BXX_TEST(create_basic_constraint)
 {
-    mesh m = mesh::create("constraint_mesh");
-    object o = object::create("constraint_object",m);
+    mesh m = get_data().meshes().create("constraint_mesh");
+    object o = get_data().objects().create("constraint_object",m);
     o.constraints().add<action_constraint>("my_action_constraint");
     BXX_ASSERT_EQUAL(o.constraints().len(), 1);
     BXX_ASSERT_NOT_EQUAL(o.constraints().get<action_constraint>(0).get_raw_struct(), nullptr);
@@ -33,12 +34,12 @@ BXX_TEST(constraint_action_reference)
 
 BXX_TEST(constraint_object_reference_obj)
 {
-    mesh m1 = mesh::create("mesh");
-    object o1 = object::create("obj",m1);
+    mesh m1 = get_data().meshes().create("mesh");
+    object o1 = get_data().objects().create("obj",m1);
     get_context().link_object(o1);
 
-    mesh m2 = mesh::create("mesh2");
-    object o2 = object::create("obj2",m1);
+    mesh m2 = get_data().meshes().create("mesh2");
+    object o2 = get_data().objects().create("obj2",m1);
 
     action_constraint con = o2.constraints().add<action_constraint>("armature_constraint");
     con.set_target(o1);

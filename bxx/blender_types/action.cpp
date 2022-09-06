@@ -69,12 +69,6 @@ namespace bxx
         return get_raw_struct();
     }
 
-    action action::create(std::string const& name)
-    {
-        return action(eval_pyobject("out = bpy.data.actions.new(name='{}')",name));
-    }
-
-
     namespace details
     {
         size_t keyframe_len(bl_fcurve* curve)

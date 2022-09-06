@@ -1,5 +1,6 @@
 #include <common/tests.hpp>
 
+#include <bxx/blender_types/data.hpp>
 #include <bxx/blender_types/armature.hpp>
 #include <bxx/blender_types/object.hpp>
 #include <bxx/blender_types/context.hpp>
@@ -11,13 +12,13 @@ using namespace bxx;
 
 BXX_TEST(create_armature)
 {
-    BXX_ASSERT_EQUAL(armature::create("test-armature").get_name(),"test-armature");
+    BXX_ASSERT_EQUAL(get_data().armatures().create("test-armature").get_name(), "test-armature");
 }
 
 BXX_TEST(create_armature_object)
 {
-    armature armature = armature::create("test-armature");
-    object object = object::create("test-object", armature);
+    armature armature = get_data().armatures().create("test-armature");
+    object object = get_data().objects().create("test-object", armature);
 }
 
 BXX_TEST(add_armature_bone)

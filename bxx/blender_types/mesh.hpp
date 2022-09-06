@@ -146,7 +146,13 @@ namespace bxx
         uvs();
         blender_ptr_iterable<bl_mesh, bl_loop_col, color, details::loop_len, details::get_color>
         colors();
+    };
 
-        static mesh create(std::string const& name);
+    class mesh_data : public blender_py_iterable<mesh>
+    {
+    public:
+        using blender_py_iterable<mesh>::blender_py_iterable;
+        mesh create(std::string const& name);
+        mesh find(std::string const& name);
     };
 }

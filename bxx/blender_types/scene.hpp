@@ -2,6 +2,7 @@
 
 #include <bxx/objects/id.hpp>
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/iterables.hpp>
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
@@ -18,9 +19,15 @@ namespace bxx
         using id<bl_scene>::id;
         view_layer add_view_layer(std::string const& name);
         view_layer get_view_layer(std::string const& name);
-        static scene create(std::string const& name);
-        static scene get(std::string const& name);
     private:
         bl_scene *m_raw;
+    };
+
+    class scene_data : public blender_py_iterable<scene>
+    {
+    public:
+        using blender_py_iterable<scene>::blender_py_iterable;
+        scene create(std::string const& name);
+        scene find(std::string const& name);
     };
 }

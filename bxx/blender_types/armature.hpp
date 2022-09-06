@@ -3,6 +3,7 @@
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/iterables.hpp>
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
@@ -23,7 +24,6 @@ namespace bxx
             mathutils::vec3 const& tail = { 1,0,0 },
             float roll = 0
         );
-        static armature create(std::string const& name);
     };
 
     class bone : public blender_py_struct<bl_bone>
@@ -39,5 +39,13 @@ namespace bxx
         // radians
         float get_roll();
         std::string get_name();
+    };
+
+    class armature_data : public blender_py_iterable<armature>
+    {
+    public:
+        using blender_py_iterable<armature>::blender_py_iterable;
+        armature create(std::string const& name);
+        armature find(std::string const& name);
     };
 }

@@ -26,13 +26,6 @@ namespace bxx
         return get_raw_struct()->name;
     }
 
-    material material::create(std::string const& name)
-    {
-        return eval_pyobject(
-            "out = bpy.data.materials.new(name='{}')", name
-        );
-    }
-
     material_node material::add_node(std::string const& type, mathutils::vec2 const& location)
     {
         set_use_nodes(true);

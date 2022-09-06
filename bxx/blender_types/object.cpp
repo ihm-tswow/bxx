@@ -9,16 +9,6 @@
 
 namespace bxx
 {
-    object object::create(std::string const& name, mesh ms)
-    {
-        return eval_pyobject("out = bpy.data.objects").call("new", name, ms);
-    }
-
-    object object::create(std::string const& name, armature arma)
-    {
-        return eval_pyobject("out = bpy.data.objects").call("new", name, arma);
-    }
-
     object_children object::children()
     {
         return getattr<object_children>("children");
