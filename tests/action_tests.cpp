@@ -1,14 +1,16 @@
 #include <common/tests.hpp>
 #include <bxx/blender_types/action.hpp>
 
+using namespace bxx;
+
 BXX_TEST(create_action_with_name) {
-    BXX_ASSERT_EQUAL(bxx::action::create("test_action").get_name(), "test_action");
+    BXX_ASSERT_EQUAL(action::create("test_action").get_name(), "test_action");
 }
 
 BXX_TEST(create_fcurve) {
-    bxx::action action = bxx::action::create("test_action");
-    bxx::fcurve fcurve1 = action.fcurves().add("test_group", "test_name", 0);
-    bxx::fcurve fcurve2 = action.fcurves().add("test_group", "test_name", 1);
+    action action = action::create("test_action");
+    fcurve fcurve1 = action.fcurves().add("test_group", "test_name", 0);
+    fcurve fcurve2 = action.fcurves().add("test_group", "test_name", 1);
 
     BXX_ASSERT_EQUAL(fcurve1.get_data_path(),"test_name");
     BXX_ASSERT_EQUAL(fcurve1.get_index(),0);
@@ -18,7 +20,7 @@ BXX_TEST(create_fcurve) {
 }
 
 BXX_TEST(create_keyframes) {
-    bxx::fcurve curve = bxx::action::create("test_action")
+    fcurve curve = action::create("test_action")
         .fcurves().add("test_group", "test_name", 0);
     curve.add_points(10);
 

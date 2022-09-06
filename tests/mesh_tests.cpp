@@ -3,20 +3,22 @@
 #include <common/exec.hpp>
 #include <common/tests.hpp>
 
+using namespace bxx;
+
 BXX_TEST(mesh_created_with_name) {
-    BXX_ASSERT_EQUAL(bxx::mesh::create("test_mesh").get_name(), "test_mesh");
+    BXX_ASSERT_EQUAL(mesh::create("test_mesh").get_name(), "test_mesh");
 }
 
 BXX_TEST(mesh_starts_with_no_meshdata) {
-    bxx::mesh mesh = bxx::mesh::create("test_mesh");
+    mesh mesh = mesh::create("test_mesh");
     BXX_ASSERT_EQUAL(mesh.verts().len(), 0);
     BXX_ASSERT_EQUAL(mesh.polys().len(), 0);
     BXX_ASSERT_EQUAL(mesh.loops().len(), 0);
 }
 
-static bxx::mesh create_basic_triangle()
+static mesh create_basic_triangle()
 {
-    bxx::mesh mesh = bxx::mesh::create("test_mesh");
+    mesh mesh = mesh::create("test_mesh");
     mesh.add_verts(3);
     mesh.add_loops(3);
     mesh.add_polygons(1);
@@ -28,14 +30,14 @@ static bxx::mesh create_basic_triangle()
 }
 
 BXX_TEST(mesh_can_add_geometry) {
-    bxx::mesh triangle = create_basic_triangle();
+    mesh triangle = create_basic_triangle();
     BXX_ASSERT_EQUAL(triangle.verts().len(), 3);
     BXX_ASSERT_EQUAL(triangle.loops().len(), 3);
     BXX_ASSERT_EQUAL(triangle.polys().len(), 1);
 }
 
 BXX_TEST(mesh_can_add_channels) {
-    bxx::mesh tri = create_basic_triangle();
+    mesh tri = create_basic_triangle();
     tri.add_uv_channel();
     tri.add_color_channel();
     tri.uvs().get(0).set(0, 1);

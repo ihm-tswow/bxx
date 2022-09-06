@@ -37,8 +37,8 @@ namespace bxx
         constraints constraints();
         vertex_groups vertex_groups();
         object_children children();
-        static object create(std::string const& name, bxx::mesh mesh);
-        static object create(std::string const& name, bxx::armature armature);
+        static object create(std::string const& name, mesh mesh);
+        static object create(std::string const& name, armature armature);
     };
 
     class object_children : public blender_py_iterable<object>

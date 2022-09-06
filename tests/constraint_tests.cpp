@@ -35,7 +35,7 @@ BXX_TEST(constraint_object_reference_obj)
 {
     mesh m1 = mesh::create("mesh");
     object o1 = object::create("obj",m1);
-    bxx::get_context().link_object(o1);
+    get_context().link_object(o1);
 
     mesh m2 = mesh::create("mesh2");
     object o2 = object::create("obj2",m1);

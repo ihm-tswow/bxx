@@ -29,7 +29,7 @@ namespace bxx
     void menu_builder::write(python_builder& builder)
     {
         auto draw = m_draw;
-        size_t event_index = lib_register_event([=](bxx::python_tuple tuple)
+        size_t event_index = lib_register_event([=](python_tuple tuple)
         {
             draw(tuple.get<python_object>(0), tuple.get<python_object>(1));
             return python_object();

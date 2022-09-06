@@ -114,16 +114,16 @@ namespace bxx
         ShaderNodeWireframe
     };
 
-    std::string node_type_to_string(bxx::material_node_type type);
+    std::string node_type_to_string(material_node_type type);
 
     class material_node;
     class material : public id<bl_material>
     {
     public:
         using id<bl_material>::id;
-        static bxx::material create(std::string const& name);
+        static material create(std::string const& name);
         material_node add_node(std::string const& type, mathutils::vec2 const& location = { 0,0 });
-        material_node add_node(bxx::material_node_type type, mathutils::vec2 const& location = { 0,0 });
+        material_node add_node(material_node_type type, mathutils::vec2 const& location = { 0,0 });
         material_node get_node(std::string const& name);
         void connect(material_node const& output_node, int output_socket, material_node const& input_node, int input_socket);
         PYFIELD(bool,use_nodes)

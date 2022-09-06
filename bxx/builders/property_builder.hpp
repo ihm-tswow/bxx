@@ -256,7 +256,7 @@ namespace bxx
 
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::string const& description = "")
         {
-            size_t event_index = bxx::lib_register_event([=](python_tuple args) {
+            size_t event_index = lib_register_event([=](python_tuple args) {
                 std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
                 python_list list(0);
                 size_t cur_index = 0;

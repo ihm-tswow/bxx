@@ -24,8 +24,8 @@ namespace bxx
     };
 
     class operator_builder
-        : public bxx::property_builder<operator_builder>
-        , public bxx::class_header_builder<operator_builder>
+        : public property_builder<operator_builder>
+        , public class_header_builder<operator_builder>
     {
     public:
         operator_builder(std::string const& bl_id, bool registers = true);

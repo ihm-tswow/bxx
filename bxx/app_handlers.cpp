@@ -9,13 +9,13 @@
 
 namespace bxx::app::handlers
 {
-    void register_handler(std::string const& target, std::function<void(bxx::python_tuple)> func)
+    void register_handler(std::string const& target, std::function<void(python_tuple)> func)
     {
         // todo: for some bizarre reason this stops working if i don't pass all varargs python-side,
         // but everything is still in the first tuple once it reaches C++
-        size_t event_idx = lib_register_event([=](bxx::python_tuple tuple) {
+        size_t event_idx = lib_register_event([=](python_tuple tuple) {
             func(tuple.get<python_tuple>(0));
-            return bxx::python_object();
+            return python_object();
         });
         exec({
             fmt::format("@bpy.app.handlers.persistent"),

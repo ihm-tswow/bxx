@@ -11,8 +11,8 @@ namespace bxx
     class python_object;
 
     class addon_preferences_builder
-        : public bxx::property_builder<addon_preferences_builder>
-        , public bxx::class_header_builder<addon_preferences_builder>
+        : public property_builder<addon_preferences_builder>
+        , public class_header_builder<addon_preferences_builder>
     {
     public:
         addon_preferences_builder(std::string const& classname);

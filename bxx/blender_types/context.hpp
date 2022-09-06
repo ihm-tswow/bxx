@@ -30,14 +30,14 @@ namespace bxx
     {
     public:
         void set_mode(editor_mode mode);
-        bxx::editor_mode get_mode();
+        editor_mode get_mode();
         view_layer get_view_layer();
         scene get_scene();
         void select_all();
         void deselect_all();
         void clear_active_object();
         void set_active_object(object const& object);
-        bxx::object get_active_object();
+        object get_active_object();
         void link_object(object const& object);
         void update();
     };

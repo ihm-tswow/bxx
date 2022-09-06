@@ -62,12 +62,12 @@ namespace bxx
 
             operator_builder op(get_class_name(), true);
             op.read_properties_from(tmp_builder);
-            op.set_callback([this](bxx::python_object obj) {
+            op.set_callback([this](python_object obj) {
                 T(obj.get_pyobject()).execute();
             });
 
             op.set_disable_drawing(false);
-            op.set_draw([this](bxx::python_object obj) {
+            op.set_draw([this](python_object obj) {
                 T(obj.get_pyobject()).draw();
             });
         }

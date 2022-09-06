@@ -18,8 +18,8 @@ namespace bxx
         using id<bl_scene>::id;
         view_layer add_view_layer(std::string const& name);
         view_layer get_view_layer(std::string const& name);
-        static bxx::scene create(std::string const& name);
-        static bxx::scene get(std::string const& name);
+        static scene create(std::string const& name);
+        static scene get(std::string const& name);
     private:
         bl_scene *m_raw;
     };

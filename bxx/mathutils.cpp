@@ -63,105 +63,108 @@ namespace mathutils
     }
 }
 
-bxx::quaternion::quaternion(bl_quat* raw)
-    : m_raw(raw)
-{}
-
-void bxx::quaternion::set(float w, float x, float y, float z)
+namespace bxx
 {
-    set_w(w);
-    set_x(x);
-    set_y(y);
-    set_z(z);
-}
+    quaternion::quaternion(bl_quat* raw)
+        : m_raw(raw)
+    {}
 
-float bxx::quaternion::get_w()
-{
-    return (*m_raw)[0];
-}
+    void quaternion::set(float w, float x, float y, float z)
+    {
+        set_w(w);
+        set_x(x);
+        set_y(y);
+        set_z(z);
+    }
 
-float bxx::quaternion::get_x()
-{
-    return (*m_raw)[1];
-}
+    float quaternion::get_w()
+    {
+        return (*m_raw)[0];
+    }
 
-float bxx::quaternion::get_y()
-{
-    return (*m_raw)[2];
-}
+    float quaternion::get_x()
+    {
+        return (*m_raw)[1];
+    }
 
-float bxx::quaternion::get_z()
-{
-    return (*m_raw)[3];
-}
+    float quaternion::get_y()
+    {
+        return (*m_raw)[2];
+    }
 
-void bxx::quaternion::set_w(float w)
-{
-    (*m_raw)[0] = w;
-}
+    float quaternion::get_z()
+    {
+        return (*m_raw)[3];
+    }
 
-void bxx::quaternion::set_x(float x)
-{
-    (*m_raw)[1] = x;
-}
+    void quaternion::set_w(float w)
+    {
+        (*m_raw)[0] = w;
+    }
 
-void bxx::quaternion::set_y(float y)
-{
-    (*m_raw)[2] = y;
-}
+    void quaternion::set_x(float x)
+    {
+        (*m_raw)[1] = x;
+    }
 
-void bxx::quaternion::set_z(float z)
-{
-    (*m_raw)[3] = z;
-}
+    void quaternion::set_y(float y)
+    {
+        (*m_raw)[2] = y;
+    }
 
-bxx::vec3::vec3(bl_vec* raw)
-    : m_raw(raw)
-{}
+    void quaternion::set_z(float z)
+    {
+        (*m_raw)[3] = z;
+    }
 
-void bxx::vec3::set(float x, float y, float z)
-{
-    set_x(x);
-    set_y(y);
-    set_z(z);
-}
+    vec3::vec3(bl_vec* raw)
+        : m_raw(raw)
+    {}
 
-void bxx::vec3::set(mathutils::vec3 const& vec)
-{
-    set(vec.x, vec.y, vec.z);
-}
+    void vec3::set(float x, float y, float z)
+    {
+        set_x(x);
+        set_y(y);
+        set_z(z);
+    }
 
-void bxx::vec3::set_x(float x)
-{
-    *(m_raw)[0] = x;
-}
+    void vec3::set(mathutils::vec3 const& vec)
+    {
+        set(vec.x, vec.y, vec.z);
+    }
 
-void bxx::vec3::set_y(float y)
-{
-    *(m_raw)[1] = y;
-}
+    void vec3::set_x(float x)
+    {
+        *(m_raw)[0] = x;
+    }
 
-void bxx::vec3::set_z(float z)
-{
-    *(m_raw)[2] = z;
-}
+    void vec3::set_y(float y)
+    {
+        *(m_raw)[1] = y;
+    }
 
-float bxx::vec3::get_x()
-{
-    return *(m_raw)[0];
-}
+    void vec3::set_z(float z)
+    {
+        *(m_raw)[2] = z;
+    }
 
-float bxx::vec3::get_y()
-{
-    return *(m_raw)[1];
-}
+    float vec3::get_x()
+    {
+        return *(m_raw)[0];
+    }
 
-float bxx::vec3::get_z()
-{
-    return *(m_raw)[2];
-}
+    float vec3::get_y()
+    {
+        return *(m_raw)[1];
+    }
 
-mathutils::vec3 bxx::vec3::get()
-{
-    return { get_x(), get_y(), get_z() };
+    float vec3::get_z()
+    {
+        return *(m_raw)[2];
+    }
+
+    mathutils::vec3 vec3::get()
+    {
+        return { get_x(), get_y(), get_z() };
+    }
 }
