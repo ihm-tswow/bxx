@@ -46,16 +46,6 @@ namespace bxx
         getattr("keyframe_points").call("add", amount);
     }
 
-    int fcurve::num_points() const
-    {
-        return get_raw_struct()->totvert;
-    }
-
-    keyframe fcurve::get_point(int index)
-    {
-        return keyframe(get_raw_struct()->bezt + index);
-    }
-
     std::string fcurve::get_data_path() const
     {
         return get_raw_struct()->rna_path;
@@ -66,9 +56,29 @@ namespace bxx
         return get_raw_struct()->array_index;
     }
 
+    blender_ptr_iterable<bl_fcurve, bl_keyframe, keyframe, details::keyframe_len, details::get_keyframe>
+        fcurve::points()
+    {
+        return get_raw_struct();
+    }
+
     action action::create(std::string const& name)
     {
         return action(eval_pyobject("out = bpy.data.actions.new(name='{}')",name));
+    }
+
+
+    namespace details
+    {
+        size_t keyframe_len(bl_fcurve* curve)
+        {
+            return curve->totvert;
+        }
+
+        bl_keyframe* get_keyframe(bl_fcurve* curve, size_t index)
+        {
+            return curve->bezt + index;
+        }
     }
 }
 

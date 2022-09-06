@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/id.hpp>
 
 #pragma warning(push)
@@ -25,6 +26,7 @@ namespace bxx
     class keyframe : public blender_struct<bl_keyframe>
     {
     public:
+        using blender_struct<bl_keyframe>::blender_struct;
         void set(float time, float value);
         void set_time(float time);
         void set_value(float value);
@@ -32,13 +34,21 @@ namespace bxx
         float get_value();
     };
 
+    namespace details
+    {
+        size_t keyframe_len(bl_fcurve* curve);
+        bl_keyframe* get_keyframe(bl_fcurve* curve, size_t index);
+    }
+
     class fcurve : public blender_py_struct<bl_fcurve>
     {
     public:
         using blender_py_struct<bl_fcurve>::blender_py_struct;
+
+        blender_ptr_iterable<bl_fcurve, bl_keyframe, keyframe, details::keyframe_len, details::get_keyframe>
+        points();
+
         void add_points(int amount);
-        int num_points() const;
-        keyframe get_point(int index);
         std::string get_data_path() const;
         int get_index() const;
     };

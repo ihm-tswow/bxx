@@ -22,13 +22,13 @@ BXX_TEST(create_keyframes) {
         .add_fcurve("test_group", "test_name", 0);
     curve.add_points(10);
 
-    BXX_ASSERT_EQUAL(curve.num_points(), 10);
+    BXX_ASSERT_EQUAL(curve.points().len(), 10);
 
-    curve.get_point(0).set(1, 2);
-    curve.get_point(1).set(3, 4);
+    curve.points().get(0).set(1, 2);
+    curve.points().get(1).set(3, 4);
 
-    BXX_ASSERT_EQUAL(curve.get_point(0).get_time(), 1);
-    BXX_ASSERT_EQUAL(curve.get_point(0).get_value(), 2);
-    BXX_ASSERT_EQUAL(curve.get_point(1).get_time(), 3);
-    BXX_ASSERT_EQUAL(curve.get_point(1).get_value(), 4);
+    BXX_ASSERT_EQUAL(curve.points().get(0).get_time(), 1);
+    BXX_ASSERT_EQUAL(curve.points().get(0).get_value(), 2);
+    BXX_ASSERT_EQUAL(curve.points().get(1).get_time(), 3);
+    BXX_ASSERT_EQUAL(curve.points().get(1).get_value(), 4);
 }

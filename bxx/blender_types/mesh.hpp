@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bxx/blender_types/blender_types.hpp>
+#include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
@@ -22,13 +23,18 @@ namespace bxx
         void set_group_id(int group);
     };
 
-    class deform_vert : public blender_struct<bl_deform_vert>
+    namespace details
+    {
+        bl_deform_weight* get_deform_weight(bl_deform_vert* vert, size_t index);
+        size_t deform_weight_len(bl_deform_vert* vert);
+    }
+
+    class deform_vert : public blender_ptr_iterable<bl_deform_vert, bl_deform_weight, deform_weight,details::deform_weight_len,details::get_deform_weight>
     {
     public:
-        using blender_struct<bl_deform_vert>::blender_struct;
-        deform_weight get_weight(int index);
-        int get_num_weights();
+        using blender_ptr_iterable<bl_deform_vert,bl_deform_weight,deform_weight,details::deform_weight_len, details::get_deform_weight>::blender_ptr_iterable;
         int get_flags();
+        void set_flags(int flags);
     };
 
     class vert : public blender_struct<bl_vert>
@@ -102,6 +108,20 @@ namespace bxx
         bl_loop_col* m_col;
     };
 
+    namespace details
+    {
+        size_t vert_len(bl_mesh* m);
+        bl_vert* get_vert(bl_mesh* m, size_t index);
+        size_t deform_vert_len(bl_mesh* m);
+        bl_deform_vert* get_deform_vert(bl_mesh* m, size_t index);
+        size_t poly_len(bl_mesh* m);
+        bl_poly* get_poly(bl_mesh* m, size_t index);
+        size_t loop_len(bl_mesh* m);
+        bl_loop* get_loop(bl_mesh* m, size_t index);
+        bl_loop_uv* get_uv(bl_mesh* m, size_t index);
+        bl_loop_col* get_color(bl_mesh* m, size_t index);
+    }
+
     class mesh : public id<bl_mesh>
     {
     public:
@@ -114,17 +134,18 @@ namespace bxx
         void add_uv_channel(std::string const& name = "UV Channel");
         void add_color_channel(std::string const& name = "Color Channel");
 
-        int get_num_verts();
-        int get_num_deform_verts();
-        int get_num_polys();
-        int get_num_loops();
-
-        vert vert(int index);
-        deform_vert deform_vert(int index);
-        poly poly(int poly);
-        loop loop(int loop);
-        uv_wrapper uv(int loop);
-        color color(int loop);
+        blender_ptr_iterable<bl_mesh, bl_vert, vert, details::vert_len, details::get_vert>
+        verts();
+        blender_ptr_iterable<bl_mesh, bl_deform_vert, deform_vert, details::deform_vert_len, details::get_deform_vert>
+        deform_verts();
+        blender_ptr_iterable<bl_mesh, bl_poly, poly, details::poly_len, details::get_poly>
+        polys();
+        blender_ptr_iterable<bl_mesh, bl_loop, loop, details::loop_len, details::get_loop>
+        loops();
+        blender_ptr_iterable<bl_mesh, bl_loop_uv, uv_wrapper, details::loop_len, details::get_uv>
+        uvs();
+        blender_ptr_iterable<bl_mesh, bl_loop_col, color, details::loop_len, details::get_color>
+        colors();
 
         static mesh create(std::string const& name);
     };

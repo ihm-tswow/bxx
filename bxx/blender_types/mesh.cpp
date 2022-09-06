@@ -25,19 +25,14 @@ namespace bxx
         get_raw_struct()->def_nr = group;
     }
 
-    deform_weight deform_vert::get_weight(int index)
-    {
-        return get_raw_struct()->dw + index;
-    }
-
-    int deform_vert::get_num_weights()
-    {
-        return get_raw_struct()->totweight;
-    }
-
     int deform_vert::get_flags()
     {
-        return get_raw_struct()->flag;
+        return this->get_raw_struct()->flag;
+    }
+
+    void deform_vert::set_flags(int flags)
+    {
+        this->get_raw_struct()->flag = flags;
     }
 
     void vert::set(mathutils::vec3 vert)
@@ -243,27 +238,6 @@ namespace bxx
         getattr("polygons").call("add", polygons);
     }
 
-    int mesh::get_num_deform_verts()
-    {
-        // meshes without group data has null dvert ptr, otherwise data for all verts
-        return !get_raw_struct()->dvert ? 0 : get_raw_struct()->totvert;
-    }
-
-    int mesh::get_num_verts()
-    {
-        return get_raw_struct()->totvert;
-    }
-
-    int mesh::get_num_polys()
-    {
-        return get_raw_struct()->totpoly;
-    }
-
-    int mesh::get_num_loops()
-    {
-        return get_raw_struct()->totloop;
-    }
-
     void mesh::add_uv_channel(std::string const& name)
     {
         exec("bpy.data.meshes['{}'].uv_layers.new(name='{}')", get_name(), name);
@@ -279,36 +253,6 @@ namespace bxx
         return eval_pyobject("out = bpy.data.meshes.new(name='{}')", name);
     }
 
-    vert mesh::vert(int index)
-    {
-        return get_raw_struct()->mvert + index;
-    }
-
-    deform_vert mesh::deform_vert(int index)
-    {
-        return get_raw_struct()->dvert + index;
-    }
-
-    poly mesh::poly(int poly)
-    {
-        return get_raw_struct()->mpoly + poly;
-    }
-
-    loop mesh::loop(int loop)
-    {
-        return get_raw_struct()->mloop + loop;
-    }
-
-    uv_wrapper mesh::uv(int loop)
-    {
-        return get_raw_struct()->mloopuv + loop;
-    }
-
-    color mesh::color(int loop)
-    {
-        return get_raw_struct()->mloopcol + loop;
-    }
-
     mathutils::rgba color::get()
     {
         return { get_r(), get_g(), get_b(), get_a() };
@@ -321,5 +265,80 @@ namespace bxx
         set_b(color.b);
         set_a(color.a);
     }
-}
 
+    blender_ptr_iterable<bl_mesh, bl_vert, vert, details::vert_len, details::get_vert>
+        mesh::verts() { return get_raw_struct(); }
+    blender_ptr_iterable<bl_mesh, bl_deform_vert, deform_vert, details::deform_vert_len, details::get_deform_vert>
+        mesh::deform_verts() { return get_raw_struct(); }
+    blender_ptr_iterable<bl_mesh, bl_poly, poly, details::poly_len, details::get_poly>
+        mesh::polys() { return get_raw_struct(); }
+    blender_ptr_iterable<bl_mesh, bl_loop, loop, details::loop_len, details::get_loop>
+        mesh::loops() { return get_raw_struct(); }
+    blender_ptr_iterable<bl_mesh, bl_loop_uv, uv_wrapper, details::loop_len, details::get_uv>
+        mesh::uvs() { return get_raw_struct(); }
+    blender_ptr_iterable<bl_mesh, bl_loop_col, color, details::loop_len, details::get_color>
+        mesh::colors() { return get_raw_struct(); }
+
+    namespace details
+    {
+        bl_deform_weight* get_deform_weight(bl_deform_vert* vert, size_t index)
+        {
+            return vert->dw + index;
+        }
+
+        size_t deform_weight_len(bl_deform_vert* vert)
+        {
+            return vert->totweight;
+        }
+
+        size_t vert_len(bl_mesh* m)
+        {
+            return m->totvert;
+        }
+
+        bl_vert* get_vert(bl_mesh* m,size_t index)
+        {
+            return m->mvert + index;
+        }
+
+        size_t deform_vert_len(bl_mesh* m)
+        {
+            return m->dvert ? m->totvert : 0;
+        }
+
+        bl_deform_vert* get_deform_vert(bl_mesh* m,size_t index)
+        {
+            return m->dvert + index;
+        }
+
+        size_t poly_len(bl_mesh* m)
+        {
+            return m->totpoly;
+        }
+
+        bl_poly* get_poly(bl_mesh* m,size_t index)
+        {
+            return m->mpoly + index;
+        }
+
+        size_t loop_len(bl_mesh* m)
+        {
+            return m->totloop;
+        }
+
+        bl_loop* get_loop(bl_mesh* m,size_t index)
+        {
+            return m->mloop + index;
+        }
+
+        bl_loop_uv* get_uv(bl_mesh* m,size_t index)
+        {
+            return m->mloopuv + index;
+        }
+
+        bl_loop_col* get_color(bl_mesh* m,size_t index)
+        {
+            return m->mloopcol + index;
+        }
+    }
+}
