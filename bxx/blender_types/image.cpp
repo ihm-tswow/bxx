@@ -1,6 +1,11 @@
 #include <bxx/blender_types/image.hpp>
 #include <common/exec.hpp>
 
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#include <makesdna/DNA_image_types.h>
+#pragma warning(pop)
+
 #include <fmt/core.h>
 
 namespace bxx

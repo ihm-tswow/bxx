@@ -5,11 +5,6 @@
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#include <makesdna/DNA_image_types.h>
-#pragma warning(pop)
-
 #include <string>
 
 namespace bxx

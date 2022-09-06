@@ -5,12 +5,6 @@
 #include <bxx/blender_types/iterables.hpp>
 #include <bxx/blender_types/object.hpp>
 
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#include <makesdna/DNA_collection_types.h>
-#include <makesdna/DNA_object_types.h>
-#pragma warning(pop)
-
 namespace bxx
 {
     class collection_objects;

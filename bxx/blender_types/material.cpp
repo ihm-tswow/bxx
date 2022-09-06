@@ -1,6 +1,12 @@
 #include <bxx/blender_types/material.hpp>
 #include <common/exec.hpp>
 
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#include <makesdna/DNA_material_types.h>
+#include <makesdna/DNA_Node_types.h>
+#pragma warning(pop)
+
 #include <fmt/core.h>
 #include <magic_enum.hpp>
 

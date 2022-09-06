@@ -5,12 +5,6 @@
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#include <makesdna/DNA_mesh_types.h>
-#include <makesdna/DNA_meshdata_types.h>
-#pragma warning(pop)
-
 namespace bxx
 {
     class deform_weight : public blender_struct<bl_deform_weight>

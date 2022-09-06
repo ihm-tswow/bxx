@@ -4,12 +4,6 @@
 #include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/id.hpp>
 
-#pragma warning(push)
-#pragma warning(disable : 4200)
-#include <makesdna/DNA_action_types.h>
-#include <makesdna/DNA_anim_types.h>
-#pragma warning(pop)
-
 namespace bxx
 {
     namespace details
