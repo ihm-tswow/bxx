@@ -5,12 +5,6 @@
 
 namespace bxx
 {
-    image::image(python_object const& obj, int width, int height)
-        : id<bl_image>(obj)
-        , m_width(width)
-        , m_height(height)
-    {}
-
     void image::apply_buffer(image_buffer const& buffer)
     {
         get_pointers()->cy_apply_image_buffer(
@@ -19,19 +13,19 @@ namespace bxx
         );
     }
 
+    std::uint32_t image::get_width()
+    {
+        return getattr("size").get_item<int>(0);
+    }
+
+    std::uint32_t image::get_height()
+    {
+        return getattr("size").get_item<int>(1);
+    }
+
     image_buffer image::create_buffer()
     {
-        return image_buffer::create(m_width, m_height);
-    }
-
-    int image::get_width()
-    {
-        return m_width;
-    }
-
-    int image::get_height()
-    {
-        return m_height;
+        return image_buffer::create(get_width(), get_height());
     }
 
     uint64_t image_buffer::get_id() const

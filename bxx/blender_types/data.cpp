@@ -45,12 +45,12 @@ namespace bxx
 
     image image_data::create(std::string const& name, int width, int height)
     {
-        return image(call("new", name, width, height), width, height);
+        return image(call("new", name, width, height));
     }
 
-    image image_data::find(std::string const& name, int width, int height)
+    image image_data::find(std::string const& name)
     {
-        return image(get_item(name), width, height);
+        return get_item<image>(name);
     }
 
     object object_data::create(std::string const& name, mesh const& obj)

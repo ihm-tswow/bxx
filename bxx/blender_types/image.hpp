@@ -42,14 +42,11 @@ namespace bxx
     class image : public id<bl_image>
     {
     public:
-        image(python_object const& obj, int width, int height);
+        using id<bl_image>::id;
         void apply_buffer(image_buffer const& buffer);
         image_buffer create_buffer();
-        int get_width();
-        int get_height();
-    private:
-        bl_image * m_raw;
-        int m_width, m_height;
+        std::uint32_t get_width();
+        std::uint32_t get_height();
     };
 
     class image_data: public blender_py_iterable<image>
@@ -57,6 +54,6 @@ namespace bxx
     public:
         using blender_py_iterable<image>::blender_py_iterable;
         image create(std::string const& name, int width, int height);
-        image find(std::string const& name, int width, int height);
+        image find(std::string const& name);
     };
 }
