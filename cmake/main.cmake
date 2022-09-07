@@ -206,6 +206,13 @@ function(generate_blender_version build_version)
         ${Python_LIBRARIES}
       OUTPUT_VARIABLE EFFECTIVE_PYTHON_LIB
     )
+
+    execute_process(
+      COMMAND
+        ${PYTHON_BIN}
+        ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/boost_inject_pdb_hack.py
+        ${boost_SOURCE_DIR}
+    )
   endif()
 
 
