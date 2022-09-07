@@ -68,7 +68,7 @@ namespace bxx
     template <typename T, class ... Args>
     T python_object_base::call(std::string const& method, Args&&... args)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to call function on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to call function on null python_object");
         details::call_arg_stack<sizeof...(Args)> arg_refs;
         details::call_kwarg_stack<sizeof...(Args)> kwarg_refs;
         ([&] { details::convert_fn(args, arg_refs, kwarg_refs); }(), ...);
@@ -98,7 +98,7 @@ namespace bxx
     template<typename T>
     inline T python_object_base::call(std::string const& method)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to call function on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to call function on null python_object");
         python_object tup = python_object::steal(PyTuple_New(0));
         BXX_SCRIPT_ASSERT(tup.get_pyobject(), "failed to create tuple");
 
@@ -113,7 +113,7 @@ namespace bxx
     template <typename T>
     inline T python_object_base::getattr(std::string const& arr) const
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get attribute on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to get attribute on null python_object");
         python_object obj = python_object::steal(PyObject_GetAttrString(get_pyobject(), arr.c_str()));
         BXX_SCRIPT_ASSERT(obj.get_pyobject(), "could not find python attribute ", arr.c_str());
         return details::py2cxx<T>(obj);
@@ -122,7 +122,7 @@ namespace bxx
     template <typename T>
     void python_object_base::setattr(std::string const& arr, T value)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to set attribute on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to set attribute on null python_object");
         int err = PyObject_SetAttrString(get_pyobject(), arr.c_str(), details::cxx2py(value, false));
         BXX_SCRIPT_ASSERT(!err, "failed to set python attribute ", arr.c_str());
     }
@@ -130,7 +130,7 @@ namespace bxx
     template <typename T>
     T python_object_base::get_item(std::string const& key) const
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get item from null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to get item from null python_object");
         python_object str = python_object::steal(PyUnicode_FromString(key.c_str()));
         BXX_SCRIPT_ASSERT(str.get_pyobject(), "failed to create python string for ", key.c_str());
         python_object obj = python_object::steal(PyObject_GetItem(get_pyobject(), str));
@@ -141,7 +141,7 @@ namespace bxx
     template <typename T>
     T python_object_base::get_item(std::uint32_t key) const
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get item from null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to get item from null python_object");
         python_object num = python_object::steal(PyLong_FromLong(key));
         BXX_SCRIPT_ASSERT(num.get_pyobject(), "failed to create python number");
         python_object obj = python_object::steal(PyObject_GetItem(get_pyobject(), num));
@@ -152,7 +152,7 @@ namespace bxx
     template <typename T>
     void python_object_base::set_item(std::string const& key, T value)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to set item on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to set item on null python_object");
         python_object str = python_object::steal(PyUnicode_FromString(key.c_str()));
         BXX_SCRIPT_ASSERT(str.get_pyobject(), "failed to create python string");
         PyObject_SetItem(get_pyobject(), str, details::cxx2py(value, false));

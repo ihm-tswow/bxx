@@ -125,6 +125,8 @@ namespace bxx
         std::string repr() const;
         void delattr(std::string const& arr);
         bool hasattr(std::string const& arr) const;
+
+        bool is_valid() const;
     };
 
     class python_object : public python_object_base

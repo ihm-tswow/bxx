@@ -127,20 +127,25 @@ namespace bxx
 
     void python_object_base::delattr(std::string const& arr)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to delete attribute on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to delete attribute on null python_object");
         PyObject_DelAttrString(get_pyobject(), arr.c_str());
     }
 
     bool python_object_base::hasattr(std::string const& arr) const
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to read attribute on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to read attribute on null python_object");
         return PyObject_HasAttrString(get_pyobject(), arr.c_str());
     }
 
     void python_object_base::del_item(std::string const& key)
     {
-        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to delete item on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), "tried to delete item on null python_object");
         PyObject_DelItemString(get_pyobject(), key.c_str());
+    }
+
+    bool python_object_base::is_valid() const
+    {
+        return get_pyobject() && get_pyobject() != Py_None;
     }
 
     namespace details
