@@ -199,10 +199,12 @@ function(generate_blender_version build_version)
   find_package(Python COMPONENTS Development)
 
   if (WIN32)
-    execute_process(COMMAND 
-      ${PYTHON_BIN}
-      ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/fix_python_lib_path.py
-      ${Python_LIBRARIES}
+    execute_process(
+      COMMAND
+        ${PYTHON_BIN}
+        ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/fix_python_lib_path.py
+        ${Python_LIBRARIES}
+      OUTPUT_VARIABLE EFFECTIVE_PYTHON_LIB
     )
   endif()
 
@@ -293,7 +295,7 @@ function(generate_blender_version build_version)
 
   target_link_libraries(
     ${bxx} PUBLIC
-    ${Python_LIBRARIES}
+    ${EFFECTIVE_PYTHON_LIB}
     fmt::fmt-header-only
     nlohmann_json::nlohmann_json
     magic_enum
@@ -361,7 +363,7 @@ function(generate_blender_version build_version)
       target_link_libraries(
         ${script_name} PRIVATE
         ${bxx}
-        ${Python_LIBRARIES}
+        ${EFFECTIVE_PYTHON_LIB}
         ${SCRIPT_LIBRARIES}
         magic_enum
       )
