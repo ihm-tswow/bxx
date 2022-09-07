@@ -21,12 +21,17 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
+  boost
+  URL https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/boost_1_80_0.tar.gz
+)
+
+FetchContent_Declare(
   magic_enum
   GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
   GIT_TAG 1a57977ea3a286206b800e3e3fd79faa6f6e7404
 )
 
-FetchContent_MakeAvailable(fmt json magic_enum)
+FetchContent_MakeAvailable(fmt json magic_enum boost)
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -279,6 +284,7 @@ function(generate_blender_version build_version)
     ${bxx} PRIVATE
     ${Python_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/bxx
+    ${boost_SOURCE_DIR}
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
@@ -350,6 +356,7 @@ function(generate_blender_version build_version)
         ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
         ${SCRIPT_INCLUDE_DIRECTORIES}
         ${Python_INCLUDE_DIRS}
+        ${boost_SOURCE_DIR}
       )
       target_link_libraries(
         ${script_name} PRIVATE
@@ -358,6 +365,8 @@ function(generate_blender_version build_version)
         ${SCRIPT_LIBRARIES}
         magic_enum
       )
+
+      target_link_options(${script_name} PRIVATE /pdbaltpath:${script_name}.pdb)
       generate_filetree(${root} "${script_files_rel}")
     endif()
   endfunction()
