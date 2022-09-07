@@ -1,8 +1,9 @@
 #pragma once
 
+#include <bxx/script_error.hpp>
 #include <bxx/objects/python_object.hpp>
-#include <common/shared_functions.hpp>
 #include <bxx/mathutils.hpp>
+#include <common/shared_functions.hpp>
 
 #include <fmt/core.h>
 
@@ -67,19 +68,20 @@ namespace bxx
     template <typename T, class ... Args>
     T python_object_base::call(std::string const& method, Args&&... args)
     {
-        PyObject* self = get_pyobject();
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to call function on null python_object");
         details::call_arg_stack<sizeof...(Args)> arg_refs;
         details::call_kwarg_stack<sizeof...(Args)> kwarg_refs;
         ([&] { details::convert_fn(args, arg_refs, kwarg_refs); }(), ...);
 
-        PyObject* arg_tup = PyTuple_New(arg_refs.m_size);
-        PyObject* kwarg_dict = nullptr;
+        python_object arg_tup = python_object::steal(PyTuple_New(arg_refs.m_size));
+
+        std::optional<python_object> kwarg_dict;
         if (kwarg_refs.m_size)
         {
-            kwarg_dict = PyDict_New();
+            kwarg_dict.emplace(python_object::steal(PyDict_New()));
             for (size_t i = 0; i < kwarg_refs.m_size; ++i)
             {
-                PyDict_SetItemString(kwarg_dict, kwarg_refs.m_names[i].c_str(), kwarg_refs.m_refs[i].value().m_pyobj);
+                PyDict_SetItemString(kwarg_dict->get_pyobject(), kwarg_refs.m_names[i].c_str(), kwarg_refs.m_refs[i].value().m_pyobj);
             }
         }
 
@@ -88,81 +90,72 @@ namespace bxx
             PyTuple_SetItem(arg_tup, i, arg_refs.m_refs[i].value().m_pyobj);
         }
 
-        PyObject* fn = PyObject_GetAttrString(self, method.c_str());
-        PyObject* res = PyObject_Call(fn, arg_tup, kwarg_dict);
-        T value(details::py2cxx<T>(res));
-        Py_DecRef(res);
-        Py_DecRef(fn);
-        Py_DecRef(arg_tup);
-        if (kwarg_dict)
-        {
-            Py_DecRef(kwarg_dict);
-        }
-        return value;
+        python_object fn = python_object::steal(PyObject_GetAttrString(get_pyobject(), method.c_str()));
+        python_object res = python_object::steal(PyObject_Call(fn, arg_tup, kwarg_dict.has_value() ? kwarg_dict->get_pyobject() : nullptr));
+        return details::py2cxx<T>(res);
     }
 
     template<typename T>
     inline T python_object_base::call(std::string const& method)
     {
-        PyObject* self = get_pyobject();
-        PyObject* fn = PyObject_GetAttrString(self, method.c_str());
-        PyObject* tup = PyTuple_New(0);
-        PyObject* res = PyObject_Call(fn, tup, nullptr);
-        Py_DecRef(fn);
-        Py_DecRef(tup);
-        T value(details::py2cxx<T>(res));
-        Py_DecRef(res);
-        return value;
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to call function on null python_object");
+        python_object tup = python_object::steal(PyTuple_New(0));
+        BXX_SCRIPT_ASSERT(tup.get_pyobject(), "failed to create tuple");
+
+        python_object fn = getattr(method);
+        BXX_SCRIPT_ASSERT(fn.get_pyobject(), "could not find python function {}", method.c_str());
+        BXX_SCRIPT_ASSERT(!PyFunction_Check(fn.get_pyobject()), "{} is not a function", method.c_str());
+
+        python_object res = python_object::steal(PyObject_Call(fn, tup.get_pyobject(), nullptr));
+        return details::py2cxx<T>(res);
     }
 
     template <typename T>
     inline T python_object_base::getattr(std::string const& arr) const
     {
-        PyObject* self = get_pyobject();
-        PyObject* obj = PyObject_GetAttrString(self, arr.c_str());
-        T value(details::py2cxx<T>(obj));
-        Py_DecRef(obj);
-        return value;
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get attribute on null python_object");
+        python_object obj = python_object::steal(PyObject_GetAttrString(get_pyobject(), arr.c_str()));
+        BXX_SCRIPT_ASSERT(obj.get_pyobject(), "could not find python attribute ", arr.c_str());
+        return details::py2cxx<T>(obj);
     }
 
     template <typename T>
     void python_object_base::setattr(std::string const& arr, T value)
     {
-        PyObject* self = get_pyobject();
-        PyObject_SetAttrString(self, arr.c_str(), details::cxx2py(value, false));
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to set attribute on null python_object");
+        int err = PyObject_SetAttrString(get_pyobject(), arr.c_str(), details::cxx2py(value, false));
+        BXX_SCRIPT_ASSERT(!err, "failed to set python attribute ", arr.c_str());
     }
 
     template <typename T>
     T python_object_base::get_item(std::string const& key) const
     {
-        PyObject* self = get_pyobject();
-        PyObject* str = PyUnicode_FromString(key.c_str());
-        PyObject* obj = PyObject_GetItem(self, str);
-        Py_DecRef(str);
-        T value(details::py2cxx<T>(obj));
-        Py_DecRef(obj);
-        return value;
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get item from null python_object");
+        python_object str = python_object::steal(PyUnicode_FromString(key.c_str()));
+        BXX_SCRIPT_ASSERT(str.get_pyobject(), "failed to create python string for ", key.c_str());
+        python_object obj = python_object::steal(PyObject_GetItem(get_pyobject(), str));
+        BXX_SCRIPT_ASSERT(obj.get_pyobject(), "could not find python item for ", key.c_str());
+        return details::py2cxx<T>(obj);
     }
 
     template <typename T>
     T python_object_base::get_item(std::uint32_t key) const
     {
-        PyObject* self = get_pyobject();
-        PyObject* num = PyLong_FromLong(key);
-        PyObject* obj = PyObject_GetItem(self, num);
-        Py_DecRef(num);
-        T value(details::py2cxx<T>(obj));
-        Py_DecRef(obj);
-        return value;
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to get item from null python_object");
+        python_object num = python_object::steal(PyLong_FromLong(key));
+        BXX_SCRIPT_ASSERT(num.get_pyobject(), "failed to create python number");
+        python_object obj = python_object::steal(PyObject_GetItem(get_pyobject(), num));
+        BXX_SCRIPT_ASSERT(obj, "failed to get python item");
+        return details::py2cxx<T>(obj);
     }
 
     template <typename T>
     void python_object_base::set_item(std::string const& key, T value)
     {
-        PyObject* self = get_pyobject();
-        PyObject* str = PyUnicode_FromString(key.c_str());
-        PyObject_SetItem(self, str, details::cxx2py(value, false));
-        Py_DecRef(str);
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to set item on null python_object");
+        python_object str = python_object::steal(PyUnicode_FromString(key.c_str()));
+        BXX_SCRIPT_ASSERT(str.get_pyobject(), "failed to create python string");
+        PyObject_SetItem(get_pyobject(), str, details::cxx2py(value, false));
     }
 
     template <> inline bool python_object::is<bool>()
@@ -222,73 +215,94 @@ namespace bxx
 
         template <> inline std::string py2cxx<std::string>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create string from null python object");
+            BXX_SCRIPT_ASSERT(PyUnicode_Check(obj), "tried to extract string from non-string python object");
             return _PyUnicode_AsString(obj);
         }
 
         template <> inline std::uint32_t py2cxx<std::uint32_t>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create uint32 from null python object");
+            BXX_SCRIPT_ASSERT(PyLong_Check(obj), "tried to extract uint32 from non-long python object");
             return PyLong_AsUnsignedLong(obj);
         }
 
         template <> inline std::int32_t py2cxx<std::int32_t>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create int32 from null python object");
+            BXX_SCRIPT_ASSERT(PyLong_Check(obj), "tried to extract int32 from non-long python object");
             return PyLong_AsLong(obj);
         }
 
         template <> inline std::uint64_t py2cxx<std::uint64_t>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create uint64 from null python object");
+            BXX_SCRIPT_ASSERT(PyLong_Check(obj), "tried to extract uint64 from non-long python object");
             return PyLong_AsUnsignedLongLong(obj);
         }
 
         template <> inline std::int64_t py2cxx<std::int64_t>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create int64 from null python object");
+            BXX_SCRIPT_ASSERT(PyLong_Check(obj), "tried to extract int64 from non-long python object");
             return PyLong_AsLongLong(obj);
         }
 
         template <> inline float py2cxx<float>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create float from null python object");
+            BXX_SCRIPT_ASSERT(PyFloat_Check(obj), "tried to extract float from non-float python object");
             return static_cast<float>(PyFloat_AsDouble(obj));
         }
 
         template <> inline double py2cxx<double>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create double from null python object");
+            BXX_SCRIPT_ASSERT(PyFloat_Check(obj), "tried to extract double from non-float python object");
             return PyFloat_AsDouble(obj);
         }
 
         template <> inline mathutils::vec2 py2cxx<mathutils::vec2>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create vec2 from null python object");
+            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), "tried to extract vec2 from non-tuple python object");
             return {
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1)))
+                py2cxx<float>(PyTuple_GetItem(obj,0)),
+                py2cxx<float>(PyTuple_GetItem(obj,1))
             };
         }
 
         template <> inline mathutils::vec3 py2cxx<mathutils::vec3>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create vec3 from null python object");
+            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), "tried to extract vec3 from non-tuple python object");
             return {
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2)))
+                py2cxx<float>(PyTuple_GetItem(obj,0)),
+                py2cxx<float>(PyTuple_GetItem(obj,1)),
+                py2cxx<float>(PyTuple_GetItem(obj,2))
             };
         }
 
         template <> inline mathutils::quaternion py2cxx<mathutils::quaternion>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(obj, "tried to create quaternion from null python object");
+            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), "tried to extract quaternion from non-tuple python object");
             return {
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,3)))
+                py2cxx<float>(PyTuple_GetItem(obj,0)),
+                py2cxx<float>(PyTuple_GetItem(obj,1)),
+                py2cxx<float>(PyTuple_GetItem(obj,2)),
+                py2cxx<float>(PyTuple_GetItem(obj,3))
             };
         }
 
         template <> inline mathutils::rgba py2cxx<mathutils::rgba>(PyObject* obj)
         {
+            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), "tried to extract rgba from non-tuple python object");
             return {
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,0))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,1))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,2))),
-                float(PyFloat_AsDouble(PyTuple_GetItem(obj,3)))
+                py2cxx<float>(PyTuple_GetItem(obj,0)),
+                py2cxx<float>(PyTuple_GetItem(obj,1)),
+                py2cxx<float>(PyTuple_GetItem(obj,2)),
+                py2cxx<float>(PyTuple_GetItem(obj,3))
             };
         }
     }
@@ -296,16 +310,20 @@ namespace bxx
     template <typename ...Args>
     inline python_object eval_pyobject(fmt::format_string<Args...> str, Args... args)
     {
-        return get_pointers()->cy_eval_pyobject(
+        PyObject* obj = get_pointers()->cy_eval_pyobject(
             const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
         );
+        BXX_SCRIPT_ASSERT(obj, "evaluated PyObject was null");
+        return obj;
     }
 
     template <typename ...Args>
     inline PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args... args)
     {
-        return get_pointers()->cy_eval_pyobject(
+        PyObject* obj = get_pointers()->cy_eval_pyobject(
             const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
         );
+        BXX_SCRIPT_ASSERT(obj, "evaluated PyObject was null");
+        return obj;
     }
 }

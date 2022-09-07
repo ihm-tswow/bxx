@@ -1,6 +1,7 @@
 #include <bxx/objects/python_object.hpp>
-#include <common/exec.hpp>
+#include <bxx/script_error.hpp>
 #include <bxx/mathutils.hpp>
+#include <common/exec.hpp>
 
 namespace bxx
 {
@@ -46,6 +47,11 @@ namespace bxx
         }
     }
 
+    python_object python_object::steal(PyObject* obj)
+    {
+        return python_object(details::pyobject_steal(obj));
+    }
+
     void python_object::set_object(PyObject* pyobject)
     {
         if (m_pyobject == pyobject)
@@ -87,30 +93,33 @@ namespace bxx
 
     size_t python_object_base::ref_count() const
     {
+        if (!get_pyobject())
+        {
+            return 0;
+        }
         return Py_REFCNT(get_pyobject());
     }
 
     std::string python_object_base::str() const
     {
-        PyObject* self = get_pyobject();
-        PyObject* str = PyObject_Str(self);
-        if (!str)
+        if (!get_pyobject())
         {
-            return "<error str>";
+            return "null";
         }
+        python_object str = python_object::steal(PyObject_Str(get_pyobject()));
+        BXX_SCRIPT_ASSERT(str.get_pyobject(), "Failed to str() python object");
         char const* chr = _PyUnicode_AsString(str);
-        Py_DecRef(str);
         return std::string(chr);
     }
 
     std::string python_object_base::repr() const
     {
-        PyObject* self = get_pyobject();
-        PyObject* str = PyObject_Repr(self);
-        if (!str)
+        if (!get_pyobject())
         {
-            return "<error repr>";
+            return "null";
         }
+        python_object str = python_object::steal(PyObject_Repr(get_pyobject()));
+        BXX_SCRIPT_ASSERT(str,"Failed to repr() python object");
         char const* chr = _PyUnicode_AsString(str);
         Py_DecRef(str);
         return std::string(chr);
@@ -118,18 +127,20 @@ namespace bxx
 
     void python_object_base::delattr(std::string const& arr)
     {
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to delete attribute on null python_object");
         PyObject_DelAttrString(get_pyobject(), arr.c_str());
     }
 
     bool python_object_base::hasattr(std::string const& arr) const
     {
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to read attribute on null python_object");
         return PyObject_HasAttrString(get_pyobject(), arr.c_str());
     }
 
     void python_object_base::del_item(std::string const& key)
     {
-        PyObject* self = get_pyobject();
-        PyObject_DelItemString(self, key.c_str());
+        BXX_SCRIPT_ASSERT(get_pyobject(), "tried to delete item on null python_object");
+        PyObject_DelItemString(get_pyobject(), key.c_str());
     }
 
     namespace details
@@ -157,7 +168,9 @@ namespace bxx
         python_tempref::python_tempref(PyObject* pyobj, bool needs_dec)
             : m_pyobj(pyobj)
             , m_needs_dec(needs_dec)
-        {}
+        {
+            BXX_SCRIPT_ASSERT(pyobj, "failed to create python stack variable");
+        }
 
         python_tempref cxx2py(std::string const& value, bool theft)
         {
@@ -201,6 +214,7 @@ namespace bxx
 
         python_tempref cxx2py(PyObject* value, bool theft)
         {
+            BXX_SCRIPT_ASSERT(value, "tried to convert null PyObject");
             if (theft)
             {
                 Py_IncRef(value);
@@ -210,6 +224,7 @@ namespace bxx
 
         python_tempref cxx2py(python_object value, bool theft)
         {
+            BXX_SCRIPT_ASSERT(value.get_pyobject(), "tried to convert null python_object");
             if (theft)
             {
                 Py_IncRef(value.get_pyobject());
@@ -220,6 +235,7 @@ namespace bxx
         python_tempref cxx2py(mathutils::vec2 const& vec, bool theft)
         {
             PyObject* tup = PyTuple_New(2);
+            BXX_SCRIPT_ASSERT(tup, "failed to create PyTuple");
             PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.x));
             PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.y));
             return { tup, !theft };
@@ -228,6 +244,7 @@ namespace bxx
         python_tempref cxx2py(mathutils::vec3 const& vec, bool theft)
         {
             PyObject* tup = PyTuple_New(3);
+            BXX_SCRIPT_ASSERT(tup, "failed to create PyTuple");
             PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.x));
             PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.y));
             PyTuple_SetItem(tup, 2, PyFloat_FromDouble(vec.z));
@@ -237,6 +254,7 @@ namespace bxx
         python_tempref cxx2py(mathutils::quaternion const& vec, bool theft)
         {
             PyObject* tup = PyTuple_New(4);
+            BXX_SCRIPT_ASSERT(tup, "failed to create PyTuple");
             PyTuple_SetItem(tup, 0, PyFloat_FromDouble(vec.w));
             PyTuple_SetItem(tup, 1, PyFloat_FromDouble(vec.x));
             PyTuple_SetItem(tup, 2, PyFloat_FromDouble(vec.y));
@@ -247,6 +265,7 @@ namespace bxx
         python_tempref cxx2py(mathutils::rgba const& rgba, bool theft)
         {
             PyObject* tup = PyTuple_New(4);
+            BXX_SCRIPT_ASSERT(tup, "failed to create PyTuple");
             PyTuple_SetItem(tup, 0, PyFloat_FromDouble(rgba.r));
             PyTuple_SetItem(tup, 1, PyFloat_FromDouble(rgba.g));
             PyTuple_SetItem(tup, 2, PyFloat_FromDouble(rgba.b));
