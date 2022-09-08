@@ -210,9 +210,6 @@ namespace bxx
 
     template <typename ...Args>
     python_object eval_pyobject(fmt::format_string<Args...> str, Args...);
-
-    template <typename ...Args>
-    PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args...);
 }
 
 #include <bxx/objects/python_object.ipp>

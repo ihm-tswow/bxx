@@ -319,17 +319,7 @@ namespace bxx
     template <typename ...Args>
     inline python_object eval_pyobject(fmt::format_string<Args...> str, Args... args)
     {
-        PyObject* obj = get_pointers()->cy_eval_pyobject(
-            const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
-        );
-        BXX_SCRIPT_ASSERT(obj, python_object_error, "evaluated null PyObject");
-        return obj;
-    }
-
-    template <typename ...Args>
-    inline PyObject* eval_pyobject_raw(fmt::format_string<Args...> str, Args... args)
-    {
-        PyObject* obj = get_pointers()->cy_eval_pyobject(
+        PyObject* obj = get_pointers()->cy_eval(
             const_cast<char*>(fmt::format(str, std::forward<Args>(args)...).c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_object_error, "evaluated null PyObject");

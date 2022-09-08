@@ -18,11 +18,7 @@ from cpython.ref cimport PyObject
 # Library API
 ctypedef unsigned long long cy_ptr_ct;
 ctypedef void(*cy_exec_ct)(char*);
-ctypedef cy_ptr_ct (*cy_eval_ptr_ct)(char*);
-ctypedef int (*cy_eval_int_ct)(char*)
-ctypedef float (*cy_eval_float_ct)(char*)
-ctypedef char* (*cy_eval_string_ct)(char*)
-ctypedef PyObject* (*cy_eval_pyobject_ct)(char*)
+ctypedef PyObject* (*cy_eval_ct)(char*);
 ctypedef void (*cy_unregister_script_ct)(size_t)
 ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
 ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
@@ -37,11 +33,7 @@ cdef extern void unregister_cxx();
 cdef extern void setup_cxx(
     char* path,
     cy_exec_ct cy_exec,
-    cy_eval_ptr_ct cy_eval_ptr,
-    cy_eval_int_ct cy_eval_int,
-    cy_eval_float_ct cy_eval_float,
-    cy_eval_string_ct cy_eval_string,
-    cy_eval_pyobject_ct cy_eval_pyobject,
+    cy_eval_ct cy_eval,
     cy_unregister_script_ct cy_unregister_script,
     cy_create_image_buffer_ct cy_create_image_buffer,
     cy_apply_image_buffer_ct cy_apply_image_buffer,
@@ -174,35 +166,15 @@ def build_context():
 cdef void cy_exec(char* exec_bytes):
     exec(exec_bytes.decode('utf-8'), build_context())
 
-def cy_eval(char* exec_bytes):
+cdef PyObject* cy_eval(char* exec_bytes):
+    global last_obj
     try:
         context = build_context()
         exec(exec_bytes.decode('utf-8'), context)
-        return context['out']
+        last_obj = context['out']
+        return <PyObject*> last_obj
     except Exception as e:
         raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
-
-cdef cy_ptr_ct eval_ptr(char* exec_bytes):
-    return cy_eval(exec_bytes)
-
-cdef int eval_int(char* exec_bytes):
-    return int(cy_eval(exec_bytes))
-
-cdef float eval_float(char* exec_bytes):
-    return float(cy_eval(exec_bytes))
-
-cdef char* eval_string(char* exec_bytes):
-    global last_str
-    try:
-        last_str = str(cy_eval(exec_bytes)).encode('utf-8')
-    except:
-        last_str = "".encode('utf-8')
-    return last_str
-
-cdef PyObject* eval_pyobject(char* exec_bytes):
-    global last_obj
-    last_obj = cy_eval(exec_bytes)
-    return <PyObject*> last_obj
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -255,11 +227,7 @@ if os.path.exists(auto_reload_lockfile_path()):
 setup_cxx(
     get_addon_path().encode('utf-8'),
     cy_exec,
-    eval_ptr,
-    eval_int,
-    eval_float,
-    eval_string,
-    eval_pyobject,
+    cy_eval,
     unregister_script,
     create_image_buffer,
     apply_image_buffer,

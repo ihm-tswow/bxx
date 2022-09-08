@@ -152,11 +152,7 @@ extern "C" {
     void setup_cxx(
         char* path,
         cy_exec_ct exec,
-        cy_eval_ptr_ct eval_ptr,
-        cy_eval_int_ct eval_int,
-        cy_eval_float_ct eval_float,
-        cy_eval_string_ct eval_string,
-        cy_eval_pyobject_ct eval_pyobject,
+        cy_eval_ct eval,
         cy_unregister_script_ct unregister_script,
         cy_create_image_buffer_ct create_image_buffer,
         cy_apply_image_buffer_ct apply_image_buffer,
@@ -166,11 +162,7 @@ extern "C" {
         root_path = fs::path(path);
         functions = {
             exec,
-            eval_ptr,
-            eval_int,
-            eval_float,
-            eval_string,
-            eval_pyobject,
+            eval,
             create_image_buffer,
             apply_image_buffer,
             delete_image_buffer

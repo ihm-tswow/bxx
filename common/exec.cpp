@@ -19,22 +19,22 @@ void exec(std::initializer_list<std::string> lines)
 
 int eval_int(std::initializer_list<std::string> lines)
 {
-    return get_pointers()->cy_eval_int(
+    return PyLong_AsLong(get_pointers()->cy_eval(
         const_cast<char*>(join_strings(lines).c_str())
-    );
+    ));
 }
 
 float eval_float(std::initializer_list<std::string> lines)
 {
-    return get_pointers()->cy_eval_float(
+    return float(PyFloat_AsDouble(get_pointers()->cy_eval(
         const_cast<char*>(join_strings(lines).c_str())
-    );
+    )));
 }
 
 std::string eval_string(std::initializer_list<std::string> lines)
 {
-    return get_pointers()->cy_eval_string(
+    return std::string(_PyUnicode_AsString(get_pointers()->cy_eval(
         const_cast<char*>(join_strings(lines).c_str())
-    );
+    )));
 }
 
