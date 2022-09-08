@@ -23,7 +23,6 @@ ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
 
 # Core API
 cdef extern PyObject* core_fire_event(size_t script, size_t event, PyObject* state)
-cdef extern void lib_fire_operator(size_t index, char* operator, char* args)
 cdef extern int run_tests(char* incl, char* excl);
 cdef extern void register_cxx();
 cdef extern void unregister_cxx();
