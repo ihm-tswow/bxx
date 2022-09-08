@@ -152,18 +152,14 @@ extern "C" {
         char* path,
         cy_exec_ct exec,
         cy_eval_ct eval,
-        cy_create_float_buffer_ct create_float_buffer,
-        cy_apply_image_buffer_ct apply_image_buffer,
-        cy_delete_image_buffer_ct delete_image_buffer
+        cy_create_float_buffer_ct create_float_buffer
     )
     {
         root_path = fs::path(path);
         functions = {
             exec,
             eval,
-            create_float_buffer,
-            apply_image_buffer,
-            delete_image_buffer
+            create_float_buffer
         };
         init_pointers_store(&functions);
     }

@@ -12,10 +12,7 @@ namespace bxx
 {
     void image::apply_buffer(image_buffer const& buffer)
     {
-        get_pointers()->cy_apply_image_buffer(
-            buffer.get_id(),
-            const_cast<char*>(get_name().c_str())
-        );
+        exec("apply_image_buffer({},'{}')",buffer.get_id(),get_name().c_str());
     }
 
     std::uint32_t image::get_width()
@@ -55,7 +52,7 @@ namespace bxx
 
     image_buffer::~image_buffer()
     {
-        get_pointers()->cy_delete_image_buffer(m_id);
+        exec("delete_float_buffer({})", m_id);
     }
 
     void image_buffer::set_index_channel(int index, int channel, float value)

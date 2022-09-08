@@ -20,8 +20,6 @@ ctypedef unsigned long long cy_ptr_ct;
 ctypedef void(*cy_exec_ct)(char*);
 ctypedef PyObject* (*cy_eval_ct)(char*);
 ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
-ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
-ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
 # Core API
 cdef extern PyObject* core_fire_event(size_t script, size_t event, PyObject* state)
@@ -33,9 +31,7 @@ cdef extern void setup_cxx(
     char* path,
     cy_exec_ct cy_exec,
     cy_eval_ct cy_eval,
-    cy_create_float_buffer_ct cy_create_float_buffer,
-    cy_apply_image_buffer_ct cy_apply_image_buffer,
-    cy_delete_image_buffer_ct cy_delete_image_buffer,
+    cy_create_float_buffer_ct cy_create_float_buffer
 );
 cdef extern void auto_reload_cxx();
 
@@ -132,13 +128,12 @@ cdef float* create_float_buffer(unsigned long long id, int size):
     image_buffers[id] = cur_pixels
     return cur_pixels.data.as_floats
 
-cdef void apply_image_buffer(unsigned long long buffer_id, char* image_name):
-    image_name_str = image_name.decode('utf-8')
-    image = bpy.data.images[image_name_str]
+def apply_image_buffer(buffer_id, image_name):
+    image = bpy.data.images[image_name]
     buffer = image_buffers[buffer_id]
     image.pixels.foreach_set(buffer) # this looks slow, but it's very fast.
 
-cdef void delete_image_buffer(unsigned long long id):
+def delete_float_buffer(id):
     del image_buffers[id]
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -153,6 +148,8 @@ def build_context():
     context = {}
     context['bpy'] = bpy
     context['unregister_script'] = unregister_script
+    context['apply_image_buffer'] = apply_image_buffer
+    context['delete_float_buffer'] = delete_float_buffer
     context['register_operator'] = register_operator
     context['register_class'] = register_class
     context['fire_event'] = fire_event
@@ -227,7 +224,5 @@ setup_cxx(
     get_addon_path().encode('utf-8'),
     cy_exec,
     cy_eval,
-    create_float_buffer,
-    apply_image_buffer,
-    delete_image_buffer
+    create_float_buffer
 );
