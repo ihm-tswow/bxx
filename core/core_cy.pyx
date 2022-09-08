@@ -122,7 +122,10 @@ def unregister_script(script):
 
 
 def fire_event(script,event,*args):
-    return <object> core_fire_event(script,event,<PyObject*>args)
+    obj = core_fire_event(script,event,<PyObject*>args)
+    if not obj:
+        raise Exception("Failed to execute C++ event")
+    return <object> obj
 
 def register_property_group(script,target, name, property_group,is_collection):
     if not script in registered_property_groups:
@@ -184,13 +187,10 @@ cdef void cy_exec(char* exec_bytes):
 
 cdef PyObject* cy_eval(char* exec_bytes):
     global last_obj
-    try:
-        context = build_context()
-        exec(exec_bytes.decode('utf-8'), context)
-        last_obj = context['out']
-        return <PyObject*> last_obj
-    except Exception as e:
-        raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
+    context = build_context()
+    exec(exec_bytes.decode('utf-8'), context)
+    last_obj = context['out']
+    return <PyObject*> last_obj
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #

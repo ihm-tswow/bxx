@@ -32,10 +32,23 @@ std::string bxx::cur_script_name()
 
 BXX_API PyObject* lib_fire_event(size_t index, PyObject* raw)
 {
-    bxx::python_object res = events[index](bxx::python_tuple(raw));
-    PyObject* raw_res = res.get_pyobject();
-    Py_IncRef(raw_res);
-    return raw_res;
+    try
+    {
+        bxx::python_object res = events[index](bxx::python_tuple(raw));
+        PyObject* raw_res = res.get_pyobject();
+        Py_IncRef(raw_res);
+        return raw_res;
+    }
+    catch (std::exception const& err)
+    {
+        std::cout << err.what() << "\n";
+        return nullptr;
+    }
+    catch (...)
+    {
+        std::cout << "Unknown error when firing cxx event\n";
+        return nullptr;
+    }
 }
 
 namespace bxx

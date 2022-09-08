@@ -5,6 +5,8 @@
 
 #include <sstream>
 
+std::string cached_library_path;
+
 #if _WIN32
 void boost::stacktrace::detail::bxx_append_library_path(com_holder<::IDebugSymbols>& idebug)
 {
@@ -23,10 +25,9 @@ void boost::stacktrace::detail::bxx_append_library_path(com_holder<::IDebugSymbo
         s.resize(buffer_size);
     }
 
-    std::string lib_path = (std::filesystem::absolute(bxx::get_addon_path() / "lib")).string();
-    if (s.find(lib_path) == std::string::npos)
+    if (s.find(cached_library_path) == std::string::npos)
     {
-        idebug->AppendSymbolPath(lib_path.c_str());
+        idebug->AppendSymbolPath(cached_library_path.c_str());
     }
 }
 #endif
