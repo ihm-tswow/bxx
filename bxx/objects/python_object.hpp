@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Python.h>
+#include <bxx/script_error.hpp>
 
+#include <Python.h>
 #include <fmt/core.h>
 
 #include <string>
@@ -164,6 +165,14 @@ namespace bxx
     private:
         PyObject* m_pyobject;
     };
+
+    SCRIPT_ERROR_TYPE(internal_python_error, internal_error)
+
+    SCRIPT_ERROR_TYPE(python_input_error, input_error)
+    SCRIPT_ERROR_TYPE(python_object_error,python_input_error)
+    SCRIPT_ERROR_TYPE(python_key_error,python_input_error)
+    SCRIPT_ERROR_TYPE(python_size_error,python_input_error)
+    SCRIPT_ERROR_TYPE(python_type_error,python_input_error)
 
     namespace details
     {

@@ -172,10 +172,7 @@ def build_context():
     return context
 
 cdef void cy_exec(char* exec_bytes):
-    try:
-        exec(exec_bytes.decode('utf-8'), build_context())
-    except Exception as e:
-        raise Exception('Failed to execute python string:\n\n{0}'.format(exec_bytes.decode("utf-8"))) from e
+    exec(exec_bytes.decode('utf-8'), build_context())
 
 def cy_eval(char* exec_bytes):
     try:

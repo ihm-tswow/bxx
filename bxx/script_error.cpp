@@ -1,11 +1,55 @@
 #include <bxx/script_error.hpp>
+#include <common/addon.hpp>
 #include <boost/stacktrace.hpp>
 #include <boost/stacktrace/detail/frame_msvc.ipp>
 
-#include <iostream>
+#include <sstream>
 
 #if _WIN32
 void boost::stacktrace::detail::bxx_append_library_path(com_holder<::IDebugSymbols>& idebug)
 {
+    std::string s;
+    ULONG buffer_size = 1024;
+    ULONG path_size;
+    s.resize(buffer_size);
+    for (;;)
+    {
+        idebug->GetSymbolPath(s.data(), buffer_size, &path_size);
+        if (path_size < buffer_size)
+        {
+            break;
+        }
+        buffer_size *= 2;
+        s.resize(buffer_size);
+    }
+
+    std::string lib_path = (std::filesystem::absolute(bxx::get_addon_path() / "lib")).string();
+    if (s.find(lib_path) == std::string::npos)
+    {
+        idebug->AppendSymbolPath(lib_path.c_str());
+    }
 }
 #endif
+
+static std::string format_script_error_string(std::string const& message, char const* file, char const* function, int line, boost::stacktrace::stacktrace stacktrace)
+{
+    std::stringstream sstream;
+
+    sstream
+        << "[Script Error]: "
+        << message
+        << "\n"
+        << function << "(" << file << ":" << line << ")\n\n"
+        << "Stack Trace:\n"
+        << stacktrace
+        ;
+
+    return sstream.str();
+}
+
+namespace bxx
+{
+    script_error_base::script_error_base(std::string const& message, char const* file, char const* function, int line)
+        : std::runtime_error(format_script_error_string(message,file,function,line,boost::stacktrace::stacktrace()))
+    {}
+}
