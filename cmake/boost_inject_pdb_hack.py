@@ -36,7 +36,7 @@ with open(frame_msvc,'r+') as f:
             error("could not find inject location")
 
         contents = contents.replace(CLASS_HOOK,'void bxx_append_library_path(com_holder<::IDebugSymbols>& idebug);\n'+CLASS_HOOK)
-        contents = contents.replace(INJECT_HOOK,'if('+INJECT_HOOK+') bxx_append_library_path(idebug)')
+        contents = contents.replace(INJECT_HOOK,'if(!'+INJECT_HOOK+') bxx_append_library_path(idebug)')
 
         f.seek(0)
         f.write(contents)
