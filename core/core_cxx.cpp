@@ -259,6 +259,16 @@ extern "C" {
                         catch (bxx::test_exception const&) {
                             failed_tests++;
                         }
+                        catch (std::exception const& exception)
+                        {
+                            std::cout << "Unhandled exception when running test " << full_name << ": " << exception.what() << "\n";
+                            failed_tests++;
+                        }
+                        catch (...)
+                        {
+                            std::cout << "Unhandled exception when running test " << full_name << " (unknown error)\n";
+                            failed_tests++;
+                        }
                     }
                 }
             }
