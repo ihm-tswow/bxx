@@ -256,7 +256,7 @@ extern "C" {
                             exec("bpy.ops.wm.read_homefile(use_empty=True)");
                             successful_tests++;
                         }
-                        catch (bxx::test_exception const& except) {
+                        catch (bxx::test_exception const&) {
                             failed_tests++;
                         }
                     }
@@ -270,9 +270,9 @@ extern "C" {
             return 1;
         }
 
-        int grays = 80 * float(skipped_tests) / float(total_tests);
-        int greens = 80 * float(successful_tests) / float(total_tests);
-        int reds = 80 * float(failed_tests) / float(total_tests);
+        int grays = int(80 * float(skipped_tests) / float(total_tests));
+        int greens = int(80 * float(successful_tests) / float(total_tests));
+        int reds = int(80 * float(failed_tests) / float(total_tests));
 
         std::cout << "\n";
         std::cout << bxx::color_code::RED;
