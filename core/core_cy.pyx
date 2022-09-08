@@ -19,7 +19,6 @@ from cpython.ref cimport PyObject
 ctypedef unsigned long long cy_ptr_ct;
 ctypedef void(*cy_exec_ct)(char*);
 ctypedef PyObject* (*cy_eval_ct)(char*);
-ctypedef void (*cy_unregister_script_ct)(size_t)
 ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
 ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
 ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
@@ -34,7 +33,6 @@ cdef extern void setup_cxx(
     char* path,
     cy_exec_ct cy_exec,
     cy_eval_ct cy_eval,
-    cy_unregister_script_ct cy_unregister_script,
     cy_create_float_buffer_ct cy_create_float_buffer,
     cy_apply_image_buffer_ct cy_apply_image_buffer,
     cy_delete_image_buffer_ct cy_delete_image_buffer,
@@ -87,7 +85,7 @@ def register_operator(script,operator,show):
     bpy.utils.register_class(operator)
     bpy.types.VIEW3D_MT_object.append(show)
 
-cdef void unregister_script(size_t script):
+def unregister_script(script):
     if script in registered_operators:
         for (op,show) in registered_operators[script]:
              bpy.types.VIEW3D_MT_object.remove(show)
@@ -154,6 +152,7 @@ cdef void delete_image_buffer(unsigned long long id):
 def build_context():
     context = {}
     context['bpy'] = bpy
+    context['unregister_script'] = unregister_script
     context['register_operator'] = register_operator
     context['register_class'] = register_class
     context['fire_event'] = fire_event
@@ -228,7 +227,6 @@ setup_cxx(
     get_addon_path().encode('utf-8'),
     cy_exec,
     cy_eval,
-    unregister_script,
     create_float_buffer,
     apply_image_buffer,
     delete_image_buffer

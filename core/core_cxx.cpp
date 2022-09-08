@@ -38,7 +38,6 @@ struct library_handle
 };
 
 void init_pointers_store(shared_functions* pointers);
-static cy_unregister_script_ct cy_unregister_script = nullptr;
 static shared_functions functions;
 static fs::path root_path;
 static std::vector<library_handle> libraries;
@@ -69,7 +68,7 @@ static void unload_script(library_handle & handle)
     {
         script_unregister();
     }
-    cy_unregister_script(handle.m_index);
+    exec("unregister_script({})", handle.m_index);
     SL_CLOSE(handle.m_library);
     handle.unload();
     fs::remove(handle.m_load_path);
@@ -153,7 +152,6 @@ extern "C" {
         char* path,
         cy_exec_ct exec,
         cy_eval_ct eval,
-        cy_unregister_script_ct unregister_script,
         cy_create_float_buffer_ct create_float_buffer,
         cy_apply_image_buffer_ct apply_image_buffer,
         cy_delete_image_buffer_ct delete_image_buffer
@@ -167,7 +165,6 @@ extern "C" {
             apply_image_buffer,
             delete_image_buffer
         };
-        cy_unregister_script = unregister_script;
         init_pointers_store(&functions);
     }
 
