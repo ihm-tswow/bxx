@@ -1,6 +1,7 @@
 #include <bxx/script.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
+#include <common/exec.hpp>
 #include <core/core_defines.hpp>
 
 static std::string script_name = "";
@@ -35,4 +36,13 @@ BXX_API PyObject* lib_fire_event(size_t index, PyObject* raw)
     PyObject* raw_res = res.get_pyobject();
     Py_IncRef(raw_res);
     return raw_res;
+}
+
+namespace bxx
+{
+    void register_cxx_function(std::string const& name, std::function<python_object(python_tuple args)> callback)
+    {
+        size_t event_id = lib_register_event(callback);
+        exec("register_cxx_function('{}', {}, {})", name.c_str(), get_script_index(), event_id);
+    }
 }

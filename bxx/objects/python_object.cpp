@@ -125,6 +125,19 @@ namespace bxx
         return std::string(chr);
     }
 
+    std::string python_object_base::type_str() const
+    {
+        if (!get_pyobject())
+        {
+            return "std::nullptr_t";
+        }
+        python_object type = python_object::steal(PyObject_Type(get_pyobject()));
+        python_object str = python_object::steal(PyObject_Str(type.get_pyobject()));
+        char const* chr = _PyUnicode_AsString(str);
+        return std::string(chr);
+    }
+
+
     void python_object_base::delattr(std::string const& arr)
     {
         BXX_SCRIPT_ASSERT(is_valid(), python_object_error, "tried to delete attribute {} on null python_object",arr.c_str());

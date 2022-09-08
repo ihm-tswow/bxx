@@ -124,6 +124,7 @@ namespace bxx
         size_t ref_count() const;
         std::string str() const;
         std::string repr() const;
+        std::string type_str() const;
         void delattr(std::string const& arr);
         bool hasattr(std::string const& arr) const;
 
@@ -210,6 +211,9 @@ namespace bxx
 
     template <typename ...Args>
     python_object eval_pyobject(fmt::format_string<Args...> str, Args...);
+
+    template <typename T = python_object, typename ...Args>
+    T call_python_function(std::string const& name, Args&&...);
 }
 
 #include <bxx/objects/python_object.ipp>

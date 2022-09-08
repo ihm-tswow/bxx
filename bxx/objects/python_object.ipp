@@ -105,8 +105,6 @@ namespace bxx
 
         python_object fn = getattr(method);
         BXX_SCRIPT_ASSERT(fn.get_pyobject(), python_key_error, "could not find python function {}", method.c_str());
-        BXX_SCRIPT_ASSERT(!PyFunction_Check(fn.get_pyobject()), python_type_error, "{} is not a function", method.c_str());
-
         python_object res = python_object::steal(PyObject_Call(fn, tup.get_pyobject(), nullptr));
         BXX_SCRIPT_ASSERT(res.get_pyobject(), internal_python_error, "failed to call function {}", method.c_str());
 
@@ -324,5 +322,11 @@ namespace bxx
         );
         BXX_SCRIPT_ASSERT(obj, python_object_error, "evaluated null PyObject");
         return obj;
+    }
+
+    template <typename T, typename ...Args>
+    T call_python_function(std::string const& name, Args&&... args)
+    {
+        return eval_pyobject("out = registered_python_functions").call<T>(name, std::forward<Args>(args)...);
     }
 }

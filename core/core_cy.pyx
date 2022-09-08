@@ -48,6 +48,10 @@ registered_property_groups = {}
 registered_app_handlers = {}
 registered_classes = {}
 
+class python_functions: pass
+registered_python_functions = python_functions() # maps function names -> function callback
+registered_cxx_functions = {}                                   # maps function names -> (script_id,event_id)
+
 # image buffers
 cdef array.array cur_pixels # image buffer create temp
 image_buffers = {}
@@ -80,6 +84,12 @@ def register_operator(script,operator,show):
     bpy.utils.register_class(operator)
     bpy.types.VIEW3D_MT_object.append(show)
 
+def register_cxx_function(name,script,event):
+    global registered_cxx_functions
+    if name in registered_cxx_functions:
+        raise Exception("c++ function " + name + " is already registered")
+    registered_cxx_functions[name] = (script,event)
+
 def unregister_script(script):
     if script in registered_operators:
         for (op,show) in registered_operators[script]:
@@ -101,6 +111,15 @@ def unregister_script(script):
         for cls in registered_classes[script]:
             bpy.utils.unregister_class(cls)
         registered_classes[script] = []
+
+    removed_names = []
+    for func_name,(func_script,func_event) in registered_cxx_functions.items():
+        if script == func_script:
+            removed_names.append(func_name)
+
+    for name in removed_names:
+        del registered_cxx_functions[name]
+
 
 def fire_event(script,event,*args):
     return <object> core_fire_event(script,event,<PyObject*>args)
@@ -146,6 +165,8 @@ def delete_float_buffer(id):
 def build_context():
     context = {}
     context['bpy'] = bpy
+    context['register_cxx_function'] = register_cxx_function
+    context['registered_python_functions'] = registered_python_functions
     context['unregister_script'] = unregister_script
     context['apply_image_buffer'] = apply_image_buffer
     context['delete_float_buffer'] = delete_float_buffer
