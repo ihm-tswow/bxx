@@ -20,7 +20,7 @@ ctypedef unsigned long long cy_ptr_ct;
 ctypedef void(*cy_exec_ct)(char*);
 ctypedef PyObject* (*cy_eval_ct)(char*);
 ctypedef void (*cy_unregister_script_ct)(size_t)
-ctypedef float* (*cy_create_image_buffer_ct)(unsigned long long,int,int)
+ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
 ctypedef void (*cy_apply_image_buffer_ct)(unsigned long long,char*)
 ctypedef void (*cy_delete_image_buffer_ct)(unsigned long long)
 
@@ -35,7 +35,7 @@ cdef extern void setup_cxx(
     cy_exec_ct cy_exec,
     cy_eval_ct cy_eval,
     cy_unregister_script_ct cy_unregister_script,
-    cy_create_image_buffer_ct cy_create_image_buffer,
+    cy_create_float_buffer_ct cy_create_float_buffer,
     cy_apply_image_buffer_ct cy_apply_image_buffer,
     cy_delete_image_buffer_ct cy_delete_image_buffer,
 );
@@ -127,10 +127,10 @@ def register_app_handler(script, target, func):
         registered_app_handlers[script] = []
     registered_app_handlers[script].append((target,func))
 
-cdef float* create_image_buffer(unsigned long long id, int width ,int height):
+cdef float* create_float_buffer(unsigned long long id, int size):
     global cur_pixels
     cur_pixels = array.array('f',[0])
-    array.resize(cur_pixels,width*height*4)
+    array.resize(cur_pixels,size)
     image_buffers[id] = cur_pixels
     return cur_pixels.data.as_floats
 
@@ -229,7 +229,7 @@ setup_cxx(
     cy_exec,
     cy_eval,
     unregister_script,
-    create_image_buffer,
+    create_float_buffer,
     apply_image_buffer,
     delete_image_buffer
 );

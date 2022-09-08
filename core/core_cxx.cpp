@@ -154,7 +154,7 @@ extern "C" {
         cy_exec_ct exec,
         cy_eval_ct eval,
         cy_unregister_script_ct unregister_script,
-        cy_create_image_buffer_ct create_image_buffer,
+        cy_create_float_buffer_ct create_float_buffer,
         cy_apply_image_buffer_ct apply_image_buffer,
         cy_delete_image_buffer_ct delete_image_buffer
     )
@@ -163,7 +163,7 @@ extern "C" {
         functions = {
             exec,
             eval,
-            create_image_buffer,
+            create_float_buffer,
             apply_image_buffer,
             delete_image_buffer
         };

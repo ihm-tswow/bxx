@@ -12,7 +12,7 @@ BXX_TEST(create_image)
     BXX_ASSERT_EQUAL(image.get_height(), 2);
 }
 
-BXX_TEST(create_image_buffer)
+BXX_TEST(create_float_buffer)
 {
     image_buffer buffer = image_buffer::create(10, 10);
 }

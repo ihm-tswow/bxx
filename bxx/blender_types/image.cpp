@@ -42,7 +42,7 @@ namespace bxx
     {
         static uint64_t index = 0;
         uint64_t cur_index = index++;
-        float* buffer = get_pointers()->cy_create_image_buffer(cur_index, width, height);
+        float* buffer = get_pointers()->cy_create_float_buffer(cur_index, width * height * 4);
         return image_buffer(buffer, cur_index, width, height);
     }
 
