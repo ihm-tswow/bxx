@@ -92,6 +92,7 @@ namespace bxx
 
         python_object fn = python_object::steal(PyObject_GetAttrString(get_pyobject(), method.c_str()));
         python_object res = python_object::steal(PyObject_Call(fn, arg_tup, kwarg_dict.has_value() ? kwarg_dict->get_pyobject() : nullptr));
+        BXX_SCRIPT_ASSERT(res.get_pyobject(), internal_python_error, "failed to call function {}", method.c_str());
         return details::py2cxx<T>(res);
     }
 
@@ -107,6 +108,8 @@ namespace bxx
         BXX_SCRIPT_ASSERT(!PyFunction_Check(fn.get_pyobject()), python_type_error, "{} is not a function", method.c_str());
 
         python_object res = python_object::steal(PyObject_Call(fn, tup.get_pyobject(), nullptr));
+        BXX_SCRIPT_ASSERT(res.get_pyobject(), internal_python_error, "failed to call function {}", method.c_str());
+
         return details::py2cxx<T>(res);
     }
 
@@ -114,6 +117,7 @@ namespace bxx
     inline T python_object_base::getattr(std::string const& arr) const
     {
         BXX_SCRIPT_ASSERT(is_valid(), python_object_error, "tried to get attribute {} on null python_object", arr.c_str());
+        BXX_SCRIPT_ASSERT(hasattr(arr), python_key_error, "tried to get missing python attribute {}", arr.c_str());
         python_object obj = python_object::steal(PyObject_GetAttrString(get_pyobject(), arr.c_str()));
         BXX_SCRIPT_ASSERT(obj.get_pyobject(), python_key_error, "could not find python attribute {}", arr.c_str());
         return details::py2cxx<T>(obj);

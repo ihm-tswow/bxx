@@ -127,7 +127,8 @@ namespace bxx
 
     void python_object_base::delattr(std::string const& arr)
     {
-        BXX_SCRIPT_ASSERT(is_valid(), python_object_error, "tried to delete attribute on null python_object");
+        BXX_SCRIPT_ASSERT(is_valid(), python_object_error, "tried to delete attribute {} on null python_object",arr.c_str());
+        BXX_SCRIPT_ASSERT(hasattr(arr), python_key_error, "tried to delete missing attribute {}",arr.c_str());
         int err = PyObject_DelAttrString(get_pyobject(), arr.c_str());
         BXX_SCRIPT_ASSERT(!err, python_key_error, "failed to delete python attribute {}", arr.c_str());
     }
