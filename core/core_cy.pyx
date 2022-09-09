@@ -187,10 +187,14 @@ cdef void cy_exec(char* exec_bytes):
 
 cdef PyObject* cy_eval(char* exec_bytes):
     global last_obj
-    context = build_context()
-    exec(exec_bytes.decode('utf-8'), context)
-    last_obj = context['out']
-    return <PyObject*> last_obj
+    try:
+        context = build_context()
+        exec(exec_bytes.decode('utf-8'), context)
+        last_obj = context['out']
+        return <PyObject*> last_obj
+    except Exception as e:
+        print(e)
+        return NULL
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
