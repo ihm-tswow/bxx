@@ -52,6 +52,7 @@ BXX_TEST(python_eval_errors)
     ASSERT_THROWS(eval_ptr<int>("raise Exception('')"), python_exec_error);
     ASSERT_THROWS(eval_pyobject("raise Exception('')"), python_exec_error);
     ASSERT_THROWS(eval_string("raise Exception('')"), python_exec_error);
+    ASSERT_THROWS(exec("raise Exception('')"), python_exec_error);
 
     ASSERT_THROWS(eval_int("out = None"), python_type_error);
     ASSERT_THROWS(eval_float("out = None"), python_type_error);

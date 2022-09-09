@@ -13,9 +13,11 @@ std::string join_strings(std::initializer_list<std::string> const& python)
 
 void exec(std::initializer_list<std::string> lines)
 {
-    get_pointers()->cy_exec(
-        const_cast<char*>(join_strings(lines).c_str())
+    std::string text = join_strings(lines);
+    int err = get_pointers()->cy_exec(
+        const_cast<char*>(text.c_str())
     );
+    BXX_SCRIPT_ASSERT(!err, python_exec_error,"Failed to execute python: {}",text.c_str());
 }
 
 int eval_int(std::initializer_list<std::string> lines)

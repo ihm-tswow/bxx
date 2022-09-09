@@ -17,7 +17,7 @@ from cpython.ref cimport PyObject
 
 # Library API
 ctypedef unsigned long long cy_ptr_ct;
-ctypedef void(*cy_exec_ct)(char*);
+ctypedef int(*cy_exec_ct)(char*);
 ctypedef PyObject* (*cy_eval_ct)(char*);
 ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
 
@@ -182,8 +182,13 @@ def build_context():
     context['get_addon_path'] = get_addon_path
     return context
 
-cdef void cy_exec(char* exec_bytes):
-    exec(exec_bytes.decode('utf-8'), build_context())
+cdef int cy_exec(char* exec_bytes):
+    try:
+        exec(exec_bytes.decode('utf-8'), build_context())
+        return 0
+    except Exception as e:
+        print(e)
+        return -1
 
 cdef PyObject* cy_eval(char* exec_bytes):
     global last_obj
