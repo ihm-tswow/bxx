@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bxx/script_error.hpp>
+#include <common/script_error.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/mathutils.hpp>
 #include <common/shared_functions.hpp>

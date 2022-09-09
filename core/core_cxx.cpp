@@ -41,6 +41,7 @@ void init_pointers_store(shared_functions* pointers);
 static shared_functions functions;
 static fs::path root_path;
 static std::vector<library_handle> libraries;
+extern std::string cached_library_path;
 
 static auto find_library(std::string const& name)
 {
@@ -162,6 +163,7 @@ extern "C" {
             create_float_buffer
         };
         init_pointers_store(&functions);
+        cached_library_path = (bxx::get_addon_path() / "lib").string();
     }
 
     void auto_reload_cxx()

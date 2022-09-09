@@ -1,9 +1,17 @@
 #pragma once
 
+#include <common/script_error.hpp>
+
+#include <Python.h>
+
 #ifndef FMT_HEADER_ONLY
 #define FMT_HEADER_ONLY
 #endif
 #include <fmt/core.h>
+
+class python_input_error: public bxx::input_error { using bxx::input_error::input_error; };
+class python_type_error: public python_input_error { using python_input_error::python_input_error; };
+class python_exec_error: public python_input_error { using python_input_error::python_input_error; };
 
 std::string join_strings(std::initializer_list<std::string> const& python);
 

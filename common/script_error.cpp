@@ -1,4 +1,4 @@
-#include <bxx/script_error.hpp>
+#include <common/script_error.hpp>
 #include <common/addon.hpp>
 #include <boost/stacktrace.hpp>
 #include <boost/stacktrace/detail/frame_msvc.ipp>

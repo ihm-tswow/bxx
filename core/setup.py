@@ -16,6 +16,7 @@ source_files = [
     '../common/exec.cpp',
     '../common/addon.cpp',
     '../common/util.cpp',
+    '../common/script_error.cpp',
     'core_cxx.cpp',
     'core_cy.pyx',
 ]

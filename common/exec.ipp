@@ -34,8 +34,11 @@ T* eval_ptr(fmt::format_string<Args...> str, Args... args)
 template <typename T>
 T* eval_ptr(std::initializer_list<std::string> lines)
 {
-    // todo: move cast to c
-    return (T*) get_pointers()->cy_eval_ptr(
+    std::string text = join_strings(lines);
+    PyObject* obj = get_pointers()->cy_eval(
         const_cast<char*>(join_strings(lines).c_str())
     );
+    BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python pointer (script error): {}", text.c_str());
+    BXX_SCRIPT_ASSERT(PyLong_Check(obj), python_type_error, "Failed to evaluate python pointer (incorrect type): {}", text.c_str());
+    return reinterpret_cast<T*>(PyLong_AsUnsignedLongLong(obj));
 }

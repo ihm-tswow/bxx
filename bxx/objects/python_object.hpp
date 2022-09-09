@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bxx/script_error.hpp>
+#include <common/script_error.hpp>
+#include <common/exec.hpp>
 
 #include <Python.h>
 #include <fmt/core.h>
@@ -168,12 +169,9 @@ namespace bxx
     };
 
     SCRIPT_ERROR_TYPE(internal_python_error, internal_error)
-
-    SCRIPT_ERROR_TYPE(python_input_error, input_error)
     SCRIPT_ERROR_TYPE(python_object_error,python_input_error)
     SCRIPT_ERROR_TYPE(python_key_error,python_input_error)
     SCRIPT_ERROR_TYPE(python_size_error,python_input_error)
-    SCRIPT_ERROR_TYPE(python_type_error,python_input_error)
 
     namespace details
     {

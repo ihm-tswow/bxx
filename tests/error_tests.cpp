@@ -1,4 +1,5 @@
 #include <bxx/objects/python_object.hpp>
+#include <common/exec.hpp>
 #include <common/tests.hpp>
 
 using namespace bxx;
@@ -30,6 +31,7 @@ BXX_TEST(python_key_errors)
     ASSERT_THROWS(obj.get_item("key"), python_key_error)
     ASSERT_THROWS(obj.delattr("key"), python_key_error)
 }
+
 BXX_TEST(python_type_errors)
 {
     python_object s("hello");
@@ -41,4 +43,12 @@ BXX_TEST(python_type_errors)
     ASSERT_THROWS(details::py2cxx<double>(s), python_type_error);
     ASSERT_THROWS(details::py2cxx<float>(s), python_type_error);
     ASSERT_THROWS(details::py2cxx<std::string>(i), python_type_error);
+}
+
+BXX_TEST(python_eval_errors)
+{
+    ASSERT_THROWS(eval_int("out = None"), python_type_error);
+    ASSERT_THROWS(eval_float("out = None"), python_type_error);
+    ASSERT_THROWS(eval_ptr<int>("out = None"), python_type_error);
+    ASSERT_THROWS(eval_string("out = None"), python_type_error);
 }

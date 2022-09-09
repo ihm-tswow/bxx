@@ -1,6 +1,6 @@
 #include <bxx/objects/python_object.hpp>
-#include <bxx/script_error.hpp>
 #include <bxx/mathutils.hpp>
+#include <common/script_error.hpp>
 #include <common/exec.hpp>
 
 namespace bxx
