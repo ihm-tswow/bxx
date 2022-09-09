@@ -67,7 +67,7 @@ namespace bxx
 
     void python_builder::exec()
     {
-        ::exec({ m_code });
+        bxx::exec({ m_code });
     }
 
     std::string python_builder::get_code()

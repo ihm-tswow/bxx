@@ -51,7 +51,7 @@ static auto find_library(std::string const& name)
 static std::string get_library_extension()
 {
     // todo: this is wrong on 2.79b
-    static std::string blender_version = eval_string(
+    static std::string blender_version = bxx::eval_string(
         "out = "
         "str(bpy.app.version[0]) + '.' +"
         "str(bpy.app.version[1]) + '.' +"
@@ -69,7 +69,7 @@ static void unload_script(library_handle & handle)
     {
         script_unregister();
     }
-    exec("unregister_script({})", handle.m_index);
+    bxx::exec("unregister_script({})", handle.m_index);
     SL_CLOSE(handle.m_library);
     handle.unload();
     fs::remove(handle.m_load_path);
@@ -202,7 +202,7 @@ extern "C" {
 
     int run_tests(char* include, char* exclude)
     {
-        exec("bpy.ops.wm.read_homefile(use_empty=True)");
+        bxx::exec("bpy.ops.wm.read_homefile(use_empty=True)");
         std::cout
             << "\n\n"
             << "Running Tests: "
@@ -255,7 +255,7 @@ extern "C" {
                         try
                         {
                             col->m_entries[i].test_ptr();
-                            exec("bpy.ops.wm.read_homefile(use_empty=True)");
+                            bxx::exec("bpy.ops.wm.read_homefile(use_empty=True)");
                             successful_tests++;
                         }
                         catch (bxx::test_exception const&) {
