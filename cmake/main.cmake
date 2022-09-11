@@ -383,8 +383,8 @@ function(generate_blender_version build_version)
   endforeach()
 
   get_filename_component(addon_name ${CMAKE_INSTALL_PREFIX} NAME)
-  list(APPEND INSTALL_TEST_COMMANDS "file(COPY \"${CMAKE_INSTALL_PREFIX}\" DESTINATION \"${${BLENDER_BIN_ID}_SOURCE_DIR}/3.0/scripts/addons\")")
-  list(APPEND INSTALL_TEST_COMMANDS "execute_process(COMMAND \"${BLENDER_BIN}\" -b -P \"${${BLENDER_BIN_ID}_SOURCE_DIR}/3.0/scripts/addons/${addon_name}/bxx/cmake/bl_run_tests.py\")")
+  list(APPEND INSTALL_TEST_COMMANDS "file(COPY \"${CMAKE_INSTALL_PREFIX}\" DESTINATION \"${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/scripts/addons\")")
+  list(APPEND INSTALL_TEST_COMMANDS "execute_process(COMMAND \"${BLENDER_BIN}\" -b -P \"${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/scripts/addons/${addon_name}/bxx/cmake/bl_run_tests.py\")")
   set(INSTALL_TEST_COMMANDS ${INSTALL_TEST_COMMANDS} PARENT_SCOPE)
 endfunction()
 
