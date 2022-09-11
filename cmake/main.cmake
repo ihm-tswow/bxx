@@ -207,11 +207,9 @@ function(generate_blender_version build_version)
       OUTPUT_VARIABLE EFFECTIVE_PYTHON_LIB
     )
 
-    execute_process(
-      COMMAND
-        ${PYTHON_BIN}
-        ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/boost_inject_pdb_hack.py
-        ${boost_SOURCE_DIR}
+    configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/bxx/third_party/frame_msvc.ipp
+      ${boost_SOURCE_DIR}/boost/stacktrace/detail/frame_msvc.ipp
     )
   endif()
 
