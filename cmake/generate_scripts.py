@@ -75,5 +75,3 @@ def generate_dir(script_root):
 
 for directory in os.listdir('scripts'):
     generate_dir(os.path.join('scripts',directory))
-
-generate_dir('bxx/tests')
