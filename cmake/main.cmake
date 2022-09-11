@@ -381,7 +381,6 @@ function(generate_blender_version build_version)
   foreach(child ${children})
     make_script_target(${child} ${child} "scripts" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
   endforeach()
-  make_script_target("bxx-tests" "tests" "bxx" "${CMAKE_CURRENT_SOURCE_DIR}/bxx/tests")
 
   get_filename_component(addon_name ${CMAKE_INSTALL_PREFIX} NAME)
   list(APPEND INSTALL_TEST_COMMANDS "file(COPY \"${CMAKE_INSTALL_PREFIX}\" DESTINATION \"${${BLENDER_BIN_ID}_SOURCE_DIR}/3.0/scripts/addons\")")
