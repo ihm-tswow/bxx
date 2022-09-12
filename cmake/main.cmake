@@ -94,32 +94,20 @@ function(generate_blender_version build_version)
   #
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   if(WIN32)
-    if(RUN_TESTS_ON_INSTALL)
-      # todo: if doing this, don't grab python again
-      set(BLENDER_BIN_ID blender-${build_version}-bin)
-      FetchContent_Declare(
-        ${BLENDER_BIN_ID}
-        URL ${BLENDER_WINDOWS_BIN}
-      )
-      if(NOT ${BLENDER_VERSION}-bin_POPULATED)
-        message(STATUS "Installing Blender binaries")
-        FetchContent_Populate(${BLENDER_BIN_ID})
-      endif()
-      set(BLENDER_BIN ${${BLENDER_BIN_ID}_SOURCE_DIR}/blender.exe)
-    endif()
-
+    set(BLENDER_BIN_ID blender-${build_version}-bin)
     FetchContent_Declare(
-      ${PYTHON_ID}
-      URL ${PYTHON_WINDOWS_BIN_DOWNLOAD}
+      ${BLENDER_BIN_ID}
+      URL ${BLENDER_WINDOWS_BIN}
     )
-    FetchContent_GetProperties(${PYTHON_ID})
-    if(NOT ${PYTHON_ID}_POPULATED)
-      message(STATUS "Installing python")
-      FetchContent_Populate(${PYTHON_ID})
+    if(NOT ${BLENDER_VERSION}-bin_POPULATED)
+      message(STATUS "Installing Blender binaries")
+      FetchContent_Populate(${BLENDER_BIN_ID})
     endif()
+    set(BLENDER_BIN ${${BLENDER_BIN_ID}_SOURCE_DIR}/blender.exe)
 
-    set(PYTHON_PATH ${${PYTHON_ID}_SOURCE_DIR})
-    set(PYTHON_BIN ${PYTHON_PATH}/python.exe)
+    set(PYTHON_PATH ${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/python)
+    set(PYTHON_BIN ${PYTHON_PATH}/bin/python.exe)
+
     file(DOWNLOAD
       "${PIP_DOWNLOAD}"
       "${PYTHON_PATH}/get-pip.py"
@@ -147,8 +135,8 @@ function(generate_blender_version build_version)
       message(STATUS "Installing python development files")
       FetchContent_Populate(${PYTHON_SOURCE})
     endif()
-    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/libs DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
-    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/include DESTINATION ${${PYTHON_ID}_SOURCE_DIR})
+    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/libs DESTINATION ${PYTHON_PATH})
+    file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/include DESTINATION ${PYTHON_PATH})
   endif()
 
   if(UNIX AND NOT APPLE)
@@ -195,7 +183,7 @@ function(generate_blender_version build_version)
     endif()
   endif()
 
-  set(Python_ROOT_DIR ${${PYTHON_SOURCE}_SOURCE_DIR})
+  set(Python_ROOT_DIR ${${PYTHON_SOURCE}_SOURCE_DIR}/tools)
   find_package(Python COMPONENTS Development)
 
   if (WIN32)
