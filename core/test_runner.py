@@ -3,7 +3,7 @@ from .core_cy import cy_run_tests
 from .util import get_addon_name
 
 class test_runner(bpy.types.Operator):
-    bl_idname = 'object.unit_tests_{0}'.format(get_addon_name().replace('.','_'))
+    bl_idname = 'object.unit_tests_{0}'.format(get_addon_name().replace('.','_').replace('-','_'))
     bl_label = 'Unit Tests: {0}'.format(get_addon_name())
     bl_options = {'REGISTER','UNDO'}
 
