@@ -23,7 +23,7 @@ namespace bxx
         : class_header_builder(id_to_class_name(bl_id))
         , m_registers(registers)
     {
-        m_bl_id = bl_id;
+        m_bl_id = "object." + bl_id;
         set_class_variable("bl_description", "description");
         set_class_variable("bl_options", [](set_builder& set) { set
             .set_bracket_type(python_builder::squiggly_brackets)
