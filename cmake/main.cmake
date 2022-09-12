@@ -1,7 +1,17 @@
 include(FetchContent)
 include(bxx/cmake/blender_versions.cmake)
 
+set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/install" CACHE PATH "Installation directory")
+set(BXX_ZIP_INSTALL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/install.zip" CACHE PATH "Installation zip")
+
 set(INSTALL_TEST_COMMANDS "")
+string(REPLACE "\\" "/" ESCAPED_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+string(REPLACE "\\" "/" ESCAPED_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+string(REPLACE "\\" "/" ESCAPED_ZIP_INSTALL_PATH ${BXX_ZIP_INSTALL_PATH})
+set(ESCAPED_PYTHON_BIN "")
+get_filename_component(BXX_ADDON_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+option(RUN_TESTS_ON_INSTALL "Whether to run automatic tests when the addon is installed" ON)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -31,7 +41,12 @@ FetchContent_Declare(
   GIT_TAG 1a57977ea3a286206b800e3e3fd79faa6f6e7404
 )
 
+message(STATUS "Installing bxx global dependencies")
 FetchContent_MakeAvailable(fmt json magic_enum boost)
+set_property(DIRECTORY ${fmt_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
+set_property(DIRECTORY ${json_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
+set_property(DIRECTORY ${magic_enum_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
+
 set_target_properties(fmt PROPERTIES FOLDER "Libraries")
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -100,13 +115,15 @@ function(generate_blender_version build_version)
       URL ${BLENDER_WINDOWS_BIN}
     )
     if(NOT ${BLENDER_VERSION}-bin_POPULATED)
-      message(STATUS "Installing Blender binaries")
+      message(STATUS "    Installing Blender binaries")
       FetchContent_Populate(${BLENDER_BIN_ID})
     endif()
     set(BLENDER_BIN ${${BLENDER_BIN_ID}_SOURCE_DIR}/blender.exe)
 
     set(PYTHON_PATH ${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/python)
     set(PYTHON_BIN ${PYTHON_PATH}/bin/python.exe)
+    string(REPLACE "\\" "/" ESCAPED_PYTHON_BIN ${PYTHON_BIN})
+    set(ESCAPED_PYTHON_BIN ${ESCAPED_PYTHON_BIN} PARENT_SCOPE)
 
     file(DOWNLOAD
       "${PIP_DOWNLOAD}"
@@ -115,13 +132,13 @@ function(generate_blender_version build_version)
 
     if(EXISTS ${PYTHON_PATH}/Lib/site-packages/pip)
     else()
-      message(STATUS "Installing pip")
+      message(STATUS "    Installing pip")
       execute_process(COMMAND ${PYTHON_BIN} ${PYTHON_PATH}/get-pip.py)
     endif()
     file(WRITE ${PYTHON_PATH}/python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}._pth "python39.zip\n.\nLib\\site-packages")
     if(EXISTS ${PYTHON_PATH}/Lib/site-packages/Cython)
     else()
-      message(STATUS "Installing cython")
+      message(STATUS "    Installing cython")
       execute_process(COMMAND ${PYTHON_PATH}/python.exe -m pip install cython)
     endif()
 
@@ -132,7 +149,7 @@ function(generate_blender_version build_version)
     )
     FetchContent_GetProperties(${PYTHON_ID}_dev)
     if(NOT ${PYTHON_SOURCE}_POPULATED)
-      message(STATUS "Installing python development files")
+      message(STATUS "    Installing python development files")
       FetchContent_Populate(${PYTHON_SOURCE})
     endif()
     file(COPY ${${PYTHON_SOURCE}_SOURCE_DIR}/tools/libs DESTINATION ${PYTHON_PATH})
@@ -148,7 +165,7 @@ function(generate_blender_version build_version)
     )
     FetchContent_GetProperties(${BLENDER_BIN_ID})
     if(NOT ${BLENDER_BIN_ID}_POPULATED)
-      message(STATUS "Installing python (via blender)")
+      message(STATUS "    Installing python (via blender)")
       FetchContent_Populate(${BLENDER_BIN_ID})
     endif()
     set(BLENDER_BIN ${BLENDER_BIN_ID}/blender)
@@ -178,7 +195,7 @@ function(generate_blender_version build_version)
     )
     FetchContent_GetProperties(${PYTHON_SOURCE})
     if(NOT ${PYTHON_SOURCE}_POPULATED)
-      message(STATUS "Installing python development files")
+      message(STATUS "    Installing python development files")
       FetchContent_Populate(${PYTHON_SOURCE})
     endif()
   endif()
@@ -229,7 +246,7 @@ function(generate_blender_version build_version)
   )
   FetchContent_GetProperties(blender)
   if(NOT ${BLENDER_ID}_POPULATED)
-    message(STATUS "Instaling blender sources")
+    message(STATUS "    Instaling blender sources")
     FetchContent_Populate(${BLENDER_ID})
   endif()
 
@@ -369,10 +386,20 @@ function(generate_blender_version build_version)
   foreach(child ${children})
     make_script_target(${child} ${child} "scripts" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/${child}")
   endforeach()
+  string(REPLACE "\\" "/" ESCAPED_BLENDER_BIN ${BLENDER_BIN})
+  string(REPLACE "\\" "/" ESCAPED_BLENDER_SRC ${${BLENDER_BIN_ID}_SOURCE_DIR})
 
-  get_filename_component(addon_name ${CMAKE_INSTALL_PREFIX} NAME)
-  list(APPEND INSTALL_TEST_COMMANDS "file(COPY \"${CMAKE_INSTALL_PREFIX}\" DESTINATION \"${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/scripts/addons\")")
-  list(APPEND INSTALL_TEST_COMMANDS "execute_process(COMMAND \"${BLENDER_BIN}\" -b -P \"${${BLENDER_BIN_ID}_SOURCE_DIR}/${BLENDER_VERSION_SHORT}/scripts/addons/${addon_name}/bxx/cmake/bl_run_tests.py\")")
+  string(REPLACE "." "_" FIXED_ADDON_NAME ${BXX_ADDON_NAME})
+  string(REPLACE "-" "_" FIXED_ADDON_NAME ${BXX_ADDON_NAME})
+
+  list(APPEND INSTALL_TEST_COMMANDS "
+    message(\"Running unit tests for blender version ${BLENDER_VERSION}\")
+    execute_process(COMMAND \"${ESCAPED_PYTHON_BIN}\" \"${ESCAPED_CURRENT_SOURCE_DIR}/bxx/cmake/install_version.py\" \"${ESCAPED_INSTALL_PREFIX}\" \"${ESCAPED_BLENDER_SRC}/${BLENDER_VERSION_SHORT}/scripts/addons/${BXX_ADDON_NAME}\")
+    execute_process(COMMAND \"${ESCAPED_BLENDER_BIN}\" -b -P \"${ESCAPED_BLENDER_SRC}/${BLENDER_VERSION_SHORT}/scripts/addons/${BXX_ADDON_NAME}/bxx/cmake/bl_run_tests.py\" RESULT_VARIABLE BXX_TEST_RESULT)
+    if(\${BXX_TEST_RESULT})
+      message(SEND_ERROR \"Tests failed for blender version ${BLENDER_VERSION_SHORT}\")
+    endif()
+  ")
   set(INSTALL_TEST_COMMANDS ${INSTALL_TEST_COMMANDS} PARENT_SCOPE)
 endfunction()
 
@@ -382,43 +409,16 @@ endfunction()
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-install(
-  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bxx"
-  DESTINATION "./"
-  PATTERN "*/build" EXCLUDE
-  PATTERN "*core.c" EXCLUDE
-  PATTERN "*.git" EXCLUDE
-)
-
-install(
-  FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/__init__.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/preferences.py"
-  DESTINATION "./"
-)
-
-install(
-  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts"
-  DESTINATION "./"
-)
-
-install(
-  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
-  DESTINATION "./"
-  FILES_MATCHING
-    PATTERN "*.dll"
-    PATTERN "*.so"
-    PATTERN "*.dylib"
-)
-
 function(finish_bxx_generate)
-  if(RUN_TESTS_ON_INSTALL)
-    foreach(command ${INSTALL_TEST_COMMANDS})
-      string(REPLACE "\\" "/" command ${command})
-      install(
-        CODE ${command}
-      )
-    endforeach()
-  endif()
-  string(REPLACE "\\" "/" CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+  install(CODE "
+    message(\"Installing and bundling addon ${BXX_ADDON_NAME} \")
+    execute_process(COMMAND \"${ESCAPED_PYTHON_BIN}\" \"${ESCAPED_CURRENT_SOURCE_DIR}/bxx/cmake/install.py\" \"${ESCAPED_CURRENT_SOURCE_DIR}\" \"${ESCAPED_INSTALL_PREFIX}\" \"${ESCAPED_ZIP_INSTALL_PATH}\" RESULT_VARIABLE BXX_INSTALL_RESULT ERROR_VARIABLE BXX_INSTALL_ERROR)
+    if(\${BXX_INSTALL_RESULT})
+      message(FATAL_ERROR \"Failed to install bxx addon:\n\${BXX_INSTALL_ERROR}\")
+    endif()
+  ")
+
+  foreach(command ${INSTALL_TEST_COMMANDS})
+    install( CODE ${command} )
+  endforeach()
 endfunction()
