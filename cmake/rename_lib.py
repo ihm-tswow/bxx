@@ -32,7 +32,7 @@ pdb_dest = os.path.join(lib_dir,os.path.basename(pdb_source))
 
 def write_lib():
     shutil.copyfile(build_file,os.path.join(lib_dir,lib_name + ext))
-    if platform.system() == 'Windows':
+    if platform.system() == 'Windows' and os.path.exists(pdb_source):
         shutil.copyfile(pdb_source,pdb_dest)
 
 if os.path.exists(AUTO_RELOAD_CONFIG_FILE):
