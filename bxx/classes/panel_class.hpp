@@ -28,7 +28,6 @@ namespace bxx
             builder.set_draw([this](python_object self, python_object ctx) {
                 T(self).draw(ctx);
             });
-            /*
             builder.set_draw_header([this](python_object self, python_object ctx) {
                 T(self).draw_header(ctx);
             });
@@ -36,7 +35,6 @@ namespace bxx
             {
                 builder.set_poll(poll);
             }
-            */
         }
     };
 }
