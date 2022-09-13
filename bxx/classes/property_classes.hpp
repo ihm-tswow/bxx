@@ -201,7 +201,8 @@ namespace bxx
                     name_entry,
                     meta.m_name,
                     meta.m_description,
-                    meta.m_icon
+                    meta.m_icon,
+                    static_cast<std::int64_t>(enums[i])
                 ));
             }
             builder.add_enum_property(m_id, name.value, copy, description.value);
@@ -242,7 +243,7 @@ namespace bxx
                     meta.m_name,
                     meta.m_description,
                     meta.m_icon,
-                    static_cast<int>(enums[i])
+                    static_cast<std::int64_t>(enums[i])
                 ));
             }
             builder.add_mask_property(m_id, name.value, {}, copy, description.value);
