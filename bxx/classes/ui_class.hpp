@@ -27,7 +27,7 @@ namespace bxx
     class ui_class : public python_object
     {
     public:
-        PYFIELD(ui_layout, layout);
+        PYFIELD(ui_layout, layout)
         virtual std::string get_class_name() = 0;
         virtual std::string display_name() { return get_class_name(); }
     protected:
