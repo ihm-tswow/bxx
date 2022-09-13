@@ -35,7 +35,7 @@ namespace bxx
 
     panel_builder& panel_builder::set_context(bl_context context)
     {
-        set_class_variable("context", std::string(magic_enum::enum_name<bl_context>(context)));
+        set_class_variable("bl_context", std::string(magic_enum::enum_name<bl_context>(context)));
         return *this;
     }
 
