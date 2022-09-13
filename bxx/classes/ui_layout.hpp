@@ -7,6 +7,7 @@
 
 namespace bxx
 {
+    /*
     enum class alignment
     {
         EXPAND,
@@ -14,6 +15,7 @@ namespace bxx
         CENTER,
         RIGHT
     };
+    */
 
     enum class direction
     {
@@ -27,11 +29,10 @@ namespace bxx
         ui_layout(PyObject* obj)
             : python_object(obj)
         {}
-
         PYFIELD(bool, active)
         PYFIELD(bool, enabled)
 
-        PYFIELD_STRINGENUM(alignment, alignment)
+        //PYFIELD_STRINGENUM(alignment, alignment)
         PYFIELD_STRINGENUM(direction, direction)
 
         template <typename ...Args>
@@ -39,7 +40,6 @@ namespace bxx
         {
             call<python_object>("prop", base.get_owner(), base.get_id(), args...);
         }
-
         template <typename ...Args>
         void label(std::string const& text, Args&&... args)
         {
