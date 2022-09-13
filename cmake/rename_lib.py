@@ -31,8 +31,11 @@ pdb_source = build_file[prefix_len:-len(ext)] + ".pdb"
 pdb_dest = os.path.join(lib_dir,os.path.basename(pdb_source))
 
 def write_lib():
-    shutil.copyfile(build_file,os.path.join(lib_dir,lib_name + ext))
+    out_lib_file = os.path.join(lib_dir,lib_name + ext)
+    print("Copying library {0} -> {1}".format(build_file,out_lib_file))
+    shutil.copyfile(build_file,out_lib_file)
     if platform.system() == 'Windows' and os.path.exists(pdb_source):
+        print("Copying pdb {0} -> {1}".format(pdb_source,pdb_dest))
         shutil.copyfile(pdb_source,pdb_dest)
 
 if os.path.exists(AUTO_RELOAD_CONFIG_FILE):
