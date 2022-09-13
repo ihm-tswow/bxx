@@ -38,7 +38,8 @@ namespace bxx
         Scene,
         Light,
         Material,
-        Image
+        Image,
+        EditBone
     };
 
     template <typename T>
