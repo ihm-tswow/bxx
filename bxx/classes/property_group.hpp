@@ -21,13 +21,13 @@
     cls(PyObject* obj)\
         : __VA_ARGS__\
     {\
-        details::replace_python_object(*this,obj);\
+        bxx::details::replace_python_object(*this,obj);\
     }\
     template <typename T>\
     cls(T obj)\
         : __VA_ARGS__\
     {\
-        details::replace_python_object(*this,obj.getattr<python_object>(#cls).get_pyobject());\
+        bxx::details::replace_python_object(*this,obj.getattr<python_object>(#cls).get_pyobject());\
     }
 
 namespace bxx

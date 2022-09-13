@@ -9,7 +9,7 @@
     classname() = default;\
     classname(python_object obj)\
     {\
-        details::replace_python_object(*this,obj.get_pyobject());\
+        bxx::details::replace_python_object(*this,obj.get_pyobject());\
     }\
     \
     std::string get_class_name()\

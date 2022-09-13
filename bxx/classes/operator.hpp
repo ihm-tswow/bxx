@@ -17,7 +17,7 @@
     cls(PyObject* obj)\
         : __VA_ARGS__\
     {\
-        details::replace_python_object(*this, obj);\
+        bxx::details::replace_python_object(*this, obj);\
     }
 
 #define OPERATOR_NO_PROPS(cls)\
@@ -32,7 +32,7 @@
     cls() {}\
     cls(PyObject* obj)\
     {\
-        details::replace_python_object(*this,obj);\
+        bxx::details::replace_python_object(*this,obj);\
     }\
 
 namespace bxx
