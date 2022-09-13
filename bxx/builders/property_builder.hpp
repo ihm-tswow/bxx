@@ -220,6 +220,49 @@ namespace bxx
             });
         }
 
+        T& add_mask_property(std::string const& id, std::string const& name, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::string const& description = "")
+        {
+            return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
+                .add_option("name", name)
+                .add_option("description", description)
+                .add_option("options", [&](set_builder& builder) { builder
+                    .set_bracket_type(python_builder::squiggly_brackets)
+                    .insert("ENUM_FLAG")
+                    ;
+                })
+                .add_option("items", [&](list_builder& builder) {
+                    std::int64_t curMax = 0;
+                    for (enum_entry const& entry : values)
+                    {
+                        builder.add([&](list_builder& map) { map
+                            .set_bracket_type(python_builder::round_brackets)
+                            .add(entry.m_id)
+                            .add(entry.m_name)
+                            .add(entry.m_description)
+                            .add(entry.m_icon)
+                            ;
+                            if (entry.m_value.has_value())
+                            {
+                                curMax = entry.m_value.value();
+                            }
+                            map.add(curMax++);
+                        });
+                    }
+                })
+                ;
+
+                if (def.size() > 0)
+                {
+                    entry.add_option("default", [&](set_builder& builder) {
+                        for (std::string const& str : def)
+                        {
+                            builder.insert(str);
+                        }
+                    });
+                }
+            });
+        }
+
         T& add_enum_property(std::string const& id, std::string const& name, std::string const& def, std::vector<enum_entry> const& values, std::string const& description = "")
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry

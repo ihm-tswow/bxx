@@ -207,4 +207,45 @@ namespace bxx
             builder.add_enum_property(m_id, name.value, copy, description.value);
         }
     };
+
+    template <
+        typename T,
+        string_literal name,
+        string_literal description = "",
+        enum_meta(*meta_producer)(T) = nullptr
+    >
+    class mask_property : public property_base
+    {
+    public:
+        mask_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+
+        T get_value()
+        {
+            PyObject* attr = PyObject_GetAttrString(m_owner->get_pyobject(), m_id);
+            char const* c = _PyUnicode_AsString(attr);
+            return magic_enum::enum_cast<T>(c).value();
+        }
+
+    protected:
+        void write_to(class_property_builder& builder) final
+        {
+            auto enums = magic_enum::enum_values<T>();
+            std::vector<enum_entry> copy;
+            for (size_t i = 0; i < enums.size(); ++i)
+            {
+                std::string name_entry(magic_enum::enum_name<T>(enums[i]));
+                enum_meta meta = meta_producer ? meta_producer(enums[i]) : enum_meta(name_entry);
+                copy.push_back(enum_entry(
+                    name_entry,
+                    meta.m_name,
+                    meta.m_description,
+                    meta.m_icon,
+                    static_cast<int>(enums[i])
+                ));
+            }
+            builder.add_mask_property(m_id, name.value, {}, copy, description.value);
+        }
+    };
 }
