@@ -16,6 +16,8 @@
 
 namespace bxx
 {
+    PYFIELD_STRINGENUM_IMPL(object,object_type,type)
+
     object_children object::children()
     {
         return getattr<object_children>("children");

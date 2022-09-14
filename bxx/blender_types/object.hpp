@@ -15,11 +15,30 @@ namespace bxx
     class vertex_groups;
     class object_children;
 
+    enum class object_type
+    {
+        MESH,
+        CURVE,
+        SURFACE,
+        META,
+        FONT,
+        ARMATURE,
+        LATTICE,
+        EMPTY,
+        GPENCIL,
+        CAMERA,
+        LIGHT,
+        SPEAKER,
+        LIGHT_PROBE
+    };
+
     class object : public id<bl_object>
     {
     public:
         PYFIELD(bool, selected)
         PYFIELD(object, parent)
+        PYFIELD_STRINGENUM_DECL(object_type,type)
+
         using id<bl_object>::id;
         vec3 location();
         vec3 rotation_euler();
