@@ -160,6 +160,23 @@ namespace bxx
         PyObject_SetItem(get_pyobject(), str, details::cxx2py(value, false));
     }
 
+    template <typename T>
+    void python_object_base::for_each(std::function<void(T)> callback)
+    {
+        BXX_SCRIPT_ASSERT(is_valid(), python_object_error, "tried to iterate null python_object");
+        python_object itr = python_object::steal(PyObject_GetIter(get_pyobject()));
+        BXX_SCRIPT_ASSERT(itr.get_pyobject(), internal_python_error, "failed to create python iterator");
+        for (;;)
+        {
+            python_object val = python_object::steal(PyIter_Next(itr.get_pyobject()));
+            if (!val.get_pyobject())
+            {
+                break;
+            }
+            callback(val);
+        }
+    }
+
     template <> inline bool python_object::is<bool>()
     {
         return PyBool_Check(get_pyobject());

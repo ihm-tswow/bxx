@@ -7,6 +7,7 @@
 #include <fmt/core.h>
 
 #include <string>
+#include <functional>
 
 // PYFIELD
 
@@ -130,6 +131,9 @@ namespace bxx
         bool hasattr(std::string const& arr) const;
 
         bool is_valid() const;
+
+        template <typename T = python_object>
+        void for_each(std::function<void(T)> callback);
     };
 
     class python_object : public python_object_base
