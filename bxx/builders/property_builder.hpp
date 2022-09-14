@@ -4,6 +4,7 @@
 #include <bxx/builders/python_builder.hpp>
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_list.hpp>
+#include <bxx/objects/python_tuple.hpp>
 
 #include <bxx/script.hpp>
 
@@ -301,7 +302,7 @@ namespace bxx
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
-                python_list list(0);
+                python_list list;
                 size_t cur_index = 0;
                 for (enum_entry const& entry : vec)
                 {
