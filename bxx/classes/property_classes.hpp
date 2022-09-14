@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bxx/objects/python_object.hpp>
+#include <bxx/objects/python_set.hpp>
 #include <bxx/builders/property_builder.hpp>
 #include <bxx/string_literal.hpp>
 #include <magic_enum.hpp>
@@ -222,11 +223,19 @@ namespace bxx
             : property_base(owner, id)
         {}
 
-        T get_value()
+        std::uint64_t get_value()
         {
-            PyObject* attr = PyObject_GetAttrString(m_owner->get_pyobject(), m_id);
-            char const* c = _PyUnicode_AsString(attr);
-            return magic_enum::enum_cast<T>(c).value();
+            std::uint64_t value = 0;
+            python_object set = python_object::steal(PyObject_GetAttrString(m_owner->get_pyobject(), m_id));
+            set.for_each<python_object>([&](python_object obj) {
+                if (obj.is<std::string>())
+                {
+                    std::string str = details::py2cxx<std::string>(obj);
+                    T num = magic_enum::enum_cast<T>(str).value();
+                    value |= static_cast<std::uint64_t>(num);
+                }
+            });
+            return value;
         }
 
     protected:
