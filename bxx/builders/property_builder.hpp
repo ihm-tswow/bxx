@@ -177,17 +177,21 @@ namespace bxx
             }
         }
 
-        T& add_string_property(std::string const& id, std::string const& name, std::string const& def, std::string const& description = "")
+        T& add_string_property(std::string const& id, std::string const& name, std::string const& def, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.StringProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
                 .add_option("description", description)
                 .add_option("default", def)
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_int_property(std::string const& id, std::string const& name, int min, int def, int max, std::string const& description = "")
+        T& add_int_property(std::string const& id, std::string const& name, int min, int def, int max, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.IntProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -196,10 +200,14 @@ namespace bxx
                 .add_option("min", min)
                 .add_option("max", max)
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_float_property(std::string const& id, std::string const& name, float min, float def, float max, std::string const& description = "")
+        T& add_float_property(std::string const& id, std::string const& name, float min, float def, float max, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.FloatProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -208,20 +216,28 @@ namespace bxx
                 .add_option("min", min)
                 .add_option("max", max)
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_bool_property(std::string const& id, std::string const& name, bool def, std::string const& description = "")
+        T& add_bool_property(std::string const& id, std::string const& name, bool def, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.BoolProperty", [&](property_entry& entry){ entry
                 .add_option("name", name)
                 .add_option("description", description)
                 .add_option("default",def)
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_mask_property(std::string const& id, std::string const& name, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::string const& description = "")
+        T& add_mask_property(std::string const& id, std::string const& name, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -261,10 +277,15 @@ namespace bxx
                         }
                     });
                 }
+
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_enum_property(std::string const& id, std::string const& name, std::string const& def, std::vector<enum_entry> const& values, std::string const& description = "")
+        T& add_enum_property(std::string const& id, std::string const& name, std::string const& def, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -290,15 +311,19 @@ namespace bxx
                     }
                 })
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
-        T& add_enum_property(std::string const& id, std::string const& name, std::vector<enum_entry> const& values, std::string const& description = "")
+        T& add_enum_property(std::string const& id, std::string const& name, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
-            return add_enum_property(id, name, values.begin()->m_id, values, description);
+            return add_enum_property(id, name, values.begin()->m_id, values, description, callback);
         }
 
-        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::string const& description = "")
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::string const& description, std::function<void(property_entry&)> builder_callback = nullptr)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
@@ -326,16 +351,24 @@ namespace bxx
                 .add_option("description", description)
                 .add_option("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
                 ;
+                if (builder_callback)
+                {
+                    builder_callback(entry);
+                }
             });
         }
 
-        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& code, std::string const& description = "")
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& code, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
                 .add_option("description", description)
                 .add_option("items", python_code(code))
                 ;
+                if (callback)
+                {
+                    callback(entry);
+                }
             });
         }
 
