@@ -146,7 +146,7 @@ namespace bxx
                 else
                 {
                     // auto-draw
-                    for_each_property([&](property_entry& entry, bool last) {
+                    for_each_property([&](property_entry_base_base& entry, bool last) {
                         std::optional<std::string> const& draw = entry.get_draw_instruction();
                         if (draw.has_value())
                         {
@@ -157,7 +157,7 @@ namespace bxx
                             std::string val = entry.get_option_or("name", entry.get_id());
                             builder.write_line("self.layout.prop(self,'{}', text = \"{}\");", entry.get_id(), val);
                         }
-                        });
+                    });
                 }
             }
 
