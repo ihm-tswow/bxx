@@ -66,10 +66,13 @@ namespace bxx
         return python_object(m_owner->get_pyobject());
     }
 
+    using extra_settings_callback = void(*)(property_entry&);
+
     template <
         string_literal name,
         string_literal description = "",
-        bool def = false
+        bool def = false,
+        extra_settings_callback extra_settings = nullptr
     >
     class bool_property : public property_base
     {
@@ -85,7 +88,7 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_bool_property(m_id, name.value, def, description.value);
+            builder.add_bool_property(m_id, name.value, def, description.value, extra_settings);
         }
     };
 
@@ -93,7 +96,8 @@ namespace bxx
         string_literal name,
         double def = 0.0,
         double min = double(std::numeric_limits<std::int32_t>::min()),
-        double max = double(std::numeric_limits<std::int32_t>::max())
+        double max = double(std::numeric_limits<std::int32_t>::max()),
+        extra_settings_callback extra_settings = nullptr
     >
     class float_property : public property_base
     {
@@ -109,7 +113,7 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_float_property(m_id, name.value, -1007688, def, 1007688);
+            builder.add_float_property(m_id, name.value, -1007688, def, 1007688, extra_settings);
         }
     };
 
@@ -118,7 +122,8 @@ namespace bxx
         string_literal description = "",
         std::int64_t def = 0,
         std::int64_t min = std::numeric_limits<std::int32_t>::min(),
-        std::int64_t max = std::numeric_limits<std::int32_t>::max()
+        std::int64_t max = std::numeric_limits<std::int32_t>::max(),
+        extra_settings_callback extra_settings = nullptr
     >
     class int_property : public property_base
     {
@@ -134,14 +139,15 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_int_property(m_id, name.value, min, def,max, description.value);
+            builder.add_int_property(m_id, name.value, min, def,max, description.value, extra_settings);
         }
     };
 
     template <
         string_literal name,
         string_literal description,
-        std::vector<enum_entry>(*entry_producer)(python_object,python_object)
+        std::vector<enum_entry>(*entry_producer)(python_object,python_object),
+        extra_settings_callback extra_settings = nullptr
     >
     class dynamic_enum_property : public property_base
     {
@@ -157,7 +163,7 @@ namespace bxx
     private:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_dynamic_enum_property(m_id, name.value, [&](python_object o1, python_object o2) { return entry_producer(o1,o2); }, description.value);
+            builder.add_dynamic_enum_property(m_id, name.value, [&](python_object o1, python_object o2) { return entry_producer(o1,o2); }, description.value, extra_settings);
         }
     };
 
@@ -166,7 +172,8 @@ namespace bxx
         string_literal name,
         string_literal description,
         T def,
-        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>
+        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>,
+        extra_settings_callback extra_settings = nullptr
     >
     class enum_property : public property_base
     {
@@ -198,7 +205,7 @@ namespace bxx
                     meta.m_icon
                 ));
             }
-            builder.add_enum_property(m_id, name.value, copy, description.value);
+            builder.add_enum_property(m_id, name.value, copy, description.value, extra_settings);
         }
     };
 
@@ -206,7 +213,8 @@ namespace bxx
         typename T,
         string_literal name,
         string_literal description = "",
-        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>
+        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>,
+        extra_settings_callback extra_settings = nullptr
     >
     class mask_property : public property_base
     {
@@ -248,7 +256,7 @@ namespace bxx
                     static_cast<std::int64_t>(entryVal)
                 ));
             }
-            builder.add_mask_property(m_id, name.value, {}, copy, description.value);
+            builder.add_mask_property(m_id, name.value, {}, copy, description.value, extra_settings);
         }
     };
 }
