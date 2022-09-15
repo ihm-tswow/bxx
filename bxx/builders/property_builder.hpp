@@ -177,7 +177,7 @@ namespace bxx
             }
         }
 
-        T& add_string_property(std::string const& id, std::string const& name, std::string const& def, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_string_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.StringProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -191,7 +191,7 @@ namespace bxx
             });
         }
 
-        T& add_int_property(std::string const& id, std::string const& name, int min, int def, int max, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_int_property(std::string const& id, std::string const& name, std::string const& description, int min, int def, int max, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.IntProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -207,7 +207,7 @@ namespace bxx
             });
         }
 
-        T& add_float_property(std::string const& id, std::string const& name, float min, float def, float max, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_float_property(std::string const& id, std::string const& name, std::string const& description, float min, float def, float max, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.FloatProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -223,7 +223,7 @@ namespace bxx
             });
         }
 
-        T& add_bool_property(std::string const& id, std::string const& name, bool def, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_bool_property(std::string const& id, std::string const& name, std::string const& description, bool def, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.BoolProperty", [&](property_entry& entry){ entry
                 .add_option("name", name)
@@ -237,7 +237,7 @@ namespace bxx
             });
         }
 
-        T& add_mask_property(std::string const& id, std::string const& name, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_mask_property(std::string const& id, std::string const& name, std::string const& description, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -285,7 +285,7 @@ namespace bxx
             });
         }
 
-        T& add_enum_property(std::string const& id, std::string const& name, std::string const& def, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::vector<enum_entry> const& values, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)
@@ -318,12 +318,12 @@ namespace bxx
             });
         }
 
-        T& add_enum_property(std::string const& id, std::string const& name, std::vector<enum_entry> const& values, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_enum_property(std::string const& id, std::string const& name, std::string const& description, std::vector<enum_entry> const& values, std::function<void(property_entry&)> callback = nullptr)
         {
-            return add_enum_property(id, name, values.begin()->m_id, values, description, callback);
+            return add_enum_property(id, name, description, values.begin()->m_id, values, callback);
         }
 
-        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::string const& description, std::function<void(property_entry&)> builder_callback = nullptr)
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::function<void(property_entry&)> builder_callback = nullptr)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
@@ -358,7 +358,7 @@ namespace bxx
             });
         }
 
-        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& code, std::string const& description, std::function<void(property_entry&)> callback = nullptr)
+        T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& code, std::function<void(property_entry&)> callback = nullptr)
         {
             return add_property(id, "bpy.props.EnumProperty", [&](property_entry& entry) { entry
                 .add_option("name", name)

@@ -88,12 +88,13 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_bool_property(m_id, name.value, def, description.value, extra_settings);
+            builder.add_bool_property(m_id, name.value, description.value, def, extra_settings);
         }
     };
 
     template <
         string_literal name,
+        string_literal description,
         double def = 0.0,
         double min = double(std::numeric_limits<std::int32_t>::min()),
         double max = double(std::numeric_limits<std::int32_t>::max()),
@@ -113,7 +114,7 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_float_property(m_id, name.value, -1007688, def, 1007688, extra_settings);
+            builder.add_float_property(m_id, name.value, description.value, -1007688, def, 1007688, extra_settings);
         }
     };
 
@@ -139,7 +140,7 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_int_property(m_id, name.value, min, def,max, description.value, extra_settings);
+            builder.add_int_property(m_id, name.value, description.value, min, def,max, extra_settings);
         }
     };
 
@@ -163,7 +164,7 @@ namespace bxx
     private:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_dynamic_enum_property(m_id, name.value, [&](python_object o1, python_object o2) { return entry_producer(o1,o2); }, description.value, extra_settings);
+            builder.add_dynamic_enum_property(m_id, name.value, description.value, [&](python_object o1, python_object o2) { return entry_producer(o1,o2); }, extra_settings);
         }
     };
 
@@ -205,7 +206,7 @@ namespace bxx
                     meta.m_icon
                 ));
             }
-            builder.add_enum_property(m_id, name.value, copy, description.value, extra_settings);
+            builder.add_enum_property(m_id, name.value, description.value, copy, extra_settings);
         }
     };
 
@@ -256,7 +257,7 @@ namespace bxx
                     static_cast<std::int64_t>(entryVal)
                 ));
             }
-            builder.add_mask_property(m_id, name.value, {}, copy, description.value, extra_settings);
+            builder.add_mask_property(m_id, name.value, description.value, {}, copy, extra_settings);
         }
     };
 }
