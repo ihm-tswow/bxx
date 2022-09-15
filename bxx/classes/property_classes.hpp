@@ -116,8 +116,8 @@ namespace bxx
     template <
         string_literal name,
         std::int64_t def = 0,
-        std::int64_t min = std::numeric_limits<std::int64_t>::min(),
-        std::int64_t max = std::int64_t(std::numeric_limits<std::int64_t>::max()),
+        std::int64_t min = std::numeric_limits<std::int32_t>::min(),
+        std::int64_t max = std::numeric_limits<std::int32_t>::max(),
         string_literal description = ""
     >
     class int_property : public property_base
@@ -134,7 +134,7 @@ namespace bxx
     protected:
         void write_to(class_property_builder& builder) final
         {
-            builder.add_float_property(m_id, name.value, min, def,max, description.value);
+            builder.add_int_property(m_id, name.value, min, def,max, description.value);
         }
     };
 
