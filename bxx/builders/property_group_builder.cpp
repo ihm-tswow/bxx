@@ -26,9 +26,9 @@ namespace bxx
     property_group_builder& property_group_builder::add_pointer_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description)
     {
         return add_property<property_entry>(id, "bpy.props.PointerProperty", [&](property_entry& entry) { entry
-            .add_option("name", name)
-            .add_option("description", description)
-            .add_option("type", python_code(type))
+            .set_attribute("name", name)
+            .set_attribute("description", description)
+            .set_attribute("type", python_code(type))
             ;
         });
     }
@@ -36,9 +36,9 @@ namespace bxx
     property_group_builder& property_group_builder::add_collection_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description)
     {
         return add_property<property_entry>(id, "bpy.props.CollectionProperty", [&](property_entry& entry) { entry
-            .add_option("name", name)
-            .add_option("description", description)
-            .add_option("type", python_code(type))
+            .set_attribute("name", name)
+            .set_attribute("description", description)
+            .set_attribute("type", python_code(type))
             ;
         });
     }

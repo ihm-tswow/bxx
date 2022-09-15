@@ -30,8 +30,8 @@ namespace bxx
     public:
         operator_builder(std::string const& bl_id, bool registers = true);
         operator_builder& set_description(std::string const& description);
-        operator_builder& add_option(std::string const& option);
-        operator_builder& add_option(std::initializer_list<std::string> const& option);
+        operator_builder& set_attribute(std::string const& option);
+        operator_builder& set_attribute(std::initializer_list<std::string> const& option);
         operator_builder& set_callback(std::function<void(python_object)> callback);
         operator_builder& set_draw(std::function<void(python_object)> callback);
         operator_builder& set_disable_drawing(bool disable);

@@ -52,13 +52,13 @@ namespace bxx
     }
 
 
-    operator_builder& operator_builder::add_option(std::string const& option)
+    operator_builder& operator_builder::set_attribute(std::string const& option)
     {
         m_options.insert(option);
         return *this;
     }
 
-    operator_builder& operator_builder::add_option(std::initializer_list<std::string > const& options)
+    operator_builder& operator_builder::set_attribute(std::initializer_list<std::string > const& options)
     {
         m_options.insert(options);
         return *this;

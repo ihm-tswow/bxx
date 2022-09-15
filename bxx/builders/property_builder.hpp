@@ -199,7 +199,7 @@ namespace bxx
         using property_entry_base_base::property_entry_base_base;
 
         template <typename T>
-        crtp& add_option(std::string const& key, T const& value)
+        crtp& set_attribute(std::string const& key, T const& value)
         {
             m_options.emplace(key,value);
             return *static_cast<crtp*>(this);
@@ -207,7 +207,7 @@ namespace bxx
 
         crtp& add_override_options(std::initializer_list<library_flag_items> items)
         {
-            add_option("override", [&](set_builder& set) {
+            set_attribute("override", [&](set_builder& set) {
                 set.set_bracket_type(python_builder::squiggly_brackets);
                 for (library_flag_items item : items)
                 {
@@ -235,7 +235,7 @@ namespace bxx
     {
         crtp& set_property_options(std::initializer_list<option_type> items)
         {
-            return static_cast<crtp*>(this)->add_option("options", [&](set_builder& set) {
+            return static_cast<crtp*>(this)->set_attribute("options", [&](set_builder& set) {
                 set.set_bracket_type(python_builder::squiggly_brackets);
                 for (option_type item : items)
                 {
@@ -254,7 +254,7 @@ namespace bxx
                 callback(args.get(0), args.get(1));
                 return python_object();
                 });
-            return static_cast<crtp*>(this)->add_option("update", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+            return static_cast<crtp*>(this)->set_attribute("update", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
     };
 
@@ -267,7 +267,7 @@ namespace bxx
                 callback(args.get(0), args.get(1));
                 return python_object();
                 });
-            return static_cast<crtp*>(this)->add_option("set", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+            return static_cast<crtp*>(this)->set_attribute("set", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
 
         crtp& add_getter(std::function<python_object(python_object)> callback)
@@ -275,7 +275,7 @@ namespace bxx
             size_t event_index = lib_register_event([=](python_tuple args) {
                 return callback(args.get(0));
             });
-            return static_cast<crtp*>(this)->add_option("get", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+            return static_cast<crtp*>(this)->set_attribute("get", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
     };
 
@@ -285,17 +285,17 @@ namespace bxx
     {
         crtp& set_soft_min(num_type soft_min)
         {
-            return static_cast<crtp*>(this)->add_option("soft_min", soft_min);
+            return static_cast<crtp*>(this)->set_attribute("soft_min", soft_min);
         }
 
         crtp& set_soft_max(num_type soft_max)
         {
-            return static_cast<crtp*>(this)->add_option("soft_max", soft_max);
+            return static_cast<crtp*>(this)->set_attribute("soft_max", soft_max);
         }
 
         crtp& set_step(num_type step)
         {
-            return static_cast<crtp*>(this)->add_option("step", step);
+            return static_cast<crtp*>(this)->set_attribute("step", step);
         }
     };
 
@@ -306,7 +306,7 @@ namespace bxx
     {
         crtp& set_subtype(number_subtype type)
         {
-            return static_cast<crtp*>(this)->add_option("subtype", enums::get_enum_name<number_subtype>(type));
+            return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_subtype>(type));
         }
     };
 
@@ -317,7 +317,7 @@ namespace bxx
     {
         crtp& set_subtype(number_array_subtype type)
         {
-            return static_cast<crtp*>(this)->add_option("subtype", enums::get_enum_name<number_array_subtype>(type));
+            return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_array_subtype>(type));
         }
     };
 
@@ -326,7 +326,7 @@ namespace bxx
     {
         crtp& set_precision(std::uint32_t precision)
         {
-            return static_cast<crtp*>(this)->add_option("precision", precision);
+            return static_cast<crtp*>(this)->set_attribute("precision", precision);
         }
     };
     
@@ -337,12 +337,12 @@ namespace bxx
     {
         property_entry_string& set_subtype(string_subtype type)
         {
-            return add_option("subtype", enums::get_enum_name<string_subtype>(type));
+            return set_attribute("subtype", enums::get_enum_name<string_subtype>(type));
         }
 
         property_entry_string& set_search_options(std::initializer_list<string_search_options> const& options)
         {
-            return add_option("search_options", [&](set_builder& set) {
+            return set_attribute("search_options", [&](set_builder& set) {
                 for (string_search_options option : options)
                 {
                     set.insert(enums::get_enum_name<string_search_options>(option));
@@ -355,7 +355,7 @@ namespace bxx
             size_t event_index = lib_register_event([=](python_tuple args) {
                 return search_callback(args.get(0), args.get(1), args.get(2));
                 });
-            return add_option("search", python_code(fmt::format("lambda x,y,z: fire_event({},{},x,y,z)", get_script_index(), event_index)));
+            return set_attribute("search", python_code(fmt::format("lambda x,y,z: fire_event({},{},x,y,z)", get_script_index(), event_index)));
         }
     };
 
@@ -392,7 +392,7 @@ namespace bxx
             size_t event_index = lib_register_event([=](python_tuple args) {
                 return callback(args.get(0), args.get(1));
             });
-            return add_option("poll", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+            return set_attribute("poll", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
     };
 
@@ -453,9 +453,9 @@ namespace bxx
         T& add_string_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::function<void(property_entry_string&)> callback = nullptr)
         {
             return add_property<property_entry_string>(id, "bpy.props.StringProperty", [&](property_entry_string& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("default", def)
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("default", def)
                 ;
                 if (callback)
                 {
@@ -467,11 +467,11 @@ namespace bxx
         T& add_int_property(std::string const& id, std::string const& name, std::string const& description, int min, int def, int max, std::function<void(property_entry_int&)> callback = nullptr)
         {
             return add_property<property_entry_int>(id, "bpy.props.IntProperty", [&](property_entry_int& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("default", def)
-                .add_option("min", min)
-                .add_option("max", max)
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("default", def)
+                .set_attribute("min", min)
+                .set_attribute("max", max)
                 ;
                 if (callback)
                 {
@@ -483,11 +483,11 @@ namespace bxx
         T& add_float_property(std::string const& id, std::string const& name, std::string const& description, float min, float def, float max, std::function<void(property_entry_float&)> callback = nullptr)
         {
             return add_property<property_entry_float>(id, "bpy.props.FloatProperty", [&](property_entry_float& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("default", def)
-                .add_option("min", min)
-                .add_option("max", max)
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("default", def)
+                .set_attribute("min", min)
+                .set_attribute("max", max)
                 ;
                 if (callback)
                 {
@@ -499,9 +499,9 @@ namespace bxx
         T& add_bool_property(std::string const& id, std::string const& name, std::string const& description, bool def, std::function<void(property_entry_bool&)> callback = nullptr)
         {
             return add_property<property_entry_bool>(id, "bpy.props.BoolProperty", [&](property_entry_bool& entry){ entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("default",def)
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("default",def)
                 ;
                 if (callback)
                 {
@@ -513,14 +513,14 @@ namespace bxx
         T& add_mask_property(std::string const& id, std::string const& name, std::string const& description, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("options", [&](set_builder& builder) { builder
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("options", [&](set_builder& builder) { builder
                     .set_bracket_type(python_builder::squiggly_brackets)
                     .insert("ENUM_FLAG")
                     ;
                 })
-                .add_option("items", [&](list_builder& builder) {
+                .set_attribute("items", [&](list_builder& builder) {
                     std::int64_t curMax = 0;
                     for (enum_entry const& entry : values)
                     {
@@ -543,7 +543,7 @@ namespace bxx
 
                 if (def.size() > 0)
                 {
-                    entry.add_option("default", [&](set_builder& builder) {
+                    entry.set_attribute("default", [&](set_builder& builder) {
                         for (std::string const& str : def)
                         {
                             builder.insert(str);
@@ -561,10 +561,10 @@ namespace bxx
         T& add_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("default", def)
-                .add_option("items", [&](list_builder& builder) {
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("default", def)
+                .set_attribute("items", [&](list_builder& builder) {
                     std::int64_t curMax = 0;
                     for (enum_entry const& entry : values)
                     {
@@ -620,9 +620,9 @@ namespace bxx
             });
 
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
                 ;
                 if (builder_callback)
                 {
@@ -634,9 +634,9 @@ namespace bxx
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& code, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .add_option("name", name)
-                .add_option("description", description)
-                .add_option("items", python_code(code))
+                .set_attribute("name", name)
+                .set_attribute("description", description)
+                .set_attribute("items", python_code(code))
                 ;
                 if (callback)
                 {
