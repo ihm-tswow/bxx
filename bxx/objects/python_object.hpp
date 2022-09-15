@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bxx/enums.hpp>
 #include <common/script_error.hpp>
 #include <common/exec.hpp>
 
@@ -37,27 +38,27 @@
 // PYFIELD_STRINGENUM
 
 #define PYFIELD_STRINGENUM(type,name)\
-    void set_##name(type value) { this->setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
-    type get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
+    void set_##name(type value) { this->setattr<std::string>(#name, enums::get_enum_name<type>(value));}\
+    type get_##name() const { return enums::get_enum_value<type>(this->getattr<std::string>(#name)); }
 
 #define PYFIELD_STRINGENUM_DECL(type,name)\
     void set_##name(type value);\
     type get_##name() const;
 
 #define PYFIELD_STRINGENUM_IMPL(cls,type,name)\
-    void cls::set_##name(type value) { this->setattr<std::string>(#name, std::string(magic_enum::enum_name<type>(value)));}\
-    type cls::get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
+    void cls::set_##name(type value) { this->setattr<std::string>(#name, enums::get_enum_name<type>(value));}\
+    type cls::get_##name() const { return enums::get_enum_value<type>(this->getattr<std::string>(#name)); }
 
 // PYFIELD_STRINGENUM_READ
 
 #define PYFIELD_STRINGENUM_READ(type,name)\
-    type get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
+    type get_##name() const { return enums::get_enum_value<type>(this->getattr<std::string>(#name)); }
 
 #define PYFIELD_STRINGENUM_READ_DECL(type,name)\
     type get_##name() const;
 
 #define PYFIELD_STRINGENUM_READ_IMPL(cls,type,name)\
-    type cls::get_##name() const { return magic_enum::enum_cast<type>(this->getattr<std::string>(#name)).value(); }
+    type cls::get_##name() const { return enums::get_enum_value<type>(this->getattr<std::string>(#name)); }
 
 namespace mathutils
 {

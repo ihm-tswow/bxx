@@ -3,8 +3,6 @@
 #include <bxx/objects/python_object.hpp>
 #include <bxx/classes/property_classes.hpp>
 
-#include <magic_enum.hpp>
-
 namespace bxx
 {
     /*

@@ -3,8 +3,6 @@
 #include <bxx/classes/property_classes.hpp>
 #include <bxx/builders/property_group_builder.hpp>
 
-#include <magic_enum.hpp>
-
 #define PROPERTY_GROUP(cls,...)\
     static void register_class()\
     {\
@@ -64,7 +62,7 @@ namespace bxx
             builder.read_properties_from(tmp_builder);
             for (property_group_targets target: targets())
             {
-                builder.register_to("bpy.types." + std::string(magic_enum::enum_name(target)), get_class_name(), false);
+                builder.register_to("bpy.types." + std::string(enums::get_enum_name(target)), get_class_name(), false);
             }
         }
     };

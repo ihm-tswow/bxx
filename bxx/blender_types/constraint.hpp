@@ -4,7 +4,6 @@
 #include <bxx/blender_types/iterables.hpp>
 #include <bxx/objects/blender_struct.hpp>
 
-#include <magic_enum.hpp>
 #include <string>
 #include <type_traits>
 

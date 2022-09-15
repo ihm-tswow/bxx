@@ -2,8 +2,7 @@
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_tuple.hpp>
 #include <bxx/script.hpp>
-
-#include <magic_enum.hpp>
+#include <bxx/enums.hpp>
 
 namespace bxx
 {
@@ -23,19 +22,19 @@ namespace bxx
 
     panel_builder& panel_builder::set_space_type(bl_space_type space_type)
     {
-        set_class_variable("bl_space_type", std::string(magic_enum::enum_name<bl_space_type>(space_type)));
+        set_class_variable("bl_space_type", enums::get_enum_name<bl_space_type>(space_type));
         return *this;
     }
 
     panel_builder& panel_builder::set_region_type(bl_region_type region_type)
     {
-        set_class_variable("bl_region_type", std::string(magic_enum::enum_name<bl_region_type>(region_type)));
+        set_class_variable("bl_region_type", enums::get_enum_name<bl_region_type>(region_type));
         return *this;
     }
 
     panel_builder& panel_builder::set_context(bl_context context)
     {
-        set_class_variable("bl_context", std::string(magic_enum::enum_name<bl_context>(context)));
+        set_class_variable("bl_context", enums::get_enum_name<bl_context>(context));
         return *this;
     }
 

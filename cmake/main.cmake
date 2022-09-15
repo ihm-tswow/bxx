@@ -218,6 +218,12 @@ function(generate_blender_version build_version)
     )
   endif()
 
+  execute_process(
+    COMMAND
+      ${PYTHON_BIN}
+      ${CMAKE_CURRENT_SOURCE_DIR}/bxx/cmake/generate_scripts.py
+  )
+
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   #
@@ -288,6 +294,8 @@ function(generate_blender_version build_version)
   add_library(
     ${bxx} STATIC
     ${bxx_files}
+    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx/enums.generated.ipp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bxx/bxx/enums.generated.cpp
   )
 
   set_target_properties(${bxx} PROPERTIES FOLDER ${build_version})
@@ -301,7 +309,6 @@ function(generate_blender_version build_version)
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/blenlib
     ${${BLENDER_ID}_SOURCE_DIR}/source/blender/makesdna
   )
-
 
   target_link_libraries(
     ${bxx} PUBLIC

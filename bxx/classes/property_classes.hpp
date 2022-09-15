@@ -4,7 +4,7 @@
 #include <bxx/objects/python_set.hpp>
 #include <bxx/builders/property_builder.hpp>
 #include <bxx/string_literal.hpp>
-#include <magic_enum.hpp>
+#include <bxx/enums.hpp>
 
 #include <limits>
 #include <vector>
@@ -138,13 +138,6 @@ namespace bxx
         }
     };
 
-    struct enum_meta
-    {
-        std::string m_name;
-        std::string m_description = "";
-        std::string m_icon = "";
-    };
-
     template <
         string_literal name,
         std::vector<enum_entry>(*entry_producer)(python_object,python_object),
@@ -173,7 +166,7 @@ namespace bxx
         string_literal name,
         T def,
         string_literal description = "",
-        enum_meta(*meta_producer)(T) = nullptr
+        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>
     >
     class enum_property : public property_base
     {
@@ -186,24 +179,24 @@ namespace bxx
         {
             PyObject* attr = PyObject_GetAttrString(m_owner->get_pyobject(), m_id);
             char const* c = _PyUnicode_AsString(attr);
-            return magic_enum::enum_cast<T>(c).value();
+            return enums::get_enum_value<T>(c);
         }
 
     protected:
         void write_to(class_property_builder& builder) final
         {
-            auto enums = magic_enum::enum_values<T>();
+            std::vector<std::pair<T,std::string>> entries = enums::get_enum_entries<T>();
             std::vector<enum_entry> copy;
-            for (size_t i = 0; i < enums.size(); ++i)
+            copy.reserve(entries.size());
+            for (auto const& [entryVal,entryName] : entries)
             {
-                std::string name_entry(magic_enum::enum_name<T>(enums[i]));
-                enum_meta meta = meta_producer ? meta_producer(enums[i]) : enum_meta(name_entry);
+                enum_meta meta = meta_producer ? meta_producer(entryVal) : enum_meta(entryName);
                 copy.push_back(enum_entry(
-                    name_entry,
+                    entryName,
                     meta.m_name,
                     meta.m_description,
                     meta.m_icon,
-                    static_cast<std::int64_t>(enums[i])
+                    static_cast<std::int64_t>(entryVal)
                 ));
             }
             builder.add_enum_property(m_id, name.value, copy, description.value);
@@ -214,7 +207,7 @@ namespace bxx
         typename T,
         string_literal name,
         string_literal description = "",
-        enum_meta(*meta_producer)(T) = nullptr
+        enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>
     >
     class mask_property : public property_base
     {
@@ -231,7 +224,7 @@ namespace bxx
                 if (obj.is<std::string>())
                 {
                     std::string str = details::py2cxx<std::string>(obj);
-                    T num = magic_enum::enum_cast<T>(str).value();
+                    T num = enums::get_enum_value<T>(str).value();
                     value |= static_cast<std::uint64_t>(num);
                 }
             });
@@ -239,20 +232,21 @@ namespace bxx
         }
 
     protected:
+
         void write_to(class_property_builder& builder) final
         {
-            auto enums = magic_enum::enum_values<T>();
+            std::vector<std::pair<T, std::string>> entries = enums::get_enum_entries<T>();
             std::vector<enum_entry> copy;
-            for (size_t i = 0; i < enums.size(); ++i)
+            copy.reserve(entries.size());
+            for (auto const& [entryVal, entryName] : entries)
             {
-                std::string name_entry(magic_enum::enum_name<T>(enums[i]));
-                enum_meta meta = meta_producer ? meta_producer(enums[i]) : enum_meta(name_entry);
+                enum_meta meta = meta_producer ? meta_producer(entryVal) : enum_meta(entryName);
                 copy.push_back(enum_entry(
-                    name_entry,
+                    entryName,
                     meta.m_name,
                     meta.m_description,
                     meta.m_icon,
-                    static_cast<std::int64_t>(enums[i])
+                    static_cast<std::int64_t>(entryVal)
                 ));
             }
             builder.add_mask_property(m_id, name.value, {}, copy, description.value);

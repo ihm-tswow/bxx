@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include <bxx/enums.hpp>
+
 namespace bxx
 {
     template <typename T>
@@ -18,7 +20,7 @@ namespace bxx
     T constraints::add(std::string const& name)
     {
         constraint_type type = get_constraint_type<T>();
-        std::string type_name = std::string(magic_enum::enum_name<constraint_type>(type));
+        std::string type_name = enums::get_enum_name<constraint_type>(type);
         python_object constraint_py = call("new", kwarg("type", type_name));
         constraint_py.setattr("name", name);
         return T(constraint_py);
@@ -28,7 +30,7 @@ namespace bxx
     T constraints::get(std::uint32_t index)
     {
         constraint_type type = get_constraint_type<T>();
-        std::string type_name = std::string(magic_enum::enum_name<constraint_type>(type));
+        std::string type_name = enums::get_enum_name<constraint_type>(type);
         python_object constraint_py = get_item(index);
         return T(constraint_py);
     }

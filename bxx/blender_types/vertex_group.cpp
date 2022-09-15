@@ -1,12 +1,11 @@
 #include <bxx/blender_types/vertex_group.hpp>
 #include <bxx/objects/python_list.hpp>
+#include <bxx/enums.hpp>
 
 #pragma warning(push)
 #pragma warning(disable : 4200)
 #include <makesdna/DNA_object_types.h>
 #pragma warning(pop)
-
-#include <magic_enum.hpp>
 
 namespace bxx
 {
@@ -18,7 +17,7 @@ namespace bxx
         call("add"
             , python_list(indices)
             , weight
-            , std::string(magic_enum::enum_name<VertexAssignMode>(mode))
+            , enums::get_enum_name<VertexAssignMode>(mode)
         );
     }
 

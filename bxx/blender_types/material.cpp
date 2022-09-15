@@ -1,4 +1,5 @@
 #include <bxx/blender_types/material.hpp>
+#include <bxx/enums.hpp>
 #include <common/exec.hpp>
 
 #pragma warning(push)
@@ -8,13 +9,12 @@
 #pragma warning(pop)
 
 #include <fmt/core.h>
-#include <magic_enum.hpp>
 
 namespace bxx
 {
     std::string node_type_to_string(material_node_type type)
     {
-        return std::string(magic_enum::enum_name<material_node_type>(type));
+        return enums::get_enum_name<material_node_type>(type);
     }
 
     material_node::material_node(material const& parent, python_object const& obj)

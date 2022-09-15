@@ -2,16 +2,16 @@
 #include <bxx/blender_types/view_layer.hpp>
 #include <bxx/blender_types/scene.hpp>
 #include <bxx/blender_types/object.hpp>
+#include <bxx/enums.hpp>
 #include <common/exec.hpp>
 
 #include <fmt/core.h>
-#include <magic_enum.hpp>
 
 namespace bxx
 {
     void context::set_mode(editor_mode mode)
     {
-        exec("bpy.ops.object.mode_set(mode='{}')", std::string(magic_enum::enum_name<editor_mode>(mode)));
+        exec("bpy.ops.object.mode_set(mode='{}')", std::string(enums::get_enum_name<editor_mode>(mode)));
     }
 
     view_layer context::get_view_layer()
@@ -27,9 +27,9 @@ namespace bxx
 
     editor_mode context::get_mode()
     {
-        return magic_enum::enum_cast<editor_mode>(eval_string(
+        return enums::get_enum_value<editor_mode>(eval_string(
             "out = bpy.context.mode"
-        )).value();
+        ));
     }
 
     void context::select_all()

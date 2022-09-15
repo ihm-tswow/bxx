@@ -1,5 +1,6 @@
 import os
 import re
+import enum_generator
 
 def generate_dir(script_root):
     all_tests = []
@@ -73,5 +74,7 @@ def generate_dir(script_root):
     with open(generated_path,'w') as generated_file:
         generated_file.write(generated)
 
-for directory in os.listdir('scripts'):
-    generate_dir(os.path.join('scripts',directory))
+
+scripts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),'scripts')
+for directory in os.listdir(scripts_dir):
+    generate_dir(os.path.join(scripts_dir,directory))
