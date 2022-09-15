@@ -244,7 +244,8 @@ namespace bxx
                     entryName,
                     meta.m_name,
                     meta.m_description,
-                    meta.m_icon
+                    meta.m_icon,
+                    static_cast<std::int64_t>(entryVal)
                 ));
             }
             builder.add_mask_property(m_id, name.value, {}, copy, description.value);
