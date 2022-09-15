@@ -22,27 +22,6 @@ namespace bxx
         }
     }
 
-
-    property_group_builder& property_group_builder::add_pointer_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description)
-    {
-        return add_property<property_entry>(id, "bpy.props.PointerProperty", [&](property_entry& entry) { entry
-            .set_attribute("name", name)
-            .set_attribute("description", description)
-            .set_attribute("type", python_code(type))
-            ;
-        });
-    }
-
-    property_group_builder& property_group_builder::add_collection_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description)
-    {
-        return add_property<property_entry>(id, "bpy.props.CollectionProperty", [&](property_entry& entry) { entry
-            .set_attribute("name", name)
-            .set_attribute("description", description)
-            .set_attribute("type", python_code(type))
-            ;
-        });
-    }
-
     property_group_builder& property_group_builder::register_to(std::string const& target, std::string name, bool collection)
     {
         if (name.size() == 0)

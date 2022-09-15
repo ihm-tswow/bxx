@@ -213,6 +213,46 @@ namespace bxx
 
     template <
         typename T,
+        string_literal type_name,
+        string_literal name,
+        string_literal description,
+        extra_settings_callback<property_entry_pointer> extra_settings = nullptr
+    >
+    class pointer_property : public property_base
+    {
+    public:
+        pointer_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+
+        void write_to(class_property_builder& builder) final
+        {
+            builder.add_pointer_property(m_id, type_name.value, name.value, description.value, extra_settings);
+        }
+    };
+
+    template <
+        typename T,
+        string_literal type_name,
+        string_literal name,
+        string_literal description,
+        extra_settings_callback<property_entry_collection> extra_settings = nullptr
+    >
+    class collection_property: public property_base
+    {
+    public:
+        collection_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+
+        void write_to(class_property_builder& builder) final
+        {
+            builder.add_collection_property(m_id, type_name.value, name.value, description.value, extra_settings);
+        }
+    };
+
+    template <
+        typename T,
         string_literal name,
         string_literal description = "",
         enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>,

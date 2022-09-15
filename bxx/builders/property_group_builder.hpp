@@ -21,8 +21,6 @@ namespace bxx
     public:
         property_group_builder(std::string const& class_name, bool should_register = true);
         ~property_group_builder();
-        property_group_builder& add_pointer_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description = "");
-        property_group_builder& add_collection_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description = "");
         property_group_builder& register_to(std::string const& target, std::string name = "", bool collection = false);
 
         void write(python_builder& builder);

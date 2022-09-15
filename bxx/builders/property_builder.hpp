@@ -142,19 +142,13 @@ namespace bxx
     public:
         property_entry_base_base(property_entry_base_base const&) = delete;
         property_entry_base_base(property_entry_base_base&&) = delete;
-        property_entry_base_base(std::string const& id, std::string const& type)
+        property_entry_base_base(std::string const& id)
             : m_id(id)
-            , m_type(type)
         {}
 
         std::string get_id() const
         {
             return m_id;
-        }
-
-        std::string get_type() const
-        {
-            return m_type;
         }
 
         std::optional<std::string>& get_draw_instruction()
@@ -185,9 +179,10 @@ namespace bxx
                 ++i;
             }
         }
+
+        virtual std::string class_name() = 0;
     protected:
         std::string m_id;
-        std::string m_type;
         std::optional<std::string> m_draw_instruction;
         std::map<std::string, builder_value> m_options;
     };
@@ -349,12 +344,18 @@ namespace bxx
     template <typename crtp, typename num_type>
     class property_entry_number_vector
         : public property_entry_number<crtp,num_type>
+        , public property_default<crtp,std::vector<num_type>>
         , public property_entry_update<crtp>
     {
     public:
         crtp& set_subtype(number_array_subtype type)
         {
             return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_array_subtype>(type));
+        }
+
+        crtp& set_size(std::uint32_t size)
+        {
+            return static_cast<crtp*>(this)->set_attribute("size", size);
         }
     };
 
@@ -367,6 +368,36 @@ namespace bxx
             return static_cast<crtp*>(this)->set_attribute("precision", precision);
         }
     };
+
+    class property_entry_float_vector
+        : public property_entry_base<property_entry_float_vector>
+        , public property_entry_number_vector<property_entry_float_vector,double>
+        , public property_entry_float_base<property_entry_float_vector>
+    {
+    public:
+        using property_entry_base<property_entry_float_vector>::property_entry_base;
+        std::string class_name() final { return "bpy.props.FloatVectorProperty"; }
+    };
+
+    class property_entry_int_vector
+        : public property_entry_base<property_entry_int_vector>
+        , public property_entry_number_vector<property_entry_int_vector,std::int64_t>
+        , public property_entry_float_base<property_entry_int_vector>
+    {
+    public:
+        using property_entry_base<property_entry_int_vector>::property_entry_base;
+        std::string class_name() final { return "bpy.props.IntVectorProperty"; }
+    };
+
+    class property_entry_bool_vector
+        : public property_entry_base<property_entry_bool_vector>
+        , public property_entry_number_vector<property_entry_bool_vector, bool>
+        , public property_entry_float_base<property_entry_bool_vector>
+    {
+    public:
+        using property_entry_base<property_entry_bool_vector>::property_entry_base;
+        std::string class_name() final { return "bpy.props.BoolVectorProperty"; }
+    };
     
     class property_entry_string
         : public property_entry_base<property_entry_string>
@@ -375,6 +406,8 @@ namespace bxx
         , public property_default<property_entry_string,std::string>
     {
     public:
+        std::string class_name() final { return "bpy.props.StringProperty"; }
+
         property_entry_string& set_subtype(string_subtype type)
         {
             return set_attribute("subtype", enums::get_enum_name<string_subtype>(type));
@@ -405,6 +438,7 @@ namespace bxx
         , public property_entry_float_base<property_entry_float>
     {
     public:
+        std::string class_name() final { return "bpy.props.FloatProperty"; }
         using property_entry_base<property_entry_float>::property_entry_base;
     };
 
@@ -413,6 +447,7 @@ namespace bxx
         , public property_entry_number_primitive<property_entry_int,std::int64_t>
     {
     public:
+        std::string class_name() final { return "bpy.props.IntProperty"; }
         using property_entry_base<property_entry_int>::property_entry_base;
     };
 
@@ -423,6 +458,7 @@ namespace bxx
     {
     public:
         using property_entry_base<property_entry_bool>::property_entry_base;
+        std::string class_name() final { return "bpy.props.BoolProperty"; }
     };
 
     class property_entry_pointer
@@ -432,6 +468,7 @@ namespace bxx
     {
     public:
         using property_entry_base<property_entry_pointer>::property_entry_base;
+        std::string class_name() final { return "bpy.props.PointerProperty"; }
         property_entry_pointer& set_poll(std::function<bool(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
@@ -441,12 +478,22 @@ namespace bxx
         }
     };
 
+    class property_entry_collection
+        : public property_entry_base<property_entry_collection>
+        , public property_options<property_entry_pointer, property_flag_items>
+    {
+    public:
+        using property_entry_base<property_entry_collection>::property_entry_base;
+        std::string class_name() final { return "bpy.props.CollectionProperty"; }
+    };
+
     class property_entry_enum
         : public property_entry_base<property_entry_enum>
         , public property_entry_update<property_entry_enum>
         , public property_options<property_entry_enum, property_flag_enum_items>
     {
     public:
+        std::string class_name() final { return "bpy.props.EnumProperty"; }
         using property_entry_base<property_entry_enum>::property_entry_base;
         property_entry_enum& set_items(std::function<std::vector<enum_entry>(python_object, python_object)> callback)
         {
@@ -525,7 +572,7 @@ namespace bxx
         {
             for (std::shared_ptr<property_entry_base_base>& entry : m_properties)
             {
-                builder.begin_line("{}: {}", entry->get_id(), entry->get_type());
+                builder.begin_line("{}: {}", entry->get_id(), entry->class_name());
                 auto block = builder.scoped_block(python_builder::round_brackets, 2);
                 entry->for_each_option([&](std::string const& key, builder_value& option, bool last)
                     {
@@ -551,7 +598,7 @@ namespace bxx
 
         T& add_string_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::function<void(property_entry_string&)> callback = nullptr)
         {
-            return add_property<property_entry_string>(id, "bpy.props.StringProperty", [&](property_entry_string& entry) { entry
+            return add_property<property_entry_string>(id, [&](property_entry_string& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_default(def)
@@ -565,7 +612,7 @@ namespace bxx
 
         T& add_int_property(std::string const& id, std::string const& name, std::string const& description, int min, int def, int max, std::function<void(property_entry_int&)> callback = nullptr)
         {
-            return add_property<property_entry_int>(id, "bpy.props.IntProperty", [&](property_entry_int& entry) { entry
+            return add_property<property_entry_int>(id, [&](property_entry_int& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_default(def)
@@ -581,7 +628,7 @@ namespace bxx
 
         T& add_float_property(std::string const& id, std::string const& name, std::string const& description, float min, float def, float max, std::function<void(property_entry_float&)> callback = nullptr)
         {
-            return add_property<property_entry_float>(id, "bpy.props.FloatProperty", [&](property_entry_float& entry) { entry
+            return add_property<property_entry_float>(id, [&](property_entry_float& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_default(def)
@@ -597,7 +644,7 @@ namespace bxx
 
         T& add_bool_property(std::string const& id, std::string const& name, std::string const& description, bool def, std::function<void(property_entry_bool&)> callback = nullptr)
         {
-            return add_property<property_entry_bool>(id, "bpy.props.BoolProperty", [&](property_entry_bool& entry){ entry
+            return add_property<property_entry_bool>(id, [&](property_entry_bool& entry){ entry
                 .set_name(name)
                 .set_description(description)
                 .set_default(def)
@@ -611,7 +658,7 @@ namespace bxx
 
         T& add_mask_property(std::string const& id, std::string const& name, std::string const& description, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
-            return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
+            return add_property<property_entry_enum>(id, [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_property_options({property_flag_enum_items::ENUM_FLAG})
@@ -655,7 +702,7 @@ namespace bxx
 
         T& add_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
-            return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
+            return add_property<property_entry_enum>(id, [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_attribute("default", def)
@@ -675,7 +722,7 @@ namespace bxx
 
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::function<void(property_entry_enum&)> builder_callback = nullptr)
         {
-            return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
+            return add_property<property_entry_enum>(id, [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_items(callback)
@@ -689,7 +736,7 @@ namespace bxx
 
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& code, std::function<void(property_entry_enum&)> callback = nullptr)
         {
-            return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
+            return add_property<property_entry_enum>(id, [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
                 .set_items(code)
@@ -701,10 +748,38 @@ namespace bxx
             });
         }
 
-        template <typename prop_type = property_entry>
-        T& add_property(std::string const& id, std::string const& type, std::function<void(prop_type&)> callback)
+        T& add_pointer_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description, std::function<void(property_entry_pointer&)> callback = nullptr)
         {
-            std::shared_ptr<prop_type> ptr = std::make_shared<prop_type>(id, type);
+            return add_property<property_entry_pointer>(id, [&](property_entry_pointer& entry) { entry
+                .set_name(name)
+                .set_description(description)
+                .set_attribute("type", python_code(type))
+                ;
+                if (callback)
+                {
+                    callback(entry);
+                }
+            });
+        }
+
+        T& add_collection_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description, std::function<void(property_entry_collection)> callback = nullptr)
+        {
+            return add_property<property_entry_collection>(id, [&](property_entry_collection& entry) { entry
+                .set_name(name)
+                .set_description(description)
+                .set_attribute("type", python_code(type))
+                ;
+                if (callback)
+                {
+                    callback(entry);
+                }
+            });
+        }
+
+        template <typename prop_type = property_entry>
+        T& add_property(std::string const& id, std::function<void(prop_type&)> callback)
+        {
+            std::shared_ptr<prop_type> ptr = std::make_shared<prop_type>(id);
             callback(*ptr.get());
             m_properties.push_back(ptr);
             return *dynamic_cast<T*>(this);
