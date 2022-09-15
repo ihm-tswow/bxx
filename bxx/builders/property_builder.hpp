@@ -5,6 +5,7 @@
 #include <bxx/objects/python_object.hpp>
 #include <bxx/objects/python_list.hpp>
 #include <bxx/objects/python_tuple.hpp>
+#include <bxx/string_literal.hpp>
 
 #include <bxx/script.hpp>
 
@@ -15,6 +16,12 @@
 
 namespace bxx
 {
+    template <string_literal name, typename T>
+    struct property_entry_ref {
+        using cxx_type = T;
+        static char const* python_name() { return name.value; }
+    };
+
     enum class property_flag_items
     {
         HIDDEN,
@@ -461,26 +468,27 @@ namespace bxx
         std::string class_name() final { return "bpy.props.BoolProperty"; }
     };
 
+    template <typename T>
     class property_entry_pointer
-        : public property_entry_base<property_entry_pointer>
-        , public property_entry_update<property_entry_pointer>
-        , public property_options<property_entry_pointer, property_flag_items>
+        : public property_entry_base<property_entry_pointer<T>>
+        , public property_entry_update<property_entry_pointer<T>>
+        , public property_options<property_entry_pointer<T>, property_flag_items>
     {
     public:
-        using property_entry_base<property_entry_pointer>::property_entry_base;
+        using property_entry_base<property_entry_pointer<T>>::property_entry_base;
         std::string class_name() final { return "bpy.props.PointerProperty"; }
-        property_entry_pointer& set_poll(std::function<bool(python_object, python_object)> callback)
+        property_entry_pointer<T>& set_poll(std::function<bool(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 return callback(args.get(0), args.get(1));
             });
-            return set_attribute("poll", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+            return this->set_attribute("poll", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
     };
 
     class property_entry_collection
         : public property_entry_base<property_entry_collection>
-        , public property_options<property_entry_pointer, property_flag_items>
+        , public property_options<property_entry_collection, property_flag_items>
     {
     public:
         using property_entry_base<property_entry_collection>::property_entry_base;
@@ -748,12 +756,13 @@ namespace bxx
             });
         }
 
-        T& add_pointer_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description, std::function<void(property_entry_pointer&)> callback = nullptr)
+        template <typename ref_type>
+        T& add_pointer_property(std::string const& id, std::string const& name, std::string const& description, std::function<void(property_entry_pointer<typename ref_type::cxx_type>&)> callback = nullptr)
         {
-            return add_property<property_entry_pointer>(id, [&](property_entry_pointer& entry) { entry
+            return add_property<property_entry_pointer<typename ref_type::cxx_type>>(id, [&](property_entry_pointer<typename ref_type::cxx_type>& entry) { entry
                 .set_name(name)
                 .set_description(description)
-                .set_attribute("type", python_code(type))
+                .set_attribute("type", python_code(ref_type::python_name()))
                 ;
                 if (callback)
                 {
