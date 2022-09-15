@@ -205,7 +205,7 @@ namespace bxx
             return *static_cast<crtp*>(this);
         }
 
-        crtp& add_override_options(std::initializer_list<library_flag_items> items)
+        crtp& set_override_options(std::initializer_list<library_flag_items> items)
         {
             set_attribute("override", [&](set_builder& set) {
                 set.set_bracket_type(python_builder::squiggly_brackets);
@@ -248,7 +248,7 @@ namespace bxx
     template <typename crtp>
     class property_entry_update
     {
-        crtp& add_update(std::function<void(python_object, python_object)> callback)
+        crtp& set_update(std::function<void(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 callback(args.get(0), args.get(1));
@@ -261,7 +261,7 @@ namespace bxx
     template <typename crtp>
     class property_entry_dynamic_access : public property_entry_update<crtp>
     {
-        crtp& add_setter(std::function<void(python_object, python_object)> callback)
+        crtp& set_setter(std::function<void(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 callback(args.get(0), args.get(1));
@@ -270,7 +270,7 @@ namespace bxx
             return static_cast<crtp*>(this)->set_attribute("set", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
         }
 
-        crtp& add_getter(std::function<python_object(python_object)> callback)
+        crtp& set_getter(std::function<python_object(python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
                 return callback(args.get(0));
