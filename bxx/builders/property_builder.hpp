@@ -205,6 +205,16 @@ namespace bxx
             return *static_cast<crtp*>(this);
         }
 
+        crtp& set_name(std::string const& name)
+        {
+            return set_attribute("name", name);
+        }
+
+        crtp& set_description(std::string const& description)
+        {
+            return set_attribute("description", description);
+        }
+
         crtp& set_override_options(std::initializer_list<library_flag_items> items)
         {
             set_attribute("override", [&](set_builder& set) {
@@ -230,9 +240,20 @@ namespace bxx
         }
     };
 
+    template <typename crtp, typename default_type>
+    class property_default
+    {
+    public:
+        crtp& set_default(default_type def)
+        {
+            return static_cast<crtp*>(this)->set_attribute("options", def);
+        }
+    };
+
     template <typename crtp, typename option_type>
     class property_options
     {
+    public:
         crtp& set_property_options(std::initializer_list<option_type> items)
         {
             return static_cast<crtp*>(this)->set_attribute("options", [&](set_builder& set) {
@@ -248,6 +269,7 @@ namespace bxx
     template <typename crtp>
     class property_entry_update
     {
+    public:
         crtp& set_update(std::function<void(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
@@ -261,6 +283,7 @@ namespace bxx
     template <typename crtp>
     class property_entry_dynamic_access : public property_entry_update<crtp>
     {
+    public:
         crtp& set_setter(std::function<void(python_object, python_object)> callback)
         {
             size_t event_index = lib_register_event([=](python_tuple args) {
@@ -283,6 +306,17 @@ namespace bxx
     class property_entry_number
         : public property_options<crtp, property_flag_items>
     {
+    public:
+        crtp& set_min(num_type min)
+        {
+            return static_cast<crtp*>(this)->set_attribute("min", min);
+        }
+
+        crtp& set_max(num_type max)
+        {
+            return static_cast<crtp*>(this)->set_attribute("max", max);
+        }
+
         crtp& set_soft_min(num_type soft_min)
         {
             return static_cast<crtp*>(this)->set_attribute("soft_min", soft_min);
@@ -303,7 +337,9 @@ namespace bxx
     class property_entry_number_primitive
         : public property_entry_number<crtp,num_type>
         , public property_entry_dynamic_access<crtp>
+        , public property_default<crtp,num_type>
     {
+    public:
         crtp& set_subtype(number_subtype type)
         {
             return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_subtype>(type));
@@ -315,6 +351,7 @@ namespace bxx
         : public property_entry_number<crtp,num_type>
         , public property_entry_update<crtp>
     {
+    public:
         crtp& set_subtype(number_array_subtype type)
         {
             return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_array_subtype>(type));
@@ -324,6 +361,7 @@ namespace bxx
     template <typename crtp>
     class property_entry_float_base
     {
+    public:
         crtp& set_precision(std::uint32_t precision)
         {
             return static_cast<crtp*>(this)->set_attribute("precision", precision);
@@ -334,7 +372,9 @@ namespace bxx
         : public property_entry_base<property_entry_string>
         , public property_entry_dynamic_access<property_entry_string>
         , public property_options<property_entry_string, property_flag_items>
+        , public property_default<property_entry_string,std::string>
     {
+    public:
         property_entry_string& set_subtype(string_subtype type)
         {
             return set_attribute("subtype", enums::get_enum_name<string_subtype>(type));
@@ -364,6 +404,7 @@ namespace bxx
         , public property_entry_number_primitive<property_entry_float,double>
         , public property_entry_float_base<property_entry_float>
     {
+    public:
         using property_entry_base<property_entry_float>::property_entry_base;
     };
 
@@ -371,13 +412,16 @@ namespace bxx
         : public property_entry_base<property_entry_int>
         , public property_entry_number_primitive<property_entry_int,std::int64_t>
     {
+    public:
         using property_entry_base<property_entry_int>::property_entry_base;
     };
 
     class property_entry_bool
         : public property_entry_base<property_entry_bool>
         , public property_entry_dynamic_access<property_entry_bool>
+        , public property_default<property_entry_bool,bool>
     {
+    public:
         using property_entry_base<property_entry_bool>::property_entry_base;
     };
 
@@ -386,6 +430,7 @@ namespace bxx
         , public property_entry_update<property_entry_pointer>
         , public property_options<property_entry_pointer, property_flag_items>
     {
+    public:
         using property_entry_base<property_entry_pointer>::property_entry_base;
         property_entry_pointer& set_poll(std::function<bool(python_object, python_object)> callback)
         {
@@ -401,11 +446,13 @@ namespace bxx
         , public property_entry_update<property_entry_enum>
         , public property_options<property_entry_enum, property_flag_enum_items>
     {
+    public:
         using property_entry_base<property_entry_enum>::property_entry_base;
     };
 
     class property_entry : public property_entry_base<property_entry>
     {
+    public:
         using property_entry_base<property_entry>::property_entry_base;
     };
 
@@ -453,9 +500,9 @@ namespace bxx
         T& add_string_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::function<void(property_entry_string&)> callback = nullptr)
         {
             return add_property<property_entry_string>(id, "bpy.props.StringProperty", [&](property_entry_string& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
-                .set_attribute("default", def)
+                .set_name(name)
+                .set_description(description)
+                .set_default(def)
                 ;
                 if (callback)
                 {
@@ -467,11 +514,11 @@ namespace bxx
         T& add_int_property(std::string const& id, std::string const& name, std::string const& description, int min, int def, int max, std::function<void(property_entry_int&)> callback = nullptr)
         {
             return add_property<property_entry_int>(id, "bpy.props.IntProperty", [&](property_entry_int& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
-                .set_attribute("default", def)
-                .set_attribute("min", min)
-                .set_attribute("max", max)
+                .set_name(name)
+                .set_description(description)
+                .set_default(def)
+                .set_min(min)
+                .set_max(max)
                 ;
                 if (callback)
                 {
@@ -483,11 +530,11 @@ namespace bxx
         T& add_float_property(std::string const& id, std::string const& name, std::string const& description, float min, float def, float max, std::function<void(property_entry_float&)> callback = nullptr)
         {
             return add_property<property_entry_float>(id, "bpy.props.FloatProperty", [&](property_entry_float& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
-                .set_attribute("default", def)
-                .set_attribute("min", min)
-                .set_attribute("max", max)
+                .set_name(name)
+                .set_description(description)
+                .set_default(def)
+                .set_min(min)
+                .set_max(max)
                 ;
                 if (callback)
                 {
@@ -499,9 +546,9 @@ namespace bxx
         T& add_bool_property(std::string const& id, std::string const& name, std::string const& description, bool def, std::function<void(property_entry_bool&)> callback = nullptr)
         {
             return add_property<property_entry_bool>(id, "bpy.props.BoolProperty", [&](property_entry_bool& entry){ entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
-                .set_attribute("default",def)
+                .set_name(name)
+                .set_description(description)
+                .set_default(def)
                 ;
                 if (callback)
                 {
@@ -513,13 +560,9 @@ namespace bxx
         T& add_mask_property(std::string const& id, std::string const& name, std::string const& description, std::vector<std::string> const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
-                .set_attribute("options", [&](set_builder& builder) { builder
-                    .set_bracket_type(python_builder::squiggly_brackets)
-                    .insert("ENUM_FLAG")
-                    ;
-                })
+                .set_name(name)
+                .set_description(description)
+                .set_property_options({property_flag_enum_items::ENUM_FLAG})
                 .set_attribute("items", [&](list_builder& builder) {
                     std::int64_t curMax = 0;
                     for (enum_entry const& entry : values)
@@ -561,8 +604,8 @@ namespace bxx
         T& add_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& def, std::vector<enum_entry> const& values, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
+                .set_name(name)
+                .set_description(description)
                 .set_attribute("default", def)
                 .set_attribute("items", [&](list_builder& builder) {
                     std::int64_t curMax = 0;
@@ -620,8 +663,8 @@ namespace bxx
             });
 
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
+                .set_name(name)
+                .set_description(description)
                 .set_attribute("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
                 ;
                 if (builder_callback)
@@ -634,8 +677,8 @@ namespace bxx
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::string const& code, std::function<void(property_entry_enum&)> callback = nullptr)
         {
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
-                .set_attribute("name", name)
-                .set_attribute("description", description)
+                .set_name(name)
+                .set_description(description)
                 .set_attribute("items", python_code(code))
                 ;
                 if (callback)
