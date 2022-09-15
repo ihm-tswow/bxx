@@ -68,8 +68,8 @@ namespace bxx
 
     template <
         string_literal name,
-        bool def = false,
-        string_literal description = ""
+        string_literal description = "",
+        bool def = false
     >
     class bool_property : public property_base
     {
@@ -115,10 +115,10 @@ namespace bxx
 
     template <
         string_literal name,
+        string_literal description = "",
         std::int64_t def = 0,
         std::int64_t min = std::numeric_limits<std::int32_t>::min(),
-        std::int64_t max = std::numeric_limits<std::int32_t>::max(),
-        string_literal description = ""
+        std::int64_t max = std::numeric_limits<std::int32_t>::max()
     >
     class int_property : public property_base
     {
@@ -140,8 +140,8 @@ namespace bxx
 
     template <
         string_literal name,
-        std::vector<enum_entry>(*entry_producer)(python_object,python_object),
-        string_literal description = ""
+        string_literal description,
+        std::vector<enum_entry>(*entry_producer)(python_object,python_object)
     >
     class dynamic_enum_property : public property_base
     {
@@ -164,8 +164,8 @@ namespace bxx
     template <
         typename T,
         string_literal name,
+        string_literal description,
         T def,
-        string_literal description = "",
         enum_meta(*meta_producer)(T) = enums::get_enum_meta<T>
     >
     class enum_property : public property_base
