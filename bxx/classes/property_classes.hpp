@@ -224,6 +224,11 @@ namespace bxx
             : property_base(owner, id)
         {}
 
+        ref_type::cxx_type get_value()
+        {
+            return m_owner->getattr<ref_type::cxx_type>(m_id);
+        }
+
         void write_to(class_property_builder& builder) final
         {
             builder.add_pointer_property<ref_type>(m_id, name.value, description.value, extra_settings);
