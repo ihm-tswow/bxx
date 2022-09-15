@@ -486,12 +486,13 @@ namespace bxx
         }
     };
 
+    template <typename T>
     class property_entry_collection
-        : public property_entry_base<property_entry_collection>
-        , public property_options<property_entry_collection, property_flag_items>
+        : public property_entry_base<property_entry_collection<T>>
+        , public property_options<property_entry_collection<T>, property_flag_items>
     {
     public:
-        using property_entry_base<property_entry_collection>::property_entry_base;
+        using property_entry_base<property_entry_collection<T>>::property_entry_base;
         std::string class_name() final { return "bpy.props.CollectionProperty"; }
     };
 
@@ -771,12 +772,13 @@ namespace bxx
             });
         }
 
-        T& add_collection_property(std::string const& id, std::string const& type, std::string const& name, std::string const& description, std::function<void(property_entry_collection)> callback = nullptr)
+        template <typename ref_type>
+        T& add_collection_property(std::string const& id, std::string const& name, std::string const& description, std::function<void(property_entry_collection<typename ref_type::cxx_type>&)> callback = nullptr)
         {
-            return add_property<property_entry_collection>(id, [&](property_entry_collection& entry) { entry
+            return add_property<property_entry_collection<typename ref_type::cxx_type>>(id, [&](property_entry_collection<typename ref_type::cxx_type>& entry) { entry
                 .set_name(name)
                 .set_description(description)
-                .set_attribute("type", python_code(type))
+                .set_attribute("type", python_code(ref_type::python_name()))
                 ;
                 if (callback)
                 {

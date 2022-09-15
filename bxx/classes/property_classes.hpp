@@ -231,11 +231,10 @@ namespace bxx
     };
 
     template <
-        typename T,
-        string_literal type_name,
+        typename ref_type,
         string_literal name,
         string_literal description,
-        extra_settings_callback<property_entry_collection> extra_settings = nullptr
+        extra_settings_callback<property_entry_collection<typename ref_type::cxx_type>> extra_settings = nullptr
     >
     class collection_property: public property_base
     {
@@ -246,7 +245,7 @@ namespace bxx
 
         void write_to(class_property_builder& builder) final
         {
-            builder.add_collection_property(m_id, type_name.value, name.value, description.value, extra_settings);
+            builder.add_collection_property<ref_type>(m_id, name.value, description.value, extra_settings);
         }
     };
 
