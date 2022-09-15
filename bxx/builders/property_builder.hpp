@@ -246,7 +246,7 @@ namespace bxx
     public:
         crtp& set_default(default_type def)
         {
-            return static_cast<crtp*>(this)->set_attribute("options", def);
+            return static_cast<crtp*>(this)->set_attribute("default", def);
         }
     };
 
@@ -448,6 +448,58 @@ namespace bxx
     {
     public:
         using property_entry_base<property_entry_enum>::property_entry_base;
+        property_entry_enum& set_items(std::function<std::vector<enum_entry>(python_object, python_object)> callback)
+        {
+            size_t event_index = lib_register_event([=](python_tuple args) {
+                std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
+                python_list list;
+                size_t cur_index = 0;
+                for (enum_entry const& entry : vec)
+                {
+                    python_tuple tup(5);
+                    if (entry.m_value.has_value())
+                    {
+                        cur_index = entry.m_value.value();
+                    }
+                    tup.set<std::string>(0, entry.m_id);
+                    tup.set<std::string>(1, entry.m_name);
+                    tup.set<std::string>(2, entry.m_description);
+                    tup.set<std::string>(3, entry.m_icon);
+                    tup.set<std::int64_t>(4, cur_index++);
+                    list.append(tup);
+                }
+                return list;
+            });
+            return set_attribute("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)));
+        }
+
+        property_entry_enum& set_items(std::vector<enum_entry> const& values)
+        {
+            return set_attribute("items", [&](list_builder& builder) {
+                std::int64_t curMax = 0;
+                for (enum_entry const& entry : values)
+                {
+                    builder.add([&](list_builder& map) { map
+                        .set_bracket_type(python_builder::round_brackets)
+                        .add(entry.m_id)
+                        .add(entry.m_name)
+                        .add(entry.m_description)
+                        .add(entry.m_icon)
+                        ;
+                    if (entry.m_value.has_value())
+                    {
+                        curMax = entry.m_value.value();
+                    }
+                    map.add(curMax++);
+                        });
+                }
+            });
+        }
+
+        property_entry_enum& set_items(std::string const& python)
+        {
+            return set_attribute("items", python_code(python));
+        }
     };
 
     class property_entry : public property_entry_base<property_entry>
@@ -607,25 +659,7 @@ namespace bxx
                 .set_name(name)
                 .set_description(description)
                 .set_attribute("default", def)
-                .set_attribute("items", [&](list_builder& builder) {
-                    std::int64_t curMax = 0;
-                    for (enum_entry const& entry : values)
-                    {
-                        builder.add([&](list_builder& map) { map
-                            .set_bracket_type(python_builder::round_brackets)
-                            .add(entry.m_id)
-                            .add(entry.m_name)
-                            .add(entry.m_description)
-                            .add(entry.m_icon)
-                            ;
-                            if (entry.m_value.has_value())
-                            {
-                                curMax = entry.m_value.value();
-                            }
-                            map.add(curMax++);
-                        });
-                    }
-                })
+                .set_items(values)
                 ;
                 if (callback)
                 {
@@ -641,31 +675,10 @@ namespace bxx
 
         T& add_dynamic_enum_property(std::string const& id, std::string const& name, std::string const& description, std::function<std::vector<enum_entry>(python_object,python_object)> callback, std::function<void(property_entry_enum&)> builder_callback = nullptr)
         {
-            size_t event_index = lib_register_event([=](python_tuple args) {
-                std::vector<enum_entry> vec = callback(args.get<python_object>(0), args.get<python_object>(1));
-                python_list list;
-                size_t cur_index = 0;
-                for (enum_entry const& entry : vec)
-                {
-                    python_tuple tup(5);
-                    if (entry.m_value.has_value())
-                    {
-                        cur_index = entry.m_value.value();
-                    }
-                    tup.set<std::string>(0, entry.m_id);
-                    tup.set<std::string>(1, entry.m_name);
-                    tup.set<std::string>(2, entry.m_description);
-                    tup.set<std::string>(3, entry.m_icon);
-                    tup.set<std::int64_t>(4, cur_index++);
-                    list.append(tup);
-                }
-                return list;
-            });
-
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
-                .set_attribute("items", python_code(fmt::format("lambda x,y: fire_event({},{},x,y)", get_script_index(), event_index)))
+                .set_items(callback)
                 ;
                 if (builder_callback)
                 {
@@ -679,7 +692,7 @@ namespace bxx
             return add_property<property_entry_enum>(id, "bpy.props.EnumProperty", [&](property_entry_enum& entry) { entry
                 .set_name(name)
                 .set_description(description)
-                .set_attribute("items", python_code(code))
+                .set_items(code)
                 ;
                 if (callback)
                 {
