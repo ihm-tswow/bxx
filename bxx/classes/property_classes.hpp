@@ -248,6 +248,21 @@ namespace bxx
             : property_base(owner, id)
         {}
 
+        void add()
+        {
+            m_owner->getattr(m_id).call("add");
+        }
+
+        std::uint32_t len()
+        {
+            return PyObject_Length(m_owner->getattr(m_id));
+        }
+
+        void remove(std::uint32_t index)
+        {
+            m_owner->getattr(m_id).call("remove", index);
+        }
+
         void write_to(class_property_builder& builder) final
         {
             builder.add_collection_property<ref_type>(m_id, name.value, description.value, extra_settings);
