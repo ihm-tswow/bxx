@@ -38,6 +38,13 @@ namespace bxx
         {
             call<python_object>("prop", base.get_owner(), base.get_id(), args...);
         }
+
+        template <typename ...Args>
+        void prop(python_object base, std::string const& name, Args&&...args)
+        {
+            call<python_object>("prop", base, name, args...);
+        }
+
         template <typename ...Args>
         void label(std::string const& text, Args&&... args)
         {
