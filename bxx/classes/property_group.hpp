@@ -25,7 +25,7 @@
     cls(T obj)\
         : __VA_ARGS__\
     {\
-        bxx::details::replace_python_object(*this,obj.getattr<python_object>(#cls).get_pyobject());\
+        bxx::details::replace_python_object(*this,obj.get_pyobject());\
     }
 
 namespace bxx
