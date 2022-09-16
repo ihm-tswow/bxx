@@ -49,7 +49,8 @@ namespace bxx
             return obj.getattr<T>(get_class_name());
         }
     protected:
-        virtual std::vector<property_group_targets> targets() = 0;
+        // empty by default because property groups don't need to attach to anything (can be used in Collection properties etc)
+        virtual std::vector<property_group_targets> targets() { return {}; };
 
         void register_class_internal() final
         {
