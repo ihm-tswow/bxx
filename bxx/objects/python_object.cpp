@@ -66,7 +66,7 @@ namespace bxx
         Py_IncRef(m_pyobject);
     }
 
-    python_object::operator PyObject* ()
+    python_object::operator PyObject* () const
     {
         return get_pyobject();
     }

@@ -153,7 +153,7 @@ namespace bxx
         python_object& operator=(T value);
         template <typename T>
         bool is();
-        operator PyObject*();
+        operator PyObject*() const;
         static python_object steal(PyObject* obj);
     protected:
         // used by constructors of child classees that create new PyObjects
