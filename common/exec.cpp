@@ -1,4 +1,5 @@
 #include <common/exec.hpp>
+#include <common/script_index.hpp>
 #include <common/script_error.hpp>
 
 namespace bxx
@@ -17,8 +18,10 @@ namespace bxx
     {
         std::string text = join_strings(lines);
         int err = get_pointers()->cy_exec(
+            get_script_index(),
             const_cast<char*>(text.c_str())
         );
+        int h = get_script_index();
         BXX_SCRIPT_ASSERT(!err, python_exec_error, "Failed to execute python: {}", text.c_str());
     }
 
@@ -26,6 +29,7 @@ namespace bxx
     {
         std::string text = join_strings(lines);
         PyObject* obj = get_pointers()->cy_eval(
+            get_script_index(),
             const_cast<char*>(text.c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python int (script error): {}", text.c_str());
@@ -37,6 +41,7 @@ namespace bxx
     {
         std::string text = join_strings(lines);
         PyObject* obj = get_pointers()->cy_eval(
+            get_script_index(),
             const_cast<char*>(text.c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python float (script error): {}", text.c_str());
@@ -48,6 +53,7 @@ namespace bxx
     {
         std::string text = join_strings(lines);
         PyObject* obj = get_pointers()->cy_eval(
+            get_script_index(),
             const_cast<char*>(text.c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python float (script error): {}", text.c_str());

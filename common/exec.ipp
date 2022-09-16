@@ -1,5 +1,6 @@
 #include <common/exec.hpp>
 #include <common/shared_functions.hpp>
+#include <common/script_index.hpp>
 
 namespace bxx
 {
@@ -38,6 +39,7 @@ namespace bxx
     {
         std::string text = join_strings(lines);
         PyObject* obj = get_pointers()->cy_eval(
+            get_script_index(),
             const_cast<char*>(join_strings(lines).c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python pointer (script error): {}", text.c_str());

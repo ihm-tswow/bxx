@@ -38,7 +38,7 @@ namespace bxx
             property_builder::write(builder);
         });
 
-        builder.write_line("bpy.utils.register_class({})", get_class_name());
+        builder.write_line("register_class({},{})", get_script_index(), get_class_name());
         for (auto const& [target,reg] : m_registered_to)
         {
             builder.write_line("register_property_group({},{},\"{}\",{},{})"

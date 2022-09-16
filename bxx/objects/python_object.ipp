@@ -336,6 +336,7 @@ namespace bxx
     {
         std::string text = fmt::format(str, std::forward<Args>(args)...);
         PyObject* obj = get_pointers()->cy_eval(
+            get_script_index(),
             const_cast<char*>(text.c_str())
         );
         BXX_SCRIPT_ASSERT(obj, python_exec_error, "Failed to evaluate python object (script error): {}",text.c_str());

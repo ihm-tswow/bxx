@@ -4,8 +4,8 @@
 
 #include <Python.h>
 
-typedef int(*cy_exec_ct)(char*);
-typedef PyObject* (*cy_eval_ct)(char*);
+typedef int(*cy_exec_ct)(int,char*);
+typedef PyObject* (*cy_eval_ct)(int,char*);
 typedef float* (*cy_create_float_buffer_ct)(unsigned long long, int);
 
 struct shared_functions

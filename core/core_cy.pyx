@@ -17,8 +17,8 @@ from cpython.ref cimport PyObject
 
 # Library API
 ctypedef unsigned long long cy_ptr_ct;
-ctypedef int(*cy_exec_ct)(char*);
-ctypedef PyObject* (*cy_eval_ct)(char*);
+ctypedef int(*cy_exec_ct)(int,char*);
+ctypedef PyObject* (*cy_eval_ct)(int,char*);
 ctypedef float* (*cy_create_float_buffer_ct)(unsigned long long,int)
 
 # Core API
@@ -165,7 +165,7 @@ def delete_float_buffer(id):
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-def build_context():
+def build_context(script):
     context = {}
     context['bpy'] = bpy
     context['register_cxx_function'] = register_cxx_function
@@ -180,20 +180,23 @@ def build_context():
     context['register_app_handler'] = register_app_handler
     context['get_addon_name'] = get_addon_name
     context['get_addon_path'] = get_addon_path
+    if script in registered_classes:
+        for cls in registered_classes[script]:
+            context[cls.__name__] = cls
     return context
 
-cdef int cy_exec(char* exec_bytes):
+cdef int cy_exec(int script, char* exec_bytes):
     try:
-        exec(exec_bytes.decode('utf-8'), build_context())
+        exec(exec_bytes.decode('utf-8'), build_context(script))
         return 0
     except Exception as e:
         print(e)
         return -1
 
-cdef PyObject* cy_eval(char* exec_bytes):
+cdef PyObject* cy_eval(int script, char* exec_bytes):
     global last_obj
     try:
-        context = build_context()
+        context = build_context(script)
         exec(exec_bytes.decode('utf-8'), context)
         last_obj = context['out']
         return <PyObject*> last_obj
