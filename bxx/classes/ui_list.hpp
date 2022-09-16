@@ -41,6 +41,8 @@ namespace bxx
     class generic_property
     {
     public:
+        generic_property(generic_property<property_type, owner_type> const&) = delete;
+        generic_property(generic_property<property_type, owner_type>&&) = delete;
         generic_property(owner_type owner, std::string const& name)
             : m_owner(owner)
             , m_id(name)
@@ -60,6 +62,8 @@ namespace bxx
     class generic_property_readonly
     {
     public:
+        generic_property_readonly(generic_property_readonly<property_type, owner_type> const&) = delete;
+        generic_property_readonly(generic_property_readonly<property_type, owner_type> &&) = delete;
         generic_property_readonly(python_object owner, python_object prop)
             : m_owner(owner_type(owner))
             , m_property(property_type(prop))
