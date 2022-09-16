@@ -35,6 +35,14 @@
         bxx::details::replace_python_object(*this,obj);\
     }\
 
+#define SIMPLE_OPERATOR(cls,fn)\
+    class cls : public bxx::operator_class<cls>\
+    {\
+    public:\
+        void execute fn\
+        OPERATOR_NO_PROPS(cls)\
+    };\
+
 namespace bxx
 {
     template <typename T>
