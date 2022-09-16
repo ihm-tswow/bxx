@@ -2,6 +2,7 @@
 
 #include <bxx/objects/python_object.hpp>
 #include <bxx/classes/property_classes.hpp>
+#include <bxx/classes/ui_layout.hpp>
 #include <bxx/builders/ui_list_builder.hpp>
 
 #include <type_traits>
@@ -40,8 +41,8 @@ namespace bxx
     class ui_list : public property_class
     {
     public:
-        virtual void draw_item(python_object ctx, python_object layout, python_object data, python_object item, std::uint64_t icon, python_object active_data, std::string const& active_propname) = 0;
-        virtual void draw_filter(python_object ctx, python_object layout) {}
+        virtual void draw_item(python_object ctx, ui_layout layout, python_object data, python_object item, std::uint64_t icon, python_object active_data, std::string const& active_propname) = 0;
+        virtual void draw_filter(python_object ctx, ui_layout layout) {}
         virtual python_tuple filter_items(python_object ctx, python_object data, python_object propname) { return python_tuple(); }
 
         PYFIELD_STRINGENUM(ui_list_layout_type, layout_type)
@@ -65,11 +66,11 @@ namespace bxx
             builder.read_properties_from(tmp_builder);
 
             builder.set_draw_item([this](python_object self, python_object ctx, python_object layout, python_object data, python_object item, python_object icon, python_object active_data, python_object active_propname) {
-                crtp(self.get_pyobject()).draw_item(ctx, layout, data, item, details::py2cxx<std::uint64_t>(icon), active_data, details::py2cxx<std::string>(active_propname));
+                crtp(self.get_pyobject()).draw_item(ctx, layout.get_pyobject(), data, item, details::py2cxx<std::uint64_t>(icon), active_data, details::py2cxx<std::string>(active_propname));
             });
 
             builder.set_draw_filter([this](python_object self, python_object ctx, python_object layout) {
-                crtp(self.get_pyobject()).draw_filter(ctx,layout);
+                crtp(self.get_pyobject()).draw_filter(ctx,layout.get_pyobject());
             });
 
             if (!std::is_same<decltype(& crtp::filter_items), decltype(&ui_list::filter_items)>::value)
