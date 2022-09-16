@@ -43,5 +43,11 @@ namespace bxx
         {
             call<python_object>("label", kwarg("text", text), args...);
         }
+
+        template <typename col_prop_type, typename active_prop_type, typename ...Args>
+        void template_list(std::string const& name, col_prop_type col, active_prop_type active, Args&&...args)
+        {
+            call("template_list", name, "", col.get_owner(), col.get_id(), active.get_owner(), active.get_id(), args...);
+        }
     };
 }
