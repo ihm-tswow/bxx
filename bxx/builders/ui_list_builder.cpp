@@ -6,6 +6,8 @@ namespace bxx
         : class_header_builder(class_name)
     {
         add_parent_class("bpy.types.UIList");
+        // todo: hack to remove bxx. prefix, but we should stop assuming it in class_header_builder itself
+        set_id(class_name);
     }
 
     ui_list_builder::~ui_list_builder()
