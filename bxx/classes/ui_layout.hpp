@@ -33,6 +33,13 @@ namespace bxx
         //PYFIELD_STRINGENUM(alignment, alignment)
         PYFIELD_STRINGENUM(direction, direction)
 
+        // equivalent to bpy "operator" method ("operator" is a keyword in c++)
+        template <typename ...Args>
+        python_object operator_button(std::string const& name, Args&&...args)
+        {
+            return call<python_object>("operator", name, args...);
+        }
+
         template <typename ...Args>
         void prop(property_base const& base, Args&&... args)
         {
