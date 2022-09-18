@@ -147,6 +147,67 @@ namespace bxx
 
     template <
         string_literal name,
+        string_literal description = "",
+        int size = 3,
+        std::int64_t min = std::numeric_limits<std::int32_t>::min(),
+        std::int64_t max = std::numeric_limits<std::int32_t>::max(),
+        extra_settings_callback<property_entry_int_vector> extra_settings = nullptr
+    >
+    class int_vector_property : public property_base
+    {
+    public:
+        int_vector_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+    protected:
+        void write_to(class_property_builder& builder) final
+        {
+            builder.add_int_vector_property(m_id, name.value, description.value, size, min, max, {}, extra_settings);
+        }
+    };
+
+    template <
+        string_literal name,
+        string_literal description = "",
+        int size = 3,
+        extra_settings_callback<property_entry_bool_vector> extra_settings = nullptr
+    >
+    class bool_vector_property : public property_base
+    {
+    public:
+        bool_vector_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+    protected:
+        void write_to(class_property_builder& builder) final
+        {
+            builder.add_bool_vector_property(m_id, name.value, description.value, size, {}, extra_settings);
+        }
+    };
+
+    template <
+        string_literal name,
+        string_literal description = "",
+        int size = 3,
+        std::int64_t min = std::numeric_limits<std::int32_t>::min(),
+        std::int64_t max = std::numeric_limits<std::int32_t>::max(),
+        extra_settings_callback<property_entry_float_vector> extra_settings = nullptr
+    >
+    class float_vector_property: public property_base
+    {
+    public:
+        float_vector_property(property_class* owner, char const* id)
+            : property_base(owner, id)
+        {}
+    protected:
+        void write_to(class_property_builder& builder) final
+        {
+            builder.add_float_vector_property(m_id, name.value, description.value, size, min, max, {}, extra_settings);
+        }
+    };
+
+    template <
+        string_literal name,
         string_literal description,
         std::vector<enum_entry>(*entry_producer)(python_object,python_object),
         extra_settings_callback<property_entry_enum> extra_settings = nullptr

@@ -351,10 +351,20 @@ namespace bxx
     template <typename crtp, typename num_type>
     class property_entry_number_vector
         : public property_entry_number<crtp,num_type>
-        , public property_default<crtp,std::vector<num_type>>
         , public property_entry_update<crtp>
     {
     public:
+        crtp& set_default(std::vector<num_type> const& vec)
+        {
+            return static_cast<crtp*>(this)->set_attribute("default", [&](list_builder& builder) {
+                builder.set_bracket_type(python_builder::round_brackets);
+                for (num_type num: vec)
+                {
+                    builder.add(num);
+                }
+            });
+        }
+
         crtp& set_subtype(number_array_subtype type)
         {
             return static_cast<crtp*>(this)->set_attribute("subtype", enums::get_enum_name<number_array_subtype>(type));
@@ -618,6 +628,65 @@ namespace bxx
                 }
             });
         }
+
+        T& add_int_vector_property(std::string const& id, std::string const& name, std::string const& description, int size, int min, int max, std::vector<std::int64_t> def = {}, std::function<void(property_entry_int_vector&)> callback = nullptr)
+        {
+            return add_property<property_entry_int_vector>(id, [&](property_entry_int_vector& entry) { entry
+                .set_name(name)
+                .set_description(description)
+                .set_min(min)
+                .set_max(max)
+                .set_size(size)
+                ;
+                if (def.size() > 0)
+                {
+                    entry.set_default(def);
+                }
+                if (callback)
+                {
+                    callback(entry);
+                }
+            });
+        }
+
+        T& add_float_vector_property(std::string const& id, std::string const& name, std::string const& description, int size, float min, float max, std::vector<double> def = {}, std::function<void(property_entry_float_vector&)> callback = nullptr)
+        {
+            return add_property<property_entry_float_vector>(id, [&](property_entry_float_vector& entry) { entry
+                .set_name(name)
+                .set_description(description)
+                .set_min(min)
+                .set_max(max)
+                .set_size(size)
+                ;
+                if (def.size() > 0)
+                {
+                    entry.set_default(def);
+                }
+                if (callback)
+                {
+                    callback(entry);
+                }
+            });
+        }
+
+        T& add_bool_vector_property(std::string const& id, std::string const& name, std::string const& description, int size, std::vector<bool> def = {}, std::function<void(property_entry_bool_vector&)> callback = nullptr)
+        {
+            return add_property<property_entry_bool_vector>(id, [&](property_entry_bool_vector& entry) { entry
+                .set_name(name)
+                .set_description(description)
+                .set_size(size)
+                ;
+                if (def.size() > 0)
+                {
+                    entry.set_default(def);
+                }
+                if (callback)
+                {
+                    callback(entry);
+                }
+            });
+        }
+
 
         T& add_int_property(std::string const& id, std::string const& name, std::string const& description, int min, int def, int max, std::function<void(property_entry_int&)> callback = nullptr)
         {
