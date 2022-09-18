@@ -4,6 +4,7 @@
 #include <bxx/blender_types/vertex_group.hpp>
 #include <bxx/blender_types/iterables.hpp>
 #include <bxx/blender_types/constraint.hpp>
+#include <bxx/builders/property_builder.hpp>
 #include <bxx/objects/id.hpp>
 #include <bxx/mathutils.hpp>
 
@@ -35,6 +36,7 @@ namespace bxx
     class object : public id<bl_object>
     {
     public:
+        using ref = property_entry_ref<"bpy.types.Object", object>;
         PYFIELD(bool, selected)
         PYFIELD(object, parent)
         PYFIELD_STRINGENUM_DECL(object_type,type)

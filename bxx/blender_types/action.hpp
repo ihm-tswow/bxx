@@ -2,6 +2,7 @@
 
 #include <bxx/blender_types/blender_types.hpp>
 #include <bxx/blender_types/iterables.hpp>
+#include <bxx/builders/property_builder.hpp>
 #include <bxx/objects/id.hpp>
 
 namespace bxx
@@ -47,6 +48,7 @@ namespace bxx
     class action : public id<bl_action>
     {
     public:
+        using ref = property_entry_ref<"bpy.types.Action", action>;
         using id<bl_action>::id;
         fcurves fcurves();
     };
