@@ -8,6 +8,7 @@
     {\
         cls().register_class_internal();\
     }\
+    using ref = bxx::property_entry_ref<#cls,cls>;\
     std::string get_class_name()\
     {\
         return #cls;\
