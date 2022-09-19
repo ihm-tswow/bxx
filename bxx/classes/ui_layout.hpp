@@ -29,6 +29,7 @@ namespace bxx
         {}
         PYFIELD(bool, active)
         PYFIELD(bool, enabled)
+        PYFIELD(float, scale_x)
 
         //PYFIELD_STRINGENUM(alignment, alignment)
         PYFIELD_STRINGENUM(direction, direction)
@@ -58,10 +59,32 @@ namespace bxx
             call<python_object>("label", kwarg("text", text), args...);
         }
 
+        template <typename ...Args>
+        ui_layout column(Args&&... args)
+        {
+            return call<ui_layout>("column", args...);
+        }
+
+        template <typename ...Args>
+        ui_layout row(Args&&... args)
+        {
+            return call<ui_layout>("row", args...);
+        }
+
         template <typename col_prop_type, typename active_prop_type, typename ...Args>
         void template_list(std::string const& name, col_prop_type col, active_prop_type active, Args&&...args)
         {
             call("template_list", name, "", col.get_owner(), col.get_id(), active.get_owner(), active.get_id(), args...);
+        }
+
+        ui_layout split(double factor = 0.0, bool align = false)
+        {
+            return call<ui_layout>("split", kwarg("factor",factor), kwarg("align",align));
+        }
+
+        ui_layout separator(float factor = 0.0)
+        {
+            return call<ui_layout>("separator",kwarg("factor", factor));
         }
     };
 }
