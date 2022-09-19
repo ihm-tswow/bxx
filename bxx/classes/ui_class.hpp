@@ -7,7 +7,7 @@
 
 #define UI_CLASS(classname)\
     classname() = default;\
-    classname(python_object obj)\
+    classname(bxx::python_object obj)\
     {\
         bxx::details::replace_python_object(*this,obj.get_pyobject());\
     }\
