@@ -246,6 +246,13 @@ namespace bxx
             return PyLong_AsUnsignedLong(obj);
         }
 
+        template <> inline bool py2cxx<bool>(PyObject* obj)
+        {
+            BXX_SCRIPT_ASSERT(obj, python_object_error, "tried to create bool from null python object");
+            BXX_SCRIPT_ASSERT(PyBool_Check(obj), python_type_error, "tried to extract uint32 from non-long python object");
+            return PyObject_IsTrue(obj);
+        }
+
         template <> inline std::int32_t py2cxx<std::int32_t>(PyObject* obj)
         {
             BXX_SCRIPT_ASSERT(obj, python_object_error, "tried to create int32 from null python object");
