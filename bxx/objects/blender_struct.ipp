@@ -11,7 +11,19 @@ namespace bxx
         template <typename blender_type>
         blender_type* blender_py_ptr(PyObject* obj)
         {
-            return reinterpret_cast<blender_type*>(python_object_weak(obj).call<std::uint64_t>("as_pointer"));
+            if (obj == nullptr)
+            {
+                return nullptr;
+            }
+
+            python_object_weak weak(obj);
+
+            if (!weak.is_valid())
+            {
+                return nullptr;
+            }
+
+            return reinterpret_cast<blender_type*>(weak.call<std::uint64_t>("as_pointer"));
         }
     }
 
@@ -37,7 +49,6 @@ namespace bxx
     blender_struct<blender_type>::blender_struct(blender_type* ptr)
         : m_ptr(ptr)
     {
-        assert(ptr);
     }
 
     template <typename blender_type>
