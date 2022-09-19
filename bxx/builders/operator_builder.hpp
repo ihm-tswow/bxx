@@ -32,6 +32,7 @@ namespace bxx
         operator_builder& set_description(std::string const& description);
         operator_builder& set_attribute(std::string const& option);
         operator_builder& set_attribute(std::initializer_list<std::string> const& option);
+        operator_builder& set_invoke(std::function<python_object(python_object,python_object,python_object)> invoke);
         operator_builder& set_callback(std::function<void(python_object)> callback);
         operator_builder& set_draw(std::function<void(python_object)> callback);
         operator_builder& set_disable_drawing(bool disable);
@@ -44,6 +45,7 @@ namespace bxx
         operator_builder() = delete;
         void write(python_builder& builder);
     private:
+        std::function<python_object(python_object,python_object,python_object)> m_invoke;
         std::function<void(python_object)> m_callback;
         std::function<void(python_object)> m_draw;
         std::vector<operator_draw_instruction> m_draw_instructions = { { "cur = self.layout", true } };

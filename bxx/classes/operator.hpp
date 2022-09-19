@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bxx/blender_types/context.hpp>
 #include <bxx/classes/property_classes.hpp>
 #include <bxx/classes/ui_layout.hpp>
 #include <bxx/builders/operator_builder.hpp>
@@ -58,6 +59,11 @@ namespace bxx
             }
         };
 
+        virtual python_object invoke(context ctx, python_object evt)
+        {
+            return python_object();
+        }
+
         PYFIELD(ui_layout, layout);
 
         void register_class_internal() final
@@ -78,6 +84,13 @@ namespace bxx
             op.set_draw([this](python_object obj) {
                 T(obj.get_pyobject()).draw();
             });
+
+            if (!std::is_same<decltype(&T::invoke), decltype(&operator_class::invoke)>::value)
+            {
+                op.set_invoke([this](python_object self, python_object ctx, python_object evt) {
+                    return T(self.get_pyobject()).invoke(context(ctx), evt);
+                });
+            }
         }
     };
 }

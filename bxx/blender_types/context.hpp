@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bxx/blender_types/window_manager.hpp>
+#include <bxx/objects/python_object.hpp>
+
 #include <string>
 
 namespace bxx
@@ -26,9 +29,11 @@ namespace bxx
         UNKNOWN
     };
 
-    class context
+    class context : python_object
     {
     public:
+        using python_object::python_object;
+        PYFIELD_READ(bxx::window_manager, window_manager);
         void set_mode(editor_mode mode);
         editor_mode get_mode();
         view_layer get_view_layer();

@@ -39,11 +39,18 @@ namespace bxx
         return *this;
     }
 
+    operator_builder& operator_builder::set_invoke(std::function<python_object(python_object, python_object, python_object)> invoke)
+    {
+        m_invoke = invoke;
+        return *this;
+    }
+
     operator_builder& operator_builder::set_callback(std::function<void(python_object)> callback)
     {
         m_callback = callback;
         return *this;
     }
+
 
     operator_builder& operator_builder::set_draw(std::function<void(python_object)> callback)
     {
@@ -110,7 +117,7 @@ namespace bxx
         size_t event_index = lib_register_event([cb](python_tuple args) {
             cb(python_object(args.get<python_object>(0)));
             return python_object();
-            });
+        });
 
         class_header_builder::write(builder, [&]() {
             property_builder<operator_builder>::write(builder);
@@ -128,7 +135,18 @@ namespace bxx
                 builder.begin_line("def invoke(self, context, event):");
                 {
                     auto block = builder.scoped_block(python_builder::no_brackets, 1);
-                    builder.write_line("return context.window_manager.invoke_props_dialog(self)");
+                    if (m_invoke)
+                    {
+                        auto invoke = m_invoke;
+                        size_t invoke_id = lib_register_event([invoke](python_tuple args) {
+                            return invoke(args.get_item(0), args.get_item(1), args.get_item(2));
+                        });
+                        builder.write_line("return fire_event({},{},self,context,event)", get_script_index(), invoke_id);
+                    }
+                    else
+                    {
+                        builder.write_line("return context.window_manager.invoke_props_dialog(self)");
+                    }
                 }
 
                 builder.begin_line("def draw(self, context):");

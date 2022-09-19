@@ -47,7 +47,7 @@ namespace bxx
         exec({
             "bpy.context.view_layer.objects.active = None",
             "bpy.context.view_layer.update()"
-            });
+        });
     }
 
     void context::set_active_object(object const& object)
@@ -72,7 +72,6 @@ namespace bxx
 
     context get_context()
     {
-        return context();
+        return context(eval_pyobject("out = bpy.context"));
     }
 }
-
