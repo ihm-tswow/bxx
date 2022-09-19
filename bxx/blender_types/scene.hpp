@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bxx/objects/id.hpp>
+#include <bxx/builders/property_builder.hpp>
 #include <bxx/blender_types/blender_types.hpp>
 #include <bxx/blender_types/iterables.hpp>
 
@@ -12,6 +13,7 @@ namespace bxx
     class scene : public id<bl_scene>
     {
     public:
+        using ref = property_entry_ref<"bpy.types.Scene", scene>;
         using id<bl_scene>::id;
         view_layers view_layers();
     private:
