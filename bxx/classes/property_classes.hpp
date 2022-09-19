@@ -136,7 +136,7 @@ namespace bxx
 
         std::int64_t get_value()
         {
-            return m_owner->getattr<double>(m_id);
+            return m_owner->getattr<std::int64_t>(m_id);
         }
     protected:
         void write_to(class_property_builder& builder) final
@@ -322,6 +322,11 @@ namespace bxx
         void remove(std::uint32_t index)
         {
             m_owner->getattr(m_id).call("remove", index);
+        }
+
+        ref_type::cxx_type get_item(std::uint32_t index)
+        {
+            return m_owner->getattr(m_id).get_item<ref_type::cxx_type>(index);
         }
 
         void write_to(class_property_builder& builder) final
