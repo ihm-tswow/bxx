@@ -9,6 +9,7 @@ namespace bxx
 {
     class view_layer;
     class scene;
+    class screen;
     class object;
 
     enum class editor_mode
@@ -38,6 +39,7 @@ namespace bxx
         editor_mode get_mode();
         view_layer get_view_layer();
         scene get_scene();
+        screen get_screen();
         void select_all();
         void deselect_all();
         void clear_active_object();

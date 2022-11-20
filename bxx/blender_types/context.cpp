@@ -2,6 +2,7 @@
 #include <bxx/blender_types/view_layer.hpp>
 #include <bxx/blender_types/scene.hpp>
 #include <bxx/blender_types/object.hpp>
+#include <bxx/blender_types/screen.hpp>
 #include <bxx/enums.hpp>
 #include <common/exec.hpp>
 
@@ -68,6 +69,11 @@ namespace bxx
     void context::update()
     {
         exec("bpy.context.view_layer.update()");
+    }
+
+    screen context::get_screen()
+    {
+        return getattr<screen>("screen");
     }
 
     context get_context()
