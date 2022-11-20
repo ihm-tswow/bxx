@@ -53,6 +53,10 @@ namespace bxx
             iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
             friend bool operator== (const iterator& a, const iterator& b) { return a.m_obj.get_pyobject() == b.m_obj.get_pyobject() && a.m_index == b.m_index; }
             friend bool operator!= (const iterator& a, const iterator& b) { return !(a == b); }
+            iterator(python_object const& obj, size_t index)
+                : m_obj(obj)
+                , m_index(index)
+            {}
         private:
             python_object m_obj;
             size_t m_index;
@@ -65,4 +69,4 @@ namespace bxx
     };
 }
 
-#include <bxx/blender_types/iterables.hpp>
+#include <bxx/blender_types/iterables.ipp>
