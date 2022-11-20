@@ -1,7 +1,28 @@
 #include <bxx/mathutils.hpp>
+#include <bxx/objects/python_object.hpp>
 
 namespace mathutils
 {
+    rgba::rgba(bxx::python_object_weak obj)
+        : r(obj.get_item<float>(0)), g(obj.get_item<float>(1)), b(obj.get_item<float>(2)), a(obj.get_item<float>(3))
+    {
+    }
+
+    vec3::vec3(bxx::python_object_weak obj)
+        : x(obj.get_item<float>(0)), y(obj.get_item<float>(1)), z(obj.get_item<float>(2))
+    {
+    }
+
+    vec2::vec2(bxx::python_object_weak obj)
+        : x(obj.get_item<float>(0)), y(obj.get_item<float>(1))
+    {
+    }
+
+    quaternion::quaternion(bxx::python_object_weak obj)
+        : w(obj.get_item<float>(0)), x(obj.get_item<float>(1)), y(obj.get_item<float>(2)), z(obj.get_item<float>(2))
+    {
+    }
+
     mathutils::vec3::vec3(float _x, float _y, float _z)
         : x(_x), y(_y), z(_z)
     {}
@@ -9,7 +30,6 @@ namespace mathutils
     mathutils::vec2::vec2(float _x, float _y)
         : x(_x), y(_y)
     {}
-
 
     mathutils::quaternion::quaternion(float _w, float _x, float _y, float _z)
         : w(_w), x(_x), y(_y), z(_z)

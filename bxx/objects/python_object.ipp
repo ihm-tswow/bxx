@@ -287,55 +287,6 @@ namespace bxx
             BXX_SCRIPT_ASSERT(PyFloat_Check(obj), python_type_error, "tried to extract double from non-float python object");
             return PyFloat_AsDouble(obj);
         }
-
-        template <> inline mathutils::vec2 py2cxx<mathutils::vec2>(PyObject* obj)
-        {
-            BXX_SCRIPT_ASSERT(obj, python_object_error, "tried to create vec2 from null python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), python_type_error, "tried to extract vec2 from non-tuple python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Size(obj) >= 2, python_size_error, "tried to create vec2 from too small tuple");
-            return {
-                py2cxx<float>(PyTuple_GetItem(obj,0)),
-                py2cxx<float>(PyTuple_GetItem(obj,1))
-            };
-        }
-
-        template <> inline mathutils::vec3 py2cxx<mathutils::vec3>(PyObject* obj)
-        {
-            BXX_SCRIPT_ASSERT(obj, python_object_error, "tried to create vec3 from null python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), python_type_error, "tried to extract vec3 from non-tuple python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Size(obj) >= 3, python_size_error, "tried to create vec3 from too small tuple");
-            return {
-                py2cxx<float>(PyTuple_GetItem(obj,0)),
-                py2cxx<float>(PyTuple_GetItem(obj,1)),
-                py2cxx<float>(PyTuple_GetItem(obj,2))
-            };
-        }
-
-        template <> inline mathutils::quaternion py2cxx<mathutils::quaternion>(PyObject* obj)
-        {
-            BXX_SCRIPT_ASSERT(obj, python_object_error, "tried to create quaternion from null python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), python_type_error, "tried to extract quaternion from non-tuple python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Size(obj) >= 4, python_size_error, "tried to create quaternion from too small tuple");
-            return {
-                py2cxx<float>(PyTuple_GetItem(obj,0)),
-                py2cxx<float>(PyTuple_GetItem(obj,1)),
-                py2cxx<float>(PyTuple_GetItem(obj,2)),
-                py2cxx<float>(PyTuple_GetItem(obj,3))
-            };
-        }
-
-        template <> inline mathutils::rgba py2cxx<mathutils::rgba>(PyObject* obj)
-        {
-            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), python_object_error, "tried to extract rgba from non-tuple python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Check(obj), python_type_error, "tried to extract quaternion from non-tuple python object");
-            BXX_SCRIPT_ASSERT(PyTuple_Size(obj) >= 4, python_size_error, "tried to create rgba from too small tuple");
-            return {
-                py2cxx<float>(PyTuple_GetItem(obj,0)),
-                py2cxx<float>(PyTuple_GetItem(obj,1)),
-                py2cxx<float>(PyTuple_GetItem(obj,2)),
-                py2cxx<float>(PyTuple_GetItem(obj,3))
-            };
-        }
     }
 
     template <typename ...Args>

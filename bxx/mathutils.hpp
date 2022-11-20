@@ -2,6 +2,11 @@
 
 #include <ostream>
 
+namespace bxx
+{
+    class python_object_weak;
+}
+
 // mathutils is for our own primitive math types
 namespace mathutils
 {
@@ -10,6 +15,7 @@ namespace mathutils
         rgba(float _r, float _g, float _b, float _a = 255)
             : r(_r), g(_g), b(_b), a(_a)
         {}
+        rgba(bxx::python_object_weak obj);
         float r;
         float g;
         float b;
@@ -19,6 +25,7 @@ namespace mathutils
     struct vec3
     {
         vec3(float x, float y, float z);
+        vec3(bxx::python_object_weak obj);
         float x;
         float y;
         float z;
@@ -27,6 +34,7 @@ namespace mathutils
     struct vec2
     {
         vec2(float x, float y);
+        vec2(bxx::python_object_weak obj);
         float x;
         float y;
     };
@@ -34,6 +42,7 @@ namespace mathutils
     struct quaternion
     {
         quaternion(float w, float x, float y, float z);
+        quaternion(bxx::python_object_weak obj);
         float w;
         float x;
         float y;
