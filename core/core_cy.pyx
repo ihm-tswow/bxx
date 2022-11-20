@@ -47,6 +47,7 @@ registered_operators = {}
 registered_property_groups = {}
 registered_app_handlers = {}
 registered_classes = {}
+registered_timers = {}
 
 class python_functions: pass
 registered_python_functions = python_functions() # maps function names -> function callback
@@ -84,6 +85,13 @@ def register_operator(script,operator,show):
     bpy.utils.register_class(operator)
     bpy.types.VIEW3D_MT_object.append(show)
 
+def register_timer(script,event,first):
+    global registered_timers
+    if not script in registered_timers:
+        registered_timers[script] = []
+    registered_timers[script].append(event)
+    bpy.app.timers.register(event,first_interval=first,persistent=True)
+
 def register_cxx_function(name,script,event):
     global registered_cxx_functions
     if name in registered_cxx_functions:
@@ -111,6 +119,11 @@ def unregister_script(script):
         for cls in registered_classes[script]:
             bpy.utils.unregister_class(cls)
         registered_classes[script] = []
+
+    if script in registered_timers:
+        for cls in registered_timers[script]:
+            bpy.app.timers.unregister(cls)
+        registered_timers[script] = []
 
     removed_names = []
     for func_name,(func_script,func_event) in registered_cxx_functions.items():
@@ -183,6 +196,7 @@ def build_context(script):
     if script in registered_classes:
         for cls in registered_classes[script]:
             context[cls.__name__] = cls
+    context['register_timer'] = register_timer
     return context
 
 cdef int cy_exec(int script, char* exec_bytes):
